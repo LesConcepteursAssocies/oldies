@@ -1,0 +1,606 @@
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+// Module Arbo - Gestion des arborescences des services			      //
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+// Version 1.02                                                               //
+// 									      //
+// Date de cration     : 17/02/95				              //
+// Date de Mise … jour  : 13/04/95				              //
+// 								              //
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+
+PUBLIC
+     CHAR   _PROMPT := "\25\46"
+
+LOCAL
+     NUMBER MyArbo        := 1
+     NUMBER XcursorPos    := 1
+     NUMBER YcursorPos    := 1
+     NUMBER CursorActive  := 0
+     NUMBER CursorVisible := 1
+
+     // { Champs de l'arborescence }
+
+     CHAR   ArboProcInit := " "
+     CHAR   ArboProcRun  := " "
+     CHAR   ArboProcDone := " "
+     CHAR   ArboPageHaut := " "
+     CHAR   ArboPage     := " "
+     CHAR   ArboPageBas  := " "
+     CHAR   ProcSommaire := " "
+     CHAR   ProcRetour   := " "
+     CHAR   ProcSuite    := " "
+     CHAR   TmpC         := " "
+
+     NUMBER Xloc := 0
+     NUMBER Yloc := 0
+     NUMBER Clignote
+     NUMBER ArboNbChoix  := 1
+     NUMBER ArboPos
+     NUMBER ArboSpc
+     NUMBER Texte
+     NUMBER Tsommaire
+     NUMBER Tsuite
+     NUMBER Tretour
+     NUMBER BandeauPub
+
+     NUMBER _Debug := 0
+     NUMBER CtrlStack
+
+     NUMBER Tmp
+     NUMBER Clavier
+     NUMBER Res
+     NUMBER CurX
+     NUMBER CurY
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Affichage d'un message en ligne 0 }
+//
+: Msg0          // n c ---
+
+  Line0
+  delay
+  clear0
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Gestion de la touche ENVOI }
+//
+: Envoi
+
+	8 Clavier :=
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion de la touche SUITE
+//
+: Suite
+
+	7 Clavier :=
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+//
+// Gestion de la touche SOMMAIRE
+//
+: Sommaire
+
+	1 Clavier :=
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion de la touche RETOUR
+//
+: Retour
+
+	3 Clavier :=
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affectation des touches de fonctions
+//
+: AffectTouches
+
+     setlocalfkey FKSOMMAIRE Sommaire
+     setlocalfkey FKRETOUR Retour
+     setlocalfkey FKENVOI Envoi
+     setlocalfkey FKSUITE Suite
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Rinitialisation des touches de fonctions … leur valeur par dfaut }
+//
+: DefautTouches
+
+	EmptyLocalFkeyTable
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Gestion des bandeaux publicitaires }
+//
+: GestionBandeau
+
+  randomize
+  5 rnd !
+  if
+    " modules\pages\pubneo.vtx" SendPage
+
+  endif
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Procdure de gestion de l'arborescense }
+//
+: Arbo
+
+    MyArbo :=
+
+    Begin
+         // { Contr“le de pile }
+         stack# ctrlstack :=
+
+         AffectTouches
+         App DbSelect
+         " CODEPAGE" DbSetIndex
+
+	 MyArbo Str DbSeek
+	 if
+	   // { On rcupre les donnes de la base }
+
+           " PROCINIT"   DbField ArboProcInit :=
+	   " PROCRUN"    DbField ArboProcRun :=
+	   " PROCDONE"   DbField ArboProcDone :=
+           " PAGEHAUT"   DbField ArboPageHaut :=
+           " PAGE"       DbField ArboPage :=
+           " PAGEBAS"    DbField ArboPageBas :=
+           " NBCHOIX"    DbField ArboNbChoix :=
+           " XLOCATE"    DbField Xloc :=
+           " YLOCATE"    DbField Yloc :=
+           " DEFAUT"     DbField ArboPos :=
+           " ESPACEMENT" DbField ArboSpc :=
+           " CLIGNOTE"   DbField Clignote :=
+           " TEXTE"      DbField Texte :=
+           " SOMMAIRE"   DbField Tsommaire :=
+           " SUITE"      DbField Tsuite :=
+           " RETOUR"     DbField Tretour :=
+           " PROCSOMM"   DbField ProcSommaire :=
+           " PROCSUITE"  DbField ProcSuite :=
+           " PROCRET"    DbField ProcRetour :=
+           " BANDEAUPUB" DbField BandeauPub :=
+
+           ArboProcInit alltrim ArboProcInit :=
+           ArboProcRun  alltrim ArboProcRun  :=
+           ArboProcDone alltrim ArboProcDone :=
+           ArboPageHaut alltrim ArboPageHaut :=
+           ArboPage     alltrim ArboPage     :=
+           ArboPageBas  alltrim ArboPageBas  :=
+           ProcSommaire alltrim ProcSommaire :=
+           ProcRetour   alltrim ProcRetour   :=
+           ProcSuite    alltrim ProcSuite    :=
+
+           // { On affiche le bandeau du haut si il y a lieu }
+           ArboPageHaut empty? ! ArboPageHaut " XX" != &&
+           if
+             CursorOff
+	     ArboPageHaut SendPage
+
+           endif
+
+           // { On affiche la page si il y a lieu }
+           ArboPage empty? ! ArboPage " XX" != &&
+           if
+             CursorOff
+	     ArboPage SendPage
+
+           endif
+
+           // { On affiche le bandeau du bas si il y a lieu }
+           ArboPageBas empty? ! ArboPageBas " XX" != &&
+           if
+             CursorOff
+	     ArboPageBas SendPage
+
+           endif
+
+           // { Gestion du bandeau publicitaire }
+           BandeauPub
+           if
+             GestionBandeau
+
+           endif
+
+           // { On excute la procdure Init si il y a lieu }
+           ArboProcInit empty? ! ArboProcInit " XX" != &&
+           if
+
+             APP Tmpc :=
+             " ::" Tmpc strcat
+             ArboProcInit Tmpc strcat
+
+             _Debug
+             if
+             	     Tmpc display
+             endif
+
+	     Tmpc Execute
+
+	     // { Rinitialisation des affectations de touches }
+             AffectTouches
+
+	   endif
+
+	   // { On excute la procdure Run si il y a lieu }
+	   ArboProcRun empty? ! ArboProcRun " XX" != &&
+	   if
+
+             APP Tmpc :=
+             " ::" Tmpc strcat
+             ArboProcRun Tmpc strcat
+
+             _Debug
+             if
+
+	       Tmpc display
+
+             endif
+
+	     Tmpc Execute
+
+	     // { Rinitialisation des affectations de touches }
+             AffectTouches
+
+	   else
+                // { S'agit il d'une page de texte sans menu ? }
+                Texte
+                if
+
+                  // { Rponse aux touches de fonctions }
+		  0 Clavier :=
+		  0 Res :=
+
+		  Begin
+		         Clavier
+		         case
+			     7 of   // { SUITE }
+
+                                 Tsuite Empty? !
+                                 if
+
+                                   Tsuite MyArbo :=
+			           1 Res :=
+
+                                   ProcSuite Empty? !
+                                   if
+
+                                     APP Tmpc :=
+                                     " ::" Tmpc strcat
+                                     ProcSuite Tmpc strcat
+                                     _Debug if Tmpc display endif
+                                     Tmpc Execute
+
+                                   endif
+
+                                 endif
+
+                                 0 Clavier :=
+
+			     endof
+
+			     3 of   // { RETOUR }
+
+                                 Tretour Empty? !
+                                 if
+
+                                   Tretour MyArbo :=
+			           1 Res :=
+
+                                   ProcRetour Empty? !
+                                   if
+
+                                     APP Tmpc :=
+                                     " ::" Tmpc strcat
+                                     ProcRetour Tmpc strcat
+                                     _Debug if Tmpc display endif
+                                     Tmpc Execute
+
+                                   endif
+
+                                 endif
+
+                                 0 Clavier :=
+
+			     endof
+
+			     1 of   // { SOMMAIRE }
+
+                                 Tsommaire Empty? !
+                                 if
+
+                                   Tsommaire MyArbo :=
+			           1 Res :=
+
+                                   ProcSommaire Empty? !
+                                   if
+
+                                     APP Tmpc :=
+                                     " ::" Tmpc strcat
+                                     ProcSommaire Tmpc strcat
+                                     _Debug if Tmpc display endif
+                                     Tmpc Execute
+
+                                   endif
+
+                                 endif
+
+                                 0 Clavier :=
+
+			     endof
+
+                             drop
+
+		         endcase
+
+		    Res UNTIL
+
+                else
+
+                    // { Affichage de la 1ere option }
+		    ArboPos 1 - ArboSpc * Tmp :=
+		    Yloc Tmp +=
+                    cursoroff
+		    Tmp Xloc Locate
+                    clignote if blinkon endif
+                    _PROMPT print
+                    clignote if blinkoff endif
+                    CursorActive
+                    if
+                      YcursorPos XcursorPos Locate
+                      CursorVisible
+                      if
+                        cursoron
+
+                      endif
+
+                    endif
+
+		    // { On saisit }
+		    0 Clavier :=
+		    0 Res :=
+
+		    Begin
+		         Clavier
+
+		         case
+		             8 of   // { ENVOI }
+
+                               0 clavier :=
+
+                               // { Saisie du numro de l'option en dur }
+
+                               data empty? !
+                               if
+                                 data val ArboNbChoix >
+                                 data val 1 <
+                                 ||
+                                 if
+                                   // { Saisie invalide }
+                                   FALSE Res :=
+                                   1500 " Choix invalide !" Msg0
+                                   YcursorPos XcursorPos Locate
+
+                                 else
+                                     TRUE Res :=
+                                     data val ArboPos :=
+
+                                 endif
+
+                               else
+			           TRUE Res :=
+
+                               endif
+
+                               Res
+                               if
+                                 // { On calcule le code page }
+			         10 MyArbo *=
+			         ArboPos MyArbo +=
+
+                               endif
+
+			     endof
+
+			     7 of   // { SUITE }
+
+                                 cursoroff
+			         Tmp Xloc Locate "  " print
+			         ArboPos ++
+			         ArboPos ArboNbChoix >
+			         if
+
+			           1 ArboPos :=
+
+			         endif
+
+			         ArboPos Tmp :=
+			         Tmp --
+			         ArboSpc Tmp *=
+			         Yloc Tmp +=
+                                 Tmp Xloc Locate
+                                 clignote if blinkon endif
+			         _PROMPT print
+                                 clignote if blinkoff endif
+                                 CursorActive
+                                 if
+                                   YcursorPos XcursorPos Locate
+                                   CursorVisible
+                                   if
+                                     cursoron
+
+                                   endif
+
+                                 endif
+
+			         0 Clavier :=
+
+			     endof
+
+			     3 of   // { RETOUR }
+
+			         Tmp Xloc Locate "  " print
+			         ArboPos --
+			         ArboPos 0 ==
+			         if
+
+			           ArboNbChoix ArboPos :=
+
+			         endif
+
+			         ArboPos Tmp :=
+			         Tmp --
+			         ArboSpc Tmp *=
+			         Yloc Tmp +=
+                                 clignote if blinkon endif
+			         Tmp Xloc Locate
+                                 _PROMPT print
+                                 clignote if blinkoff endif
+                                 CursorActive
+                                 if
+                                   YcursorPos XcursorPos Locate
+                                   CursorVisible
+                                   if
+                                     cursoron
+
+                                   endif
+
+                                 endif
+
+			         0 Clavier :=
+
+			     endof
+
+			     1 of   // { SOMMAIRE }
+
+			       1 Res :=
+
+                               // { On calcule le code page }
+			       1 MyArbo !=
+			       if
+
+				 10 MyArbo /=
+				 MyArbo Int MyArbo :=
+
+			       endif
+
+			     endof
+
+                             drop
+
+		         endcase
+
+		    Res UNTIL
+
+                endif
+
+	   endif
+
+	   // { On excute la procdure Done si il y a lieu }
+	   ArboProcDone empty? ! ArboProcDone " XX" != &&
+	   if
+
+             APP Tmpc :=
+             " ::" Tmpc strcat
+             ArboProcDone Tmpc strcat
+	     _Debug if Tmpc display endif
+	     Tmpc Execute
+
+	   endif
+
+	 else
+	     " Choix non propos" Line0
+
+	     // { On remet l'index de base }
+	     1 MyArbo :=
+
+	 endif
+
+         // { Contr“le de pile }
+         stack# ctrlstack !=
+         if
+           beep 150 delay beep 150 delay beep 150 delay beep 150 delay beep
+           " *******************************************************" display
+           " * Message de la librairie ARBO :                       " display
+           " * Erreur de pile dans un appel de procdure spcifique " display
+           ArboProcInit empty? !
+           if
+             " * ArboProcInit = " Tmpc :=
+             ArboProcInit Tmpc strcat Tmpc display
+
+           endif
+
+           ArboProcRun empty? !
+           if
+             " * ArboProcRun = " Tmpc :=
+             ArboProcRun Tmpc strcat Tmpc display
+
+           endif
+
+           ArboProcDone empty? !
+           if
+             " * ArboProcDone = " Tmpc :=
+             ArboProcDone Tmpc strcat Tmpc display
+
+           endif
+
+           " *******************************************************" display
+
+         endif
+
+    Again
+;
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Version 1.01 du 20/03/95
+// ------------------------
+//
+//      - Ajout du clignotement de l'toile
+//      - Gestion des bandeaux publicitaires
+//      - Affiche de la page Arbo mme en cas de procdure spcifique
+//      - Affichage spar des bandeaux haut et bas
+//      - Contr“le du nombre de symboles sur la pile
+//
+// Version 1.02 du 11/04/95
+// ------------------------
+//
+//	- Possibilit de grer aussi bien les menus classiques que les menus
+//	- Remplacement de l'toile par une flche
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+
+

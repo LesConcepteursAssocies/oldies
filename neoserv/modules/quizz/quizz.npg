@@ -1,0 +1,336 @@
+// ีอออออออออออออัอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออธ
+// ณQUIZZ.NPG    ณ                                                           ณ
+// รฤฤฤฤฤฤฤฤฤฤฤฤฤู                                                           ณ
+// ณDernire modification : 24/05/1995                                       ณ
+// ณ                                                                         ณ
+// ณModule Quizz Multi-Services.                                             ณ
+// ิอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออพ
+//
+// Le quizz utilise les bal
+#use modules\balgp\balgp
+
+// Dclaration des variables.
+local
+number nchoix nlig bonnerep points score nbquestion
+number maxquestion := 40 numquestion bAjoue
+char   csaisie clequizz pseudo
+number[] 1 40 tquest
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Sauvegarde des infos du joueur.
+//
+: SauveJoueur
+   " JOUEURS" dbselect
+   " PSEUDO" dbsetindex
+   app "  " 10 padr clequizz :=
+   pseudo alltrim clequizz strcat
+   clequizz dbseek !
+   if
+      // Nouveau joueur
+      dbappendblank
+   endif
+   app            " SERVICE"   dbreplace
+   pseudo alltrim " PSEUDO"    dbreplace
+   score          " SCORE"     dbreplace
+   nbquestion     " QUESTIONS" dbreplace
+   dbcommit
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Rcupration des infos du joueur.
+//
+: RecupJoueur
+   " JOUEURS" dbselect
+   " PSEUDO" dbsetindex
+   app "  " 10 padr clequizz :=
+   pseudo alltrim clequizz strcat
+   clequizz dbseek
+   if
+      " SCORE" dbfield score :=
+      " QUESTIONS" dbfield nbquestion :=
+   else
+      0 score :=
+      0 nbquestion :=
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Tirage d'une question
+//
+: TirageAuSort
+  " QUIZZ" dbselect
+  " QUIZZ" dbsetindex
+  // A voir: compter les question d'un service
+  randomize
+  begin
+     app "  " 10 padr clequizz :=
+     // Tirage d'un numro unique
+     dbreccount rnd 1 + dup
+     tquest asearch nip nip
+     if
+        // Question dj… pose.
+        drop false
+     else
+        // On conserve le numro tir
+        dup 0 numquestion 1 - tquest :=
+        str "  " 4 padl clequizz strcat
+        clequizz dbseek
+     endif
+  until
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage de la question courante.
+//
+: AfficheQuestion
+   cursoroff
+   " QUESTION" dbfield 11 1 locate print
+   " REP1" dbfield 15 4 locate black setcolor print
+   " REP2" dbfield 17 4 locate black setcolor print
+   " REP3" dbfield 19 4 locate black setcolor print
+   " REP4" dbfield 21 4 locate black setcolor print
+   " BONNEREP" dbfield bonnerep :=
+   " POINTS" dbfield points :=
+   cursoron
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gagn !!
+: Gagne
+   " Bravoooo !!" line0
+   // On ajoute les points au score
+   points score +=
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Perdu !!
+: Perdu
+   " Perduuuuu !!" line0
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Fin du jeu
+//
+: FinDuJeu
+   cursoroff
+   " MODULES\QUIZZ\FINJEU.VTX" sendpage
+   score 9 29 locate fdheight setfont print
+   cursoroff
+   23 39 locate
+   wait
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// On joue!!
+//
+: JouerAuQuizz
+   false bAjoue :=
+   1 numquestion :=
+   0 tquest afill
+   cursoroff
+   " MODULES\QUIZZ\JOUER.VTX" sendpage
+   7 11 locate pseudo alltrim print
+   10 17 locate maxquestion print
+   begin
+      8 11 locate score print
+      10 14 locate black setcolor numquestion print
+      TirageAuSort
+      AfficheQuestion
+      10 38 locate black setcolor points print
+      cursoron
+      23 29 locate
+      input csaisie :=
+      fkey fksommaire !=
+      if
+         csaisie val nchoix :=
+         nchoix dup 0 > swap 5 < &&
+         if
+            // Un numro de rponse est choisi.
+            nchoix bonnerep ==
+            if
+               Gagne
+            else
+               Perdu
+            endif
+            true bAjoue :=
+            // Question suivante
+            numquestion ++
+         else
+            " Choix incorrect !" line0
+         endif
+      endif
+      fkey fksommaire ==
+      numquestion maxquestion >
+      ||
+   until
+   bAjoue
+   if
+      numquestion nbquestion +=
+      SauveJoueur
+      FinDuJeu
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage des rgles du jeu.
+//
+: AffRegles
+   cursoroff
+   " MODULES\QUIZZ\REGLES1.VTX" sendpage
+   cursoron
+   23 39 locate
+   wait
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage de la liste des meilleurs
+//
+: AffListe
+   cursoroff
+   10 nlig :=
+   begin
+      dbeof !
+      app " SERVICE" dbfield alltrim == &&
+      nlig 21 <= &&
+   while
+      nlig  2 locate " PSEUDO" dbfield alltrim black setcolor print
+      nlig 25 locate " SCORE" dbfield str "  " 5 padl black setcolor print
+      nlig 34 locate " QUESTIONS" dbfield str "  " 5 padl black setcolor print
+      1 dbskip
+      nlig ++
+   repeat
+   cursoron
+   23 29 locate
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage des meilleurs
+//
+: AffMeilleurs
+   cursoroff
+   " MODULES\QUIZZ\HISCORE.VTX" sendpage
+   cursoron
+   " JOUEURS" dbselect
+   " SCORE" dbsetindex
+   app dbseek
+   if
+      AffListe
+      wait
+      fkey fkenvoi ==
+      if
+         // Battre les meilleurs
+         balgp.pseudo empty?
+         if
+            balgp::accesbal
+            cursoroff
+            " MODULES\QUIZZ\BDXQUIZZ.VTX" sendpage
+            cursoron
+         endif
+         balgp.pseudo pseudo :=
+         fkey fksommaire !=
+         if
+            RecupJoueur
+            JouerAuQuizz
+         endif
+      endif
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Menu gnral du Module.
+//
+: MenuGen
+   " %0.f" using
+   // On sauvegarde la base courante.
+   dbselected
+   // Ouverture des fichiers principaux.
+   " MODULES\QUIZZ\QUIZZ" dbopen
+   " MODULES\QUIZZ\JOUEURS" dbopen
+   &&
+   if
+      cursoroff
+      " MODULES\QUIZZ\MENUGEN.VTX" sendpage
+      cursoron
+      begin
+         23 29 locate
+         input csaisie :=
+         fkey fksommaire !=
+      while
+         csaisie val nchoix :=
+         nchoix
+         case
+            1 of
+                 // Rgles du jeu.
+                 AffRegles
+                 // On raffiche le menu
+                 cursoroff
+                 " MODULES\QUIZZ\MENUGEN.VTX" sendpage
+                 cursoron
+              endof
+            2 of
+                 // Jouer.
+                 balgp.pseudo empty?
+                 if
+                    balgp::accesbal
+                    cursoroff
+                    " MODULES\QUIZZ\BDXQUIZZ.VTX" sendpage
+                    cursoron
+                 endif
+                 balgp.pseudo pseudo :=
+                 fkey fksommaire !=
+                 if
+                    RecupJoueur
+                    JouerAuQuizz
+                 endif
+                 // On raffiche le menu
+                 cursoroff
+                 " MODULES\QUIZZ\MENUGEN.VTX" sendpage
+                 cursoron
+              endof
+            3 of
+                 // Liste des meilleurs.
+                 " JOUEURS" dbselect
+                 " SCORE" dbsetindex
+                 app dbseek
+                 if
+                    AffMeilleurs
+                    // On raffiche le menu
+                    cursoroff
+                    " MODULES\QUIZZ\MENUGEN.VTX" sendpage
+                    cursoron
+                 else
+                    " Pas de meilleurs pour l'instant" line0
+                 endif
+              endof
+            drop
+            " Choix incorrect" line0
+         endcase
+      repeat
+      " JOUEURS" dbclose
+      " QUIZZ" dbclose
+   else
+      " ERREUR A L'OUVERTURE DES FICHIERS" line0
+   endif
+   // On reslectionne l'ancienne base
+   dup empty? !
+   if
+      dbselect
+   else
+      drop
+   endif
+   usingoff
+;
+

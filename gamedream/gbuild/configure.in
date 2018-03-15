@@ -1,0 +1,237 @@
+dnl -----------------------------------------------------------------------
+dnl Projet GameDream
+dnl
+dnl Auteur		 : Guillaumaud Philippe
+dnl
+dnl commencé le		 : 01/04/1999
+dnl dernière modification: 25/02/2000
+dnl
+dnl configure.in
+dnl -----------------------------------------------------------------------
+
+dnl Version minimum requise de autoconf
+AC_PREREQ(2.13)
+dnl -----------------------------------------------------------------------
+dnl AC_INIT pointe sur un fichier qui doit toujours exister dans le projet.
+dnl -----------------------------------------------------------------------
+AC_INIT(configure.in)
+VERSION=`cat ${srcdir}/.version`
+
+dnl -----------------------------------------------------------------------
+dnl définition de quelques constantes relatives au projet
+dnl -----------------------------------------------------------------------
+GDREAM_MAJOR_VERSION=[`expr $VERSION : '\([0-9][0-9]*\)'`]
+AC_SUBST(GDREAM_MAJOR_VERSION)
+GDREAM_MINOR_VERSION=[`expr $VERSION : '[0-9][0-9]*\.\([0-9][0-9]*\)'`]
+AC_SUBST(GDREAM_MINOR_VERSION)
+GDREAM_MICRO_VERSION=[`expr $VERSION : '[0-9][0-9]*\.[0-9][0-9]*\.\([0-9][0-9]*\)'`]
+AC_SUBST(GDREAM_MICRO_VERSION)
+
+dnl -----------------------------------------------------------------------
+dnl Initialisation d'automake
+dnl -----------------------------------------------------------------------
+AM_INIT_AUTOMAKE([gbuild], $VERSION)
+
+dnl -----------------------------------------------------------------------
+dnl Utilisé par autoheader
+dnl -----------------------------------------------------------------------
+AM_CONFIG_HEADER(config.h)
+
+dnl -----------------------------------------------------------------------
+dnl détection du compilateur et autres outils nécessaires
+dnl -----------------------------------------------------------------------
+AC_ISC_POSIX
+AC_PROG_CC
+AM_PROG_CC_STDC
+dnl AC_HEADER_STDC
+AC_PROG_CXX
+
+dnl -----------------------------------------------------------------------
+dnl Options de par défaut
+CXXFLAGS="-O2"
+AC_SUBST(CXXFLAGS)
+
+dnl -----------------------------------------------------------------------
+dnl Options d'optimisations supplémentaires
+dnl -----------------------------------------------------------------------
+AC_ARG_ENABLE(optimize,
+[  --enable-optimize       enable extra optimization [default=on]],
+  enable_optim=$enableval, enable_optim=yes)
+if test "x$enable_optim" = xyes; then
+  dnl Optimization flags
+  if test "x$GCC" = xyes; then
+    CXXFLAGS="$CXXFLAGS -fomit-frame-pointer -ffast-math -fexpensive-optimizations"
+    case "$host" in
+    i*86-*-*) CXXFLAGS="$CXXFLAGS -malign-loops=2 -malign-jumps=2 -malign-functions=2";;
+    esac
+  fi
+fi
+
+dnl -----------------------------------------------------------------------
+dnl warnings maximum (merci loic...)
+dnl -----------------------------------------------------------------------
+AC_COMPILE_WARNINGS
+
+dnl -----------------------------------------------------------------------
+dnl détection des libraries X11
+dnl -----------------------------------------------------------------------
+AC_PATH_XTRA
+
+dnl -----------------------------------------------------------------------
+dnl détection de GTK
+dnl -----------------------------------------------------------------------
+AM_PATH_GTK(1.2.0,,AC_MSG_ERROR(GTK not installed, or gtk-config not in path))
+
+dnl -----------------------------------------------------------------------
+dnl détection de IMLIB
+dnl -----------------------------------------------------------------------
+AM_PATH_GDK_IMLIB(1.9.5,,AC_MSG_ERROR(IMLIB not installed, or imlib-config not in path))
+
+dnl -----------------------------------------------------------------------
+dnl détection de GL/MesaGL
+dnl -----------------------------------------------------------------------
+AC_ARG_WITH(GL-prefix,  [  --with-GL-prefix=DIR    Prefix where GL/MesaGL is installed])
+AC_ARG_WITH(lib-GL,     [  --with-lib-GL           use '-lGL'])
+AC_ARG_WITH(lib-MesaGL, [  --with-lib-MesaGL       use '-lMesaGL'])
+
+GL_LDOPTS=""
+GL_CFLAGS=""
+if test -n "${with_GL_prefix}"; then
+   GL_LDOPTS="-L${with_GL_prefix}/lib"
+   GL_CFLAGS="-I${with_GL_prefix}/include"
+fi
+
+AC_LANG_SAVE
+AC_LANG_C
+AC_CHECK_LIB(MesaGL, glBegin, have_MesaGL=yes, , ${GL_LDOPTS} ${X_LIBS} -lXi -lXmu -lpthread -lm)
+AC_CHECK_LIB(GL,     glBegin, have_GL=yes,     , ${GL_LDOPTS})
+AC_LANG_RESTORE
+
+if test "$have_GL" != yes && test "$with_lib_GL" = yes; then
+   AC_MSG_ERROR([Missing GL library])
+fi
+
+if test "$have_MesaGL" != yes && test "$with_lib_MesaGL" = yes; then
+   AC_MSG_ERROR([Missing MesaGL library])
+fi
+
+if test "$have_GL" = yes; then
+   GL_LIBS="${GL_LDOPTS} -lGLU -lGL"
+elif test "$have_MesaGL" = yes; then
+   GL_LIBS="${GL_LDOPTS} -lglut -lMesaGLU -lMesaGL ${X_LIBS} -lXi -lXmu -lpthread -lm"
+else
+   AC_MSG_ERROR([You need GL or MesaGL libraries])
+fi
+
+AC_SUBST(GL_CFLAGS)
+AC_SUBST(GL_LIBS)
+
+dnl -----------------------------------------------------------------------
+dnl détection de GtkGL
+dnl -----------------------------------------------------------------------
+AC_ARG_WITH(gtkgl-prefix, [  --with-gtkgl-prefix=PFX Prefix where GtkGLArea is installed],gtkgl_prefix="$withval",gtkgl_prefix="")
+
+if test x$gtkgl_prefix != x; then
+   GTKGL_CFLAGS="-I$gtkgl_prefix/include"
+   GTKGL_LDOPTS="-L$gtkgl_prefix/lib"
+else
+   GTKGL_CFLAGS=""
+   GTKGL_LDOPTS=""
+fi
+
+AC_MSG_CHECKING([for GtkGLArea])
+LIBS="$save_LIBS $GTK_LIBS $GL_LDOPTS $GL_LIBS $GTKGL_LDOPTS -lgtkgl"
+AC_TRY_LINK( ,[ char gtk_gl_area_new(); gtk_gl_area_new(); ], have_gtkgl=yes, have_gtkgl=no)
+AC_MSG_RESULT($have_gtkgl)
+
+if test x$have_gtkgl = xyes; then
+   LIBS="$saved_LIBS"
+   CFLAGS="$saved_CFLAGS"
+   GTKGL_CFLAGS="$GTKGL_CFLAGS $GL_CFLAGS"
+   GTKGL_LIBS="$GTKGL_LDOPTS -lgtkgl $GL_LDOPTS $GL_LIBS"
+   AC_SUBST(GTKSUP)
+else
+   AC_MSG_ERROR([You need GtkGL librarie])
+   LIBS="$saved_LIBS"
+   CFLAGS="$saved_CFLAGS"
+   GTKGL_LIBS=""
+   GTKGL_CFLAGS=""
+fi
+
+AC_SUBST(GTKGL_CFLAGS)
+AC_SUBST(GTKGL_LIBS)
+
+dnl -----------------------------------------------------------------------
+dnl Checks for dynamic linking
+dnl -----------------------------------------------------------------------
+AC_CHECK_LIB(dl,dlopen)
+if test "$ac_cv_lib_dl_dlopen" = "yes"; then
+  AC_CHECK_FUNCS(dlopen)
+else
+AC_CHECK_FUNCS(dlopen)
+if test "$ac_cv_func_dlopen" = "no"; then
+  AC_MSG_ERROR(Can't find dlopen.)
+fi
+fi
+
+dnl -----------------------------------------------------------------------
+dnl Locate the gnome-xml library
+dnl -----------------------------------------------------------------------
+AC_CHECK_PROG(XML_CONFIG, xml-config, xml-config)
+if test "$XML_CONFIG" != ""
+then
+  XML_LIBS="`$XML_CONFIG --libs`"
+  XML_CFLAGS="`$XML_CONFIG --cflags`"
+else
+  AC_MSG_ERROR(Can't find gnome-xml library.)
+fi
+AC_SUBST(XML_LIBS)
+AC_SUBST(XML_CFLAGS)
+
+dnl -----------------------------------------------------------------------
+dnl Support international, ajouter les langues à prendre en compte
+dnl -----------------------------------------------------------------------
+ALL_LINGUAS="fr"
+AM_GNU_GETTEXT
+localedir='${prefix}/${DATADIRNAME}/locale'
+AC_SUBST(localedir)
+
+dnl -----------------------------------------------------------------------
+dnl Define inclus dans le fichier config.h par autoheader
+dnl -----------------------------------------------------------------------
+dnl Set PACKAGE_LOCALE_DIR in config.h.
+if test "x${prefix}" = "xNONE"; then
+  AC_DEFINE_UNQUOTED(PACKAGE_LOCALE_DIR, "${ac_default_prefix}/${DATADIRNAME}/locale")
+else
+  AC_DEFINE_UNQUOTED(PACKAGE_LOCALE_DIR, "${prefix}/${DATADIRNAME}/locale")
+fi
+
+dnl -----------------------------------------------------------------------
+dnl Set PACKAGE_DATA_DIR in config.h.
+dnl -----------------------------------------------------------------------
+if test "x${datadir}" = 'x${prefix}/share'; then
+  if test "x${prefix}" = "xNONE"; then
+    AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${ac_default_prefix}/share/${PACKAGE}")
+  else
+    AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${prefix}/share/${PACKAGE}")
+  fi
+else
+  AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${datadir}/${PACKAGE}")
+fi
+
+dnl -----------------------------------------------------------------------
+dnl Set PACKAGE_SOURCE_DIR in config.h.
+dnl -----------------------------------------------------------------------
+packagesrcdir=`cd $srcdir && pwd`
+AC_DEFINE_UNQUOTED(PACKAGE_SOURCE_DIR, "${packagesrcdir}")
+
+dnl -----------------------------------------------------------------------
+dnl Génération des Makefiles
+dnl -----------------------------------------------------------------------
+AC_OUTPUT([
+Makefile
+src/Makefile
+intl/Makefile
+po/Makefile.in],[
+ls -al src/*.cc src/*.h|awk '{ print $9}' > po/POTFILES.in
+])

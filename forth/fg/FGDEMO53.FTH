@@ -1,0 +1,69 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+DECIMAL
+CREATE XMIN
+   0 , 96 , 192 , 0 , 96 , 192 , 0 , 96 , 192 , 0 , 96 , 192 ,
+CREATE YMAX
+   49 , 49 , 49 , 99 , 99 , 99 , 149 , 149 , 149 , 199 , 199 , 199 ,
+VARIABLE OLDMODE
+VARIABLE NEWMODE
+VARIABLE OFFSET
+VARIABLE X
+VARIABLE Y
+0 CONSTANT VISUAL
+1 CONSTANT HIDDEN
+
+: FGDEMO53 ( --- )
+   FASTGRAPH?
+   IF
+      320 200 2 FGBESTMODE NEWMODE !
+      NEWMODE @
+      DUP 0< SWAP 12 = OR
+      IF
+         ABORT" Cette d‚monstration n‚c‚ssite le mode 320x200"
+      THEN
+      FGGETMODE OLDMODE !
+      NEWMODE @ FGSETMODE
+      HIDDEN FGALLOCATE DROP
+      HIDDEN FGSETPAGE
+      1 FGSETCOLOR
+      0 95 0 49 FGRECT
+      15 FGSETCOLOR
+      48 25 FGMOVE
+      20 20 FGELLIPSE
+      10 FGSETCOLOR
+      -10 OFFSET !
+      12 1
+      DO
+         XMIN I + @ X !
+         YMAX I + @ Y !
+         0 95 0 49 X @ Y @ HIDDEN HIDDEN FGTRANSFER
+         X @ X @ 95 + 0 199 FGSETCLIP
+         X @ OFFSET @ + X @ OFFSET @ + 19 + Y @ 29 - Y @ 20 - FGCLPRECT
+         OFFSET @ 10 + OFFSET !
+      LOOP
+      36 0
+      DO
+         XMIN I 12 MOD + @ X !
+         YMAX I 12 MOD + @ Y !
+         X @ X @ 95 + Y @ 49 - Y @ 112 124  HIDDEN VISUAL FGTRANSFER
+         2 FGWAITFOR
+      LOOP
+      " Appuyez sur une touche" FGTEXT
+      FGWAITKEY
+      HIDDEN FGFREEPAGE DROP
+      OLDMODE @ FGSETMODE
+      FGRESET
+      1 FGCURSOR
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

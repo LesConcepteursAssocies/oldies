@@ -1,0 +1,26 @@
+//
+local
+char nomtab tableau
+char[] 8 8 stab
+
+: main
+  cls
+  " test tableaux " print cr
+  " serpent" dbopen
+  if
+     " TABLEAU" dbfield tableau :=
+     tableau " \13\10" stab strtok
+     stab alen
+     0 do
+       dup 0 do
+          i j stab print
+       loop
+     loop
+     drop
+  else
+     " erreur DBOPEN SERPENT.DBF" line0
+  endif
+  wait
+;
+
+

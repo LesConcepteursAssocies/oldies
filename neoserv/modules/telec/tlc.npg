@@ -1,0 +1,213 @@
+// ีอออออออออออออัอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออธ
+// ณTLC.NPG      ณ                                                           ณ
+// รฤฤฤฤฤฤฤฤฤฤฤฤฤู                                                           ณ
+// ณDernire modification : 28/11/1995                                       ณ
+// ณ                                                                         ณ
+// ณModule de tlchargement.                                                ณ
+// ิอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออพ
+//
+
+public
+number _Debug   := 1    // 1=MODE DEBUG, 0 sinon.
+number TVersion := 1    // Version du protocole.
+number BMode    := 0    // 0=UUEncode, 1=XXEncode.
+number SErr     := 0    // Code d'erreur sur transfert.
+number SzBlk    := 128  // Taille d'un bloc de donnes.
+char   BuffOut          // Buffer d'emission.
+number bOK
+
+// Affichage trace.
+//
+: _AffTrace  // s ---
+   _Debug
+   IF
+      DISPLAY
+   ELSE
+      DROP
+   ENDIF
+;
+
+// Encodage des donnes empiles
+: EncodeData  // l s --- s1 l1
+   BMode
+   CASE
+      0 OF
+           UUENCODE
+        ENDOF
+      1 OF
+           XXENCODE
+        ENDOF
+   ENDCASE
+;
+
+// Encodage ventuel et envoi de BuffOut
+//
+: SendBuffOut  // b ---
+   " SENDBUFFOUT ----------" _AffTrace
+   IF
+      BuffOut DUP STRLEN
+      EncodeData DROP
+   ELSE
+      BuffOut
+   ENDIF
+   DUP _AffTrace
+   EMITBUFFER
+;
+
+// Envoi du paquet de fin de transfert.
+//
+: SendEndXfer  // ---
+   " SENDENDXFER ----------" _AffTrace
+   " @@-@@" BuffOut :=
+   13 CHR  BuffOut STRCAT
+   FALSE SendBuffOut
+;
+
+// Envoi d'un break.
+//
+: SendBreak  // ---
+   " SENDBREAK ----------" _AffTrace
+   " #BREAK#" BuffOut :=
+   13 CHR  BuffOut STRCAT
+   FALSE SendBuffOut
+;
+
+// Fabrication et envoi du paquet d'entte.
+// (voir PROTOCOL.TXT pour plus de dtails sur le contenu)
+//
+: SendHeader  // NomFichier ---
+   " SENDHEADER ----------" _AffTrace
+   " @@!@@" BuffOut :=
+   FSIZE STR " 0" 8 PADL BuffOut STRCAT
+   "  " BuffOut STRCAT
+   "  " 12 PADR BuffOut STRCAT
+   "  " BuffOut STRCAT
+   TVersion STR " 0" 2 PADL BuffOut STRCAT
+   "  " BuffOut STRCAT
+   BMode STR BuffOut STRCAT
+   "  " BuffOut STRCAT
+   BuffOut DUP STRLEN CRC16
+   " %04X" using
+   STR BuffOut STRCAT
+   13 CHR  BuffOut STRCAT
+   BuffOut _AffTrace
+   FALSE SendBuffOut
+;
+
+// Attend la rponse … l'entte
+// Renvoie VRAI si Ok
+: WaitReponseHeader  // --- b
+   " WAITREPONSEHEADER ----------" _AffTrace
+   13 CHR WAITCHAR
+   DATA _AffTrace
+   DATA DUP " !" AT DUP -1 ==
+   IF
+      DROP DROP FALSE
+   ELSE
+      24 SUBSTR
+      // Pour l'instant, on teste juste
+      // la longueur, ainsi que la prsence
+      // du '!' et du '\r' en dbut et fin de paquet
+      DUP STRLEN 24 == SWAP
+      DUP " !" AT 0 == SWAP
+      13 CHR AT 23 == && &&
+      IF
+         " REPONSE HEADER OK" _AffTrace
+         TRUE
+      ELSE
+         " REPONSE HEADER *KO*" _AffTrace
+         FALSE
+      ENDIF
+   ENDIF
+;
+
+// Attend la rponse …ux donnes envoyes
+// Renvoie VRAI si Ok
+: WaitReponseData  // --- b
+   " WAITREPONSEDATA ----------" _AffTrace
+   13 CHR WAITCHAR
+   DATA _AffTrace
+   DATA " !H" AT -1 !=
+   IF
+      " REPONSE DATA OK" _AffTrace
+      TRUE
+   ELSE
+      " REPONSE DATA *KO*" _AffTrace
+      FALSE
+   ENDIF
+;
+
+// Envoi les donnes empiles,
+// et attend la rponse.
+//
+: SendData  // l s ---
+   " SENDDATA ----------" _AffTrace
+   OVER OVER
+   DUP STR " 0" 4 PADL BuffOut :=
+   EncodeData DROP
+   BuffOut STRCAT
+   CRC16
+   " %04X" using
+   STR BuffOut STRCAT
+   13 CHR  BuffOut STRCAT
+   BuffOut _AffTrace
+   BEGIN
+      FALSE SendBuffOut
+      WaitReponseData
+   UNTIL
+;
+
+// Envoi le fichier donn sur le flux du connect courant.
+// Renvoie:
+// 0 = Transfert Ok
+// 1 = Impossible d'ouvrir le fichier
+// 2 = Le distant ne rpond pas
+// 3 = Problme de lecture du fichier … transmettre
+//
+: SendFile  // NomFichier --- err
+   GETUSING SWAP
+   " %.0f" USING
+   DUP                                 // On garde le nom du fichier.
+   FOPEN
+   IF
+      FLUSHOUTBUFFER
+      0 SErr :=
+      SendHeader
+      WaitReponseHeader
+      IF
+         // Transfert du fichier.
+         " %.0f" USING
+         TRUE bOK :=
+         SETBINARYMODE
+         BEGIN
+            FEOF !
+            bOK &&
+         WHILE
+            SzBlk FREAD DUP
+            IF
+               SendData
+            ELSE
+               DROP DROP
+               SendBreak
+               3 SErr :=
+               FALSE bOK :=
+            ENDIF
+         REPEAT
+         SETNORMALMODE
+      ELSE
+         2 SErr :=
+      ENDIF
+      FCLOSE
+      SendEndXfer
+   ELSE
+      DROP 1 SErr :=
+   ENDIF
+   DUP EMPTY? !
+   IF
+      USING
+   ELSE
+      DROP
+   ENDIF
+   SErr
+;
+

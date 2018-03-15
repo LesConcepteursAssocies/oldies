@@ -1,0 +1,115 @@
+//
+// test manip des chaines.
+//
+#NAME = chaines
+#NUMCOMP = 10
+
+LOCAL
+char chaine1 := "   TOUTOU  "   // chaine 1
+char chaine2 := "   A TITI  "
+char chaine3 := "\27\87\27\64 test codes de contr“les\27\80"
+char chaine4 := "     "
+char chaine5
+
+: main
+   cls
+   " %0.f" using
+   " test chaines" print cr wait   // tab + commentaire
+   " chaine avant = [" print
+   chaine1 print " ]" print cr
+   " chaine1 RTRIM = [" print         // espaces + commentaire
+   chaine1 rtrim print " ]" print cr
+   " chaine1 LTRIM = [" print
+   chaine1 ltrim print " ]" print cr
+   " chaine avant = [" print
+   chaine2 print " ]" print cr
+   " chaine2 ALLTRIM = [" print
+   chaine2 alltrim print " ]" print cr
+
+   " chaine4 avant = [" print
+   chaine4 print " ]" print 2 spaces print chaine4 strlen print cr
+   " chaine4 RTRIM = [" print
+   chaine4 rtrim dup print " ]" print 2 spaces print strlen print cr
+   " chaine4 LTRIM = [" print
+   chaine4 ltrim dup print " ]" print 2 spaces print strlen print cr
+   " chaine4 avant = [" print
+   chaine4 print " ]" print 2 spaces print chaine4 strlen print cr
+   " chaine4 ALLTRIM = [" print
+   chaine4 alltrim dup print " ]" print 2 spaces print strlen print cr
+
+//   " A ASC = " print " A" asc print cr
+//   " 66 CHR = " print 66 chr print cr
+//   " 65 str = " print 65 str print cr
+   " 789.5 val = " print " 789.5" val print cr
+   " chaine2 3 3 substr  = [" print chaine2 3 3 substr print " ]" print cr
+   " chaine2 3 20 substr = [" print chaine2 3 20 substr print " ]" print cr
+   " chaine2 'TI' at = " print chaine2 " TI" at print cr
+   chaine3 print cr
+   " \027\087\27\066 autre (\ seul) test\27\80" print cr
+   chaine1 " 0123456789" Strspn
+   if
+      " chaine1 ne contient que des chiffres" print
+   else
+      " chaine1 ne contient pas de chiffres" print
+   endif
+   cr
+   chaine2 " AT" STRIN
+   if
+      " chaine2 contient au moins un A ou un T" print
+   else
+      " chaine2 ne contient ni A ni T" print
+   endif
+   cr
+   " chaine1 avant = [" print chaine1 print " ]" print cr
+   " O" " CO" chaine1 strtran
+   " chaine1 aprŠs = [" print chaine1 print " ]" print cr
+   " chaine2 ltrim 3 left = [" print chaine2 ltrim 3 left print " ]" print cr
+   " chaine2 rtrim 3 right = [" print chaine2 rtrim 3 right print " ]" print cr
+   wait
+   cls
+   " BONJOUR" chaine1 :=
+   "  OU MAUVAIS " chaine2 :=
+   " chaine1 = [" print chaine1 print " ]" print cr
+   " chaine2 = [" print chaine2 print " ]" print cr
+   " chaine2 chaine1 3 5 strins =" print cr
+   " [" print chaine2 chaine1 3 5 strins print " ]" print cr
+   " chaine2 chaine1 3 30 strins =" print cr
+   " [" print chaine2 chaine1 3 30 strins print " ]" print cr
+   " chaine2 chaine1 30 3 strins =" print cr
+   " [" print chaine2 chaine1 30 3 strins print " ]" print cr
+   " chaine2 chaine1 30 30 strins =" print cr
+   " [" print chaine2 chaine1 30 30 strins print " ]" print cr
+   wait
+   " chaine2 3 5 strdel = [" print
+   chaine2 3 5 strdel print " ]" print cr
+   " chaine2 3 30 strdel = [" print
+   chaine2 3 30 strdel print " ]" print cr
+   " chaine2 30 3 strdel = [" print
+   chaine2 30 3 strdel print " ]" print cr
+   " chaine2 30 30 strdel = [" print
+   chaine2 30 30 strdel print " ]" print cr
+   " chaine2 3 5 '.' strset = [" print
+   chaine2 3 5 " ." strset print " ]" print cr
+   " chaine2 3 30 '.' strset = [" print
+   chaine2 3 30 " ." strset print " ]" print cr
+   " chaine2 30 3 '.' strset = [" print
+   chaine2 30 3 " ." strset print " ]" print cr
+   " chaine2 30 30 '.' strset = [" print
+   chaine2 30 30 " ." strset print " ]" print cr
+
+   begin
+      " entrez une chaine" print cr
+      input chaine5 :=
+      " chaine5 avant = [" print chaine5 print " ]" print cr
+      " chaine5 ALLTRIM = [" print
+      chaine5 alltrim print " ]" print cr
+      " chaine5 RTRIM = [" print
+      chaine5 rtrim print " ]" print cr
+      " chaine5 LTRIM = [" print
+      chaine5 ltrim print " ]" print cr
+     " chaine5 chaine4 at = " print chaine4 chaine5 at print cr
+      wait
+   again
+   usingoff
+;
+

@@ -1,0 +1,671 @@
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+// Bataille Navalle Version 1.00
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+// Date de cration    : 05/07/94
+// Date de mise … jour : 08/05/95
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+
+//
+// Directives de compilation (jeu unique)
+//
+
+#PATHVTX jeux\VTX
+
+//
+// Appel des modules
+//
+
+#use modules\balgp\balgp
+#use jeux\nav0 jeux\nav1 jeux\nav2
+
+//
+// Dfinition des variables
+//
+
+LOCAL
+     NUMBER Sortie
+     NUMBER Tour := 0
+     NUMBER Res ii Clavier go_on cpt
+     NUMBER _debug := 0
+
+     CHAR[] 11 11 Computer
+     CHAR CompuNom := " Z6PO"
+     CHAR Msg := " "
+     CHAR Xval := " "
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Initialisation de l'application }
+//
+
+: Init
+
+   cls
+   RANDOMIZE
+   EmptyLocalFkeyTable
+
+   0 _debug ==
+   if
+     palier 99 !=
+     if
+       " bat0.vtx" sendpage
+
+     endif
+
+   endif
+
+;
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation du tableau
+//
+: InitTab
+
+   " 0" Nav0.Tab1 AFILL
+   " 0" Nav0.Tab2 AFILL
+   " " Computer AFILL
+
+;
+
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Affichage de l'ecran de jeu }
+//
+: AffCadre
+
+	cls
+	" nav1.vtx" sendpage
+;
+
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Boucle du jeu
+//
+: Jeu
+
+	0 Sortie :=
+	Tour ++
+	9 19 LOCATE
+	1 setcolor
+	" Tour" PRINT
+	10 18 LOCATE
+	" numro" PRINT
+	11 20 LOCATE
+     " %.0f" USING
+	Tour print
+	CURSORON
+
+	// Saisie des abcisses (A ... J)
+	BEGIN
+		0 Res :=
+		19 7 locate
+		"                  " print
+		19 7 locate
+		INPUT Xval :=
+		// Appui sur sommaire ?
+		Fkey FKSOMMAIRE ==
+		if
+			2 Res :=
+		else
+			Xval ASC
+			Nav0.Xplay :=
+			64 Nav0.Xplay -=
+
+			Nav0.Xplay 0 >
+			if
+				Nav0.Xplay 11 < 
+				if
+					// La saisie est OK
+					1 Res :=
+				endif
+			endif
+
+			0 Res ==
+			if
+
+				// Mauvaise saisie
+				" Erreur de saisie" LINE0
+				wait
+                                clear0
+
+			endif
+
+		endif
+		
+	Res UNTIL
+
+	// Saisie des ordonnes (1 ... 10)
+
+	2 Res !=
+	if
+		BEGIN
+			0 Res :=
+			19 9 locate
+			"             " print
+			19 9 locate
+			INPUT VAL Nav0.Yplay :=
+			Fkey FKSOMMAIRE ==
+			if
+				2 Res :=
+			else
+				Nav0.Yplay 0 >
+				if
+					Nav0.Yplay 11 < 
+					if
+						// La saisie est OK
+						1 Res :=
+					endif
+				endif
+
+				0 Res ==
+				if
+
+					// Mauvaise saisie
+					" Erreur de saisie" LINE0
+				endif
+
+			endif
+
+		Res UNTIL
+
+	endif
+
+	cursoroff
+
+;
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage des coordonnes saisie
+//
+: AffJeu1
+
+	Nav0.Yplay Nav0.YC2 + Nav0.Xplay Nav0.XC2 + LOCATE
+
+	// On vrifie si un bateau a t touch
+
+	Nav0.Xplay Nav0.Yplay Nav0.Tab2 Xval :=
+	Xval " 0" !=
+	if
+		Xval " 1" !=
+		if
+			" Touch" Msg :=
+			1 setcolor
+			Xval print
+			Xval " 2" ==
+			if
+				" Sous-marin coul !!!     " Msg :=
+			endif
+
+			Xval " 3" ==
+			if
+				" Destroyer touch !!!     " Msg :=
+			endif
+
+			Xval " 4" ==
+			if
+				" Croiseur touch !!!      " Msg :=
+			endif
+
+			Xval " 5" ==
+			if
+				" Porte-avion touch !!!   " Msg :=
+			endif
+
+			Nav2::Touche
+		else
+			1 setcolor
+			" o" print
+			" Manqu                   " Msg :=
+
+		endif
+	else
+		" o" print
+		" Manqu                   " Msg :=
+	endif
+
+	1 2 locate Msg print
+
+;
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Choix de l'ordinateur }
+//
+: Jeu2
+
+	// Calcul des abcisses
+	BEGIN
+		10 Nav0.Xrange :=
+		10 Nav0.Yrange :=
+		Nav0::Hasard
+		// Les coordonnes choisies n'ont elles pas dja t essayes ???
+		" " Nav0.yy Nav0.xx Computer ==
+		if
+			// On affiche les coordonnes
+			Nav0.xx ii :=
+			64 ii += 
+			ii CHR Xval :=
+			19 30 LOCATE
+			"            " PRINT
+			19 30 LOCATE
+			Xval PRINT
+			"  " PRINT
+			Nav0.yy PRINT
+
+			// On regarde si on a touch quelque chose ..
+			1 Res :=
+			Nav0.yy Nav0.YC1 + Nav0.xx Nav0.XC1 + LOCATE
+			" 0" Nav0.yy Nav0.xx Nav0.Tab1 !=
+			if
+				" 1" Nav0.yy Nav0.xx Nav0.Tab1 !=
+				if
+					// On a touch Kekchose ...
+					" X" print
+					0 Res :=
+				endif
+			endif
+			Res
+			if
+				" o" print
+			endif
+
+			1 Res :=
+		
+		else
+			0 Res :=
+		
+		endif
+
+	Res UNTIL
+;
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage du coup de l'ordinateur
+//
+: AffJeu2
+
+;
+
+//
+// Boucle Principale
+//
+: Run
+
+	EmptyLocalFkeyTable
+	InitTab
+
+	// Affichage de l'cran de jeu
+	AffCadre
+	2 8 LOCATE
+        Balgp.pseudo PRINT
+	2 28 LOCATE
+	CompuNom PRINT
+
+	// Positionnement des bateaux sur les grilles
+	" je calcule votre grille ..." line0
+	Nav1::CalcFlotte1
+	" je calcule ma grille ..." line0
+	Nav2::CalcFlotte2
+
+	// Affichage de la grille du joueur 1
+	" j'affiche votre grille ..." line0
+	Nav1::AffFlotte1
+
+	_debug
+	if
+		Nav2::AffFlotte2
+
+	endif
+
+        clear0
+
+	// Dbut du jeu
+	begin
+		// Joueur 1
+
+		0 Sortie :=
+		Jeu
+
+		// Analyse des touches de fonction
+
+		2 Res ==
+		if
+			2 Sortie :=
+		else
+			AffJeu1
+
+			// Computer
+			Jeu2
+			AffJeu2
+
+		endif
+
+	sortie until
+
+        drop
+;
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Touches de fonction
+//
+: f_re
+
+	3 clavier :=
+
+;
+
+: f_su
+
+	7 clavier :=
+
+;
+
+: f_en
+
+	8 clavier :=
+
+;
+
+: f_so
+
+	1 clavier :=
+
+;
+
+: AffectTouches
+
+	setlocalfkey fkretour f_re
+	setlocalfkey fksuite f_su
+	setlocalfkey fkenvoi f_en
+	setlocalfkey fksommaire f_so
+;
+
+
+: NavRegle4
+
+	" Navreg4.vtx" SendPage
+	TRUE go_on :=
+	0 clavier :=
+
+	Begin
+	  go_on TRUE ==
+	While
+		clavier
+		
+		case
+			1 of		// Sommaire
+
+				FALSE go_on :=
+
+			endof
+
+			3 of		// Retour
+
+				FALSE go_on :=
+
+			endof
+
+		endcase
+
+	Repeat
+
+	TRUE go_on :=
+;
+
+
+: NavRegle3
+
+	" Navreg3.vtx" SendPage
+	TRUE go_on :=
+	0 clavier :=
+
+	Begin
+	  go_on TRUE ==
+	While
+		clavier
+
+		case
+			1 of		// Sommaire
+
+				FALSE go_on :=
+
+			endof
+
+			3 of		// Retour
+
+				FALSE go_on :=
+
+			endof
+
+			7 of		// Suite
+
+				NavRegle4
+				" Navreg3.vtx" SendPage
+
+			endof
+
+		endcase
+
+	Repeat
+
+	TRUE go_on :=
+;
+
+
+: NavRegle2
+
+	" Navreg2.vtx" SendPage
+	TRUE go_on :=
+	0 clavier :=
+
+	Begin
+	  go_on TRUE ==
+	While
+		clavier
+		
+		case
+			1 of		// Sommaire
+
+				FALSE go_on :=
+
+			endof
+
+			3 of		// Retour
+
+				FALSE go_on :=
+
+			endof
+
+			7 of		// Suite
+
+				NavRegle3
+				" Navreg2.vtx" SendPage
+
+			endof
+
+		endcase
+
+	Repeat
+
+	TRUE go_on :=
+;
+
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Rgles du jeu }
+//
+: NavRegles
+
+	cls
+	" Navreg1.vtx" SendPage
+	TRUE go_on :=
+	0 clavier :=
+
+	Begin
+	  go_on TRUE ==
+	While
+		clavier
+
+		case
+			1 of		// Sommaire
+
+				FALSE go_on :=
+
+			endof
+
+			3 of		// Retour
+
+				FALSE go_on :=
+
+			endof
+
+			7 of		// Suite
+
+				NavRegle2
+				" Navreg1.vtx" SendPage
+
+			endof
+
+		drop
+
+		endcase
+
+	Repeat
+
+	TRUE go_on :=
+
+;
+
+: menu
+
+	" Navmenu.vtx" sendpage
+	2000 delay
+	TRUE go_on :=
+	0 clavier :=
+	1 cpt :=
+	cpt 3 * 12 + 9 locate " *" print
+	AffectTouches
+
+	Begin
+	  go_on TRUE ==
+	While
+		clavier
+		case
+			1 of  // quitter
+
+			     false go_on :=
+			     3 cpt :=
+
+			endof
+
+			3 of // retour
+
+				0 clavier :=
+				cpt 3 * 12 + 9 locate "  " print
+
+				cpt 0 >
+				if
+					cpt --
+				else
+					2 cpt :=
+				endif
+
+				cpt 3 * 12 + 9 locate " *" print
+			
+			endof
+
+			7 of // suite
+
+				0 clavier :=
+				cpt 3 * 12 + 9 locate "  " print
+
+				cpt 2 <
+				if
+					cpt ++
+				else
+					0 cpt :=
+				endif
+
+				cpt 3 * 12 + 9 locate " *" print
+
+			endof
+
+			8 of // envoi
+				// cpt str line0
+
+				0 clavier :=
+				cpt
+
+				case
+
+					0 of  // rgles
+
+						Navregles
+						0 cpt :=
+
+					endof
+
+					1 of  // Jeu
+
+						Run
+						0 cpt :=
+                 AffectTouches
+
+					endof
+
+           	2 of  // quitter
+
+			        false go_on :=
+			        0 cpt :=
+
+			        endof
+					drop
+
+				endcase
+
+				cpt 2 !=
+
+				if
+					" NavMenu.vtx" sendpage
+					2 cpt :=
+					cpt 3 * 12 + 9 locate " *" print
+
+				endif
+
+			endof
+		   drop
+
+		endcase
+
+     
+	repeat
+;
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Code principal }
+//
+: NavMain
+
+   init
+   AffectTouches
+   menu
+
+;
+
+
+: main
+
+   NavMain
+
+;
+
+// -------------------------------------------------------------------------- //

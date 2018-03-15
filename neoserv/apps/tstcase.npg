@@ -1,0 +1,29 @@
+// test case
+local number toto
+
+: main
+  cls
+  " test if...else...endif" print cr wait
+   0 toto :=
+   toto
+   if
+      " toto est diff‚rent de 0" print
+   else
+      " toto est ‚gal … 0" print
+   endif
+  " test do...loop" print cr wait
+  10 0 do I print loop
+  " test case ... endcase" print cr wait
+   toto
+   case
+      0 of
+           " toto contient 0" print
+        endof
+      5 of
+           " toto contient 5" print
+        endof
+        drop " defaut" print
+   endcase
+   wait
+;
+

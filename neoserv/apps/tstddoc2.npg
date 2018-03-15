@@ -1,0 +1,15 @@
+//
+// Test demande de doc
+//
+
+#use modules\demdoc\demdoc
+
+: main
+   cls
+   " DEMDOC 2: test demande de doc" print cr
+   wait
+   demdoc::menugen
+   cr " retour" print cr
+   wait
+;
+

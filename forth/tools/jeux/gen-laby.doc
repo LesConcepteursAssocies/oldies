@@ -1,0 +1,118 @@
+                     G‚n‚rateur de labyrinthes "GEN-LABY"
+                     ------------------------------------
+
+PRESENTATION.
+-------------
+
+Ce programme permet de g‚n‚rer, de fa‡on al‚atoire, des labyrinthes, et les
+affiche en mode graphique C.G.A (une carte de ce type est donc n‚c‚ssaire).
+
+Le programme n'utilise pas de techniques particuliŠrements complexes
+(si ce n'est le concept maintenant maitris‚ de recursivit‚).
+
+FONCTIONNEMENT DU PROGRAMME.
+----------------------------
+
+Affichage des lutins.
+---------------------
+
+Chaque d‚finition de lutin est compos‚e alternativement des lignes paires et
+impaires. La routine d'affichage devra donc proc‚der en deux temps,
+en affichant d'abord la ligne paire, puis la ligne impaire, la position
+d'affichage se calculant de la fa‡on suivante
+(X repr‚sente un num‚ro de colonne, Y un num‚ro de ligne) :
+
+    0B800h:X*2+Y*320          pour les lignes paires.
+    0B800h+2000h:X*2+Y*320    pour les lignes impaires.
+
+Conception des labyrinthes.
+---------------------------
+
+Seize lutins sont n‚c‚ssaires pour repr‚senter chaque partie des labyrinthes.
+La routine de cr‚ation des lutins r‚serve l'espace n‚c‚ssaire au stockage des
+d‚finitions, chacun de ces lutins ‚tant accessible par l'interm‚diaire de son
+num‚ro d'ordre (le premier ayant le num‚ro 0).
+
+Le programme utilise un ‚cran virtuel de travail, de taille identique … l'‚cran
+r‚el, dans lequel sont stock‚s les num‚ros des lutins correspondants au
+labyrinthe en cours de d‚finition (cet ‚cran virtuel est initialis‚ au d‚part
+avec le code 0).
+
+L'ordre dans lequel sont d‚finis les lutins est important, car le OU logique
+est utilis‚ pour calculer certains ‚l‚ments du labyrinthe courant.
+
+Exemple : consid‚rons le contexte suivant,
+
+                   +----------+----------+----------+
+                   |          |          |          |
+                   |          |          |          |
+                   |          |          |          |
+                   |          |  mur     |          |
+                   +----------+----------+----------+
+                   |          |          |          |
+                   |   mur    | position |          |
+                   |          | actuelle |          |
+                   |          |          |          |
+                   +----------+----------+----------+
+                   |          |          |          |
+                   |          | position |          |
+                   |          |pr‚c‚dente|          |
+                   |          |          |          |
+                   +----------+----------+----------+
+
+Le programme essaie d'aller en haut et rencontre un mur (il peut donc
+repr‚senter sa position actuelle par le lutin Nø 1), puis il essaie d'aller
+… gauche et rencontre un autre mur (il peut aussi repr‚senter sa position
+actuelle par le lutin Nø 2).
+
+La repr‚sentation graphique de la position actuelle est donc calcul‚e de la
+fa‡on suivante :
+1 OR 2, ce qui donne 3, ce qui correspond bien au lutin recherch‚
+(virage … droite).
+
+Principe de fonctionnement.
+---------------------------
+
+AprŠs les diverses initialisations, une position est choisie
+(dans la version actuelle du programme, on part du milieu de l'‚cran,
+mais rien n'empŠche de g‚n‚rer al‚atoirement la position initiale)
+pour d‚marrer la conception du labyrinthe.
+
+Ensuite, le programme d‚termine (de fa‡on al‚atoire) la direction … prendre,
+qu'il convertit en puissance de deux (vous trouverez pourqoi en consultant
+l'ordre de d‚finition des lutins), avec le codage suivant :
+1 = bas
+2 = droite
+4 = haut
+8 = gauche
+Puis le programme "avance" en fonction des obstacles rencontr‚s, en s'appelant
+r‚cursivement, ceci jusqu'… ce qu'il n'y ai plus de chemin … construire,
+o— que l'‚cran soit plein.
+
+Cette m‚thode permet d'obtenir un chemin valide, quelque soit le labyrinthe
+g‚n‚r‚.
+
+Le labyrinthe pourra ‚ventuellement comporter un certain nombre de "trous",
+dus … la fa‡on (al‚atoire) de prendre une direction donn‚e.
+
+Am‚liorations et extensions envisageables.
+------------------------------------------
+
+Une am‚lioration possible pourrait ˆtre que le programme ne s'arrˆte que
+lorsqu'il a rempli complŠtement l'‚cran (‚limination des "trous").
+
+Quant … une possible extension, elle pourrait ˆtre la suivanteÿ:
+
+Une fois le labyrinthe g‚n‚r‚ et affich‚, un curseur apparait au centre
+de celui-ci (curseur d‚j… cr‚‚ avec le num‚ro 16), et l'utilisateur doit
+sortir du labyrinthe en un minimum de temps.
+
+PROBLEME
+--------
+
+Du fait de son ex‚cution r‚cursive, ce programme atteint rapidement la
+capacit‚ de stockage des piles.
+Ne soyez pas surpris par des plantages pouvant survenir (accŠs aux
+tableaux du programme).
+
+

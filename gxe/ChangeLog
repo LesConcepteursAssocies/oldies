@@ -1,0 +1,155 @@
+2001-03-13  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modification de configure.in
+	  check de la version de libxml
+	  création d'un Makefile à la racine de gxe
+	* un peu plus de doc (...)
+	
+2001-02-05  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* mise à disposition de la version 0.0.1 beta
+	* utilisation de autoconf
+	
+2001-02-05  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* chemins relatifs dans les Makefile
+	* grosses modif du parser xml (augmentation de la profondeur
+	  de parsing, gestion des paramètres imbriqués)
+	  permet de gérer les requètes du genre:
+	  <GetList>
+            <Ligne>
+              <Pseudo>Robert</Pseudo>
+              <Dep>75</Dep>
+              <Resume>h 35 ans sympa</Resume>
+            </Ligne>
+            <Ligne>
+              <Pseudo>Marcel</Pseudo>
+              <Dep>92</Dep>
+              <Resume>cool</Resume>
+            </Ligne>
+            <Ligne>
+              <Pseudo>Yvon</Pseudo>
+              <Dep>78</Dep>
+              <Resume>h ch f</Resume>
+            </Ligne>
+            ...
+          </GetList>
+	* typage des paramètres, du à l'imbrication.
+	  2 types: SINGLE (défaut) et LIST
+
+2001-01-30  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* gestion du mode de sortie (XML ou ASCII, pas fini)
+	* création d'une librarie de test (libgxetest.so)
+	* API récupération de la valeur d'un attribut
+	* tests d'erreurs fatales (sigsegv entre autre)
+	
+2001-01-29  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* Gestion des attributs des balises xml.
+	  Pour pouvoir gérer l'id des requêtes entre autre.
+	
+2001-01-24  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* gestion de quelques verrous sur les tables globales
+	* modifications du traitement des signaux
+	
+2001-01-23  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifs importantes (le code est multi-thread)
+	* un thread est créé à chaque appel entrant
+	
+2001-01-19  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* réorganisation du code (préparation au multi-threading)
+	
+2001-01-18  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifications de la gestion des erreurs dans l'api
+	
+2001-01-17  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* suppression du fork sur appel entrant
+	* implémentation des sessions
+	
+2001-01-16  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifications/changement de nom de _PrintxmlError (en _AppendxmlError)
+	* déplacement du document racine xml dans le canal (_swStream)
+	* Modifs dans l'exécution d'une commande (ajout de _CreatexmlOut)
+	* Rappel du nom de la commande dans les sorties xml
+	
+2001-01-11  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* corrections _PrintxmlError
+	* API, gestion des erreurs
+	
+2001-01-10  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* Un peu de doc
+	
+2000-11-20  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifications dans s_misc.c (ajout de _DumpChild)
+	
+2000-11-13  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* un peu de documentation ...
+	
+2000-11-03  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* SIGHUP, recharge des modules
+	* modifs dans s_signaux et s_incomming
+	  (problème sur SIGHUP (boucle ...) corrigé en mettant errno = 0 avant
+	   la lecture du flux entrant)
+	
+2000-10-26  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* gestion des erreurs internes du parser
+	* modifications dans le parser xml (swError, swFatalError, swWarning)
+	
+2000-10-24  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifications dans le parser xml (simplification de swEndElement)
+
+2000-10-23  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* gestion du signal 2 (CTRL-C)
+	* gestion de codes d'erreurs xml
+	
+2000-10-20  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* réécriture de sendcmd.c
+	* modification du parser xml (gestion d'erreur 'commande non trouvée')
+
+2000-10-19  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* ajout paramètre 'MaxRetry' dans gxe.conf
+	* ajout paramètre 'Timeout' dans gxe.conf
+	* modifications de s_xmlparse.c
+	* gestion du signal 1(SIGHUP)
+	* ajout de la directive de compilation GXE_DEBUG
+	* gestion erreur 'commande non trouvée'
+
+2000-10-18  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifications de s_signaux (utilisation de g_strsignal)
+	* modifications dans _ReadCfgFile
+	* ajout paramètre 'Path' dans gxe.conf
+	* ajout paramètre 'MaxRequests' dans gxe.conf
+	
+2000-10-17  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* gestion d'un fichier de configuration (/etc/gxe.conf)
+	* ajout de l'etat d'un fils (pour les signaux)
+	* amélioration de l'api
+	* premiers tests
+	
+2000-10-06  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* ajout de _WriteSocket dans s_sockets.c
+	* modification de _PrintxmlResult
+
+2000-10-05  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* réécriture des fonctions internes (précédées par '_')

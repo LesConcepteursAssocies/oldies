@@ -1,0 +1,9 @@
+//
+// Appel‚ par BENCH.NPG
+//
+local number nombre := 0
+
+: procedure
+   1 nombre +=
+;
+

@@ -1,0 +1,749 @@
+\ ------------------------------------------------------------------------------
+\                       D‚finition du Vocabulaire ASSEMBLER.
+\ ------------------------------------------------------------------------------
+
+ONLY FORTH ALSO DEFINITIONS
+
+CR .( Chargement du vocabulaire ASSEMBLER )
+
+ECHO OFF    
+WARNING OFF 
+
+VOCABULARY ASSEMBLER
+
+IBASE DECIMAL
+
+( Marque le d‚but d'une sous-routine           )
+( retourne son adresse quand elle est invoqu‚e )
+( Routine utilisable par JMP ou CALL           )
+: LABEL
+  CREATE
+  ASSEMBLER
+;
+
+( Retourne vrai si l'opcode est un CALL )
+: DOES? ( IP --- IP' fl )
+  DUP 3 +
+  SWAP C@ 232 =
+;
+
+VARIABLE AVOC
+
+( Mot de d‚finition commencant une d‚finition  )
+( en code machine                              )
+: CODE
+  CREATE
+  [COMPILE] HIDE 
+  HERE DUP 2- !
+  CONTEXT @ AVOC !     ( Sauvegarde du contexte             )
+  ASSEMBLER            ( S‚lection du vocabulaire ASSEMBLER )
+;
+
+( permet de faire suivre une d‚finition FORTH de code machine )
+: ;CODE
+  ?CSP
+  COMPILE (;CODE)
+  [COMPILE] [
+  [COMPILE] REVEAL 
+  ASSEMBLER
+; IMMEDIATE
+
+ASSEMBLER DEFINITIONS
+
+VARIABLE INTER
+VARIABLE LOGICAL
+VARIABLE SIZE
+SIZE ON
+
+( Termine une d‚finition en code machine )
+: END-CODE
+  AVOC @ CONTEXT !
+  [COMPILE] REVEAL
+;
+
+: C;
+  END-CODE
+;
+
+IBASE OCTAL
+
+DEFER C,    FORTH ' C,   ASSEMBLER IS C,
+DEFER ,     FORTH '  ,   ASSEMBLER IS  ,
+DEFER HERE  FORTH ' HERE ASSEMBLER IS HERE
+DEFER ?>MARK
+DEFER ?>RESOLVE
+DEFER ?<MARK
+DEFER ?<RESOLVE
+
+( Cr‚ation des registres du processeur )
+: REGS ( n Mode --- )
+  SWAP 0
+  DO
+    DUP I 11 *
+    SWAP 1000 *
+    OR CONSTANT
+  LOOP
+  DROP
+;
+
+10 0 REGS AL CL DL BL AH CH DH BH
+10 1 REGS AX CX DX BX SP BP SI DI
+10 2 REGS [BX+SI] [BX+DI] [BP+SI] [BP+DI] [SI] [DI] [BP] [BX]
+ 4 2 REGS [SI+BX] [DI+BX] [SI+BP] [DI+BP]
+ 4 3 REGS ES CS SS DS
+ 3 4 REGS # #) S#)
+
+( Cr‚ation des registres de la machine virtuelle FORTH )
+
+BP   CONSTANT RP    ( Pointeur de pile de retour )
+[BP] CONSTANT [RP]
+SI   CONSTANT IP    ( Pointeur d'interpr‚tation  )
+[SI] CONSTANT [IP]
+BX   CONSTANT W     ( Pointeur du mot courant    )
+[BX] CONSTANT [W]
+
+( D‚finition des modes d'adressage )
+
+: MD
+  CREATE
+    1000 * ,
+  DOES>
+    @ SWAP 7000 AND =
+    0<>
+;
+
+0 MD R8?
+1 MD R16?
+2 MD MEM?
+3 MD SEG?
+4 MD #?
+
+: REG? ( n --- fl )
+  7000 AND
+  2000 < 0<>
+;
+
+: BIG? ( n --- fl )
+  ABS -200 AND 0<>
+;
+
+: RLOW ( n1 --- n2 )
+  7 AND
+;
+
+: RMID ( n1 --- n2 )
+  70 AND
+;
+
+: BYTE
+  SIZE OFF
+;
+
+: OP, ( n op --- )
+  OR C,
+;
+
+: W, ( op mr --- )
+  R16? 1 AND OP,
+;
+
+: SIZE, ( op --- op' )
+  SIZE @ 1 AND OP,
+;
+
+: ,/C, ( n fl --- )
+  IF
+    ,
+  ELSE
+    C,
+  THEN
+;
+
+: RR, ( mr1 mr2 --- )
+  RMID SWAP RLOW OR 300 OP,
+;
+
+: B/L? ( n --- fl )
+  BIG? LOGICAL @ OR
+;
+
+: MEM, ( disp mr rmid --- )
+  OVER #) =
+  IF
+    RMID 6 OP, DROP ,
+  ELSE
+    RMID OVER RLOW OR -ROT [BP] =
+    OVER 0= AND
+    IF
+      SWAP 100 OP, C,
+    ELSE
+      SWAP OVER BIG?
+      IF
+        200 OP, ,
+      ELSE
+        OVER 0=
+        IF
+          C, DROP
+        ELSE
+          100 OP, C,
+        THEN
+      THEN
+    THEN
+  THEN
+;
+
+: WMEM, ( disp mem reg op --- )
+  OVER W, MEM,
+;
+
+: R/M, ( mr reg --- )
+  OVER REG?
+  IF
+    RR,
+  ELSE
+    MEM,
+  THEN
+;
+
+: WR/SM, ( r/m r op --- )
+  2 PICK DUP REG?
+  IF
+    W, RR,
+  ELSE
+    DROP SIZE, MEM,
+  THEN
+  SIZE ON
+;
+
+: FAR
+  INTER ON
+;
+
+: ?FAR ( n1 --- n2 )
+  INTER @
+  IF
+    10 OR
+  THEN
+  INTER OFF
+;
+
+( D‚finition des codes op‚rateurs )
+
+: 1MI
+  CREATE
+    C,
+  DOES>
+    C@ C,
+;
+
+: 2MI
+  CREATE
+    C,
+  DOES>
+    C@ C, 12 C,
+;
+
+: 3MI
+  CREATE
+    C,
+  DOES>
+    C@ C, HERE - 1-
+    DUP -200 177 WITHIN NOT
+    ABORT" Branchement hors limite" C,
+;
+
+: 4MI
+  CREATE
+    C,
+  DOES>
+    C@ C, MEM,
+;
+
+: 5MI
+  CREATE
+    C,
+  DOES>
+    C@ SIZE, SIZE ON
+;
+
+: 6MI
+  CREATE
+    C,
+  DOES>
+    C@ SWAP W,
+;
+
+: 7MI
+  CREATE
+    C,
+  DOES>
+    C@ 366 WR/SM,
+;
+
+: 8MI
+  CREATE
+    C,
+  DOES>
+    C@ SWAP R16? 1 AND OR SWAP # =
+    IF
+      C, C,
+    ELSE
+      10 OR C,
+    THEN
+;
+
+: 9MI
+  CREATE
+    C,
+  DOES>
+    C@ OVER R16?
+    IF
+      100 OR SWAP RLOW OP,
+    ELSE
+      376 WR/SM,
+    THEN
+;
+
+: 10MI
+  CREATE
+    C,
+  DOES>
+    C@ OVER CL =
+    IF
+      NIP 322
+    ELSE
+      320
+    THEN
+    WR/SM,
+;
+
+: 11MI
+  CREATE
+    C, C,
+  DOES>
+    OVER #) =
+    IF
+      NIP C@ INTER @
+      IF
+        1 AND
+        IF
+          352
+        ELSE
+          232
+        THEN
+        C, SWAP , ,
+        INTER OFF
+      ELSE
+        SWAP HERE - 2- SWAP 2DUP
+        1 AND SWAP BIG? NOT AND
+        IF
+          2 OP, C,
+        ELSE
+          C, 1- ,
+        THEN
+      THEN
+    ELSE
+      OVER S#) =
+      IF
+        NIP #) SWAP
+      THEN
+      377 C, 1+ C@ ?FAR R/M,
+    THEN
+;
+
+: 12MI
+  CREATE
+    C, C, C,
+  DOES>
+    OVER REG?
+    IF
+      C@ SWAP RLOW OP,
+    ELSE
+      1+ OVER SEG?
+      IF
+        C@ RLOW SWAP RMID OP,
+      ELSE
+        COUNT SWAP C@ C, MEM,
+      THEN
+    THEN
+;
+
+: 14MI
+  CREATE
+    C,
+  DOES>
+    C@ DUP ?FAR C,
+    1 AND 0=
+    IF
+      ,
+    THEN
+;
+
+: 13MI
+  CREATE
+    C, C,
+  DOES>
+    COUNT >R C@ LOGICAL ! DUP REG?
+    IF
+      OVER REG?
+      IF
+        R> OVER W, SWAP RR,
+      ELSE
+        OVER DUP MEM? SWAP #) = OR
+        IF
+          R> 2 OR WMEM,
+        ELSE
+          NIP DUP RLOW 0=
+          IF
+            R> 4 OR OVER W, R16? ,/C,
+          ELSE
+            OVER B/L? OVER R16? 2DUP AND
+            -ROT 1 AND SWAP NOT 2 AND OR 200 OP,
+            SWAP RLOW 300 OR R> OP, ,/C,
+          THEN
+        THEN
+      THEN
+    ELSE
+      ROT DUP REG?
+      IF
+        R> WMEM,
+      ELSE
+        DROP 2 PICK B/L? DUP
+        NOT 2 AND 200 OR SIZE,
+        -ROT R> MEM, SIZE @ AND ,/C,
+        SIZE ON
+      THEN
+    THEN
+;
+
+( D‚finition des instructions )
+
+: TEST ( src dest --- )
+  DUP REG?
+  IF
+    OVER REG?
+    IF
+      204 OVER W, SWAP RR,
+    ELSE
+      OVER DUP MEM? SWAP #) = OR
+      IF
+        204 WMEM,
+      ELSE
+        NIP DUP RLOW 0=
+        IF
+          250 OVER W,
+        ELSE
+          366 OVER W, DUP RLOW 300 OP,
+        THEN
+        R16? ,/C,
+      THEN
+    THEN
+  ELSE
+    ROT DUP REG?
+    IF
+      204 WMEM,
+    ELSE
+      DROP 366 SIZE,
+      0 MEM, SIZE @ ,/C,
+      SIZE ON
+    THEN
+  THEN
+;
+
+IBASE HEX
+
+: ESC ( src ext-op --- )
+  RLOW 0D8 OP, R/M,
+;
+
+: INT ( n --- )
+  0CD C, C,
+;
+
+: SEG ( seg --- )
+  RMID 026 OP,
+;
+
+: XCHG ( mr1 mr2 --- )
+  DUP REG?
+  IF
+    DUP AX =
+    IF
+      DROP RLOW 090 OP,
+    ELSE
+      OVER AX =
+      IF
+        NIP RLOW 090 OP,
+      ELSE
+        086 WR/SM,
+      THEN
+    THEN
+  ELSE
+    ROT 086 WR/SM,
+  THEN
+;
+
+: CS:
+  CS SEG
+;
+
+: DS:
+  DS SEG
+;
+
+: ES:
+  ES SEG
+;
+
+: SS:
+  SS SEG
+;
+
+: MOV ( src dest --- )
+  DUP SEG?
+  IF
+    08E C, R/M,
+  ELSE
+    DUP REG?
+    IF
+      OVER #) = OVER RLOW 0= AND
+      IF
+        0A0 SWAP W, DROP ,
+      ELSE
+        OVER SEG?
+        IF
+          SWAP 08C C, RR,
+        ELSE
+          OVER # =
+          IF
+            NIP DUP R16? SWAP RLOW OVER
+            8 AND OR 0B0 OP, ,/C,
+          ELSE
+            08A OVER W, R/M,
+          THEN
+        THEN
+      THEN
+    ELSE
+      ROT DUP SEG?
+      IF
+        08C C, MEM,
+      ELSE
+        DUP # =
+        IF
+          DROP 0C6 SIZE, 0 MEM, SIZE @ ,/C,
+        ELSE
+          OVER #) = OVER RLOW 0= AND
+          IF
+            0A2 SWAP W, DROP ,
+          ELSE
+            088 OVER W, R/M,
+          THEN
+        THEN
+      THEN
+    THEN
+  THEN
+  SIZE ON
+;
+
+( D‚finition des instructions du microprocesseur h“te )
+
+ 37      1MI AAA
+0D5      2MI AAD
+0D4      2MI AAM
+ 3F      1MI AAS
+  0  10 13MI ADC
+  0  00 13MI ADD
+  2  20 13MI AND
+ 10 0E8 11MI CALL
+ 98      1MI CBW
+0F8      1MI CLC
+0FC      1MI CLD
+0FA      1MI CLI
+0F5      1MI CMC
+  0  38 13MI CMP
+0A6      5MI CMPS
+ 99      1MI CWD
+ 27      1MI DAA
+ 2F      1MI DAS
+ 08      9MI DEC
+ 30      7MI DIV
+0F4      1MI HLT
+ 38      7MI IDIV
+ 28      7MI IMUL
+0E4      8MI IN
+  0      9MI INC
+0CE      1MI INTO
+0CF      1MI IRET
+ 77      3MI JA
+ 73      3MI JAE
+ 72      3MI JB
+ 76      3MI JBE
+0E3      3MI JCXZ
+ 74      3MI JE
+ 7F      3MI JG
+ 7D      3MI JGE
+ 7C      3MI JL
+ 7E      3MI JLE
+ 20 0E9 11MI JMP
+ 75      3MI JNE
+ 71      3MI JNO
+ 79      3MI JNS
+ 70      3MI JO
+ 7A      3MI JPE
+ 7B      3MI JPO
+ 78      3MI JS
+ 9F      1MI LAHF
+0C5      4MI LDS
+ 8D      4MI LEA
+0C4      4MI LES
+0F0      1MI LOCK
+0AC      6MI LODS
+0E2      3MI LOOP
+0E1      3MI LOOPE
+0E0      3MI LOOPNE
+0A4      5MI MOVS
+ 20      7MI MUL
+ 18      7MI NEG
+ 90      1MI NOP
+ 10      7MI NOT
+  2 08  13MI OR
+0E6      8MI OUT
+ 8F 07 58 12MI POP
+ 9D      1MI POPF
+0FF 36 50 12MI PUSH
+ 9C      1MI PUSHF
+ 10     10MI RCL
+ 18     10MI RCR
+0F2      1MI REP
+0F2      1MI REPNZ
+0F3      1MI REPZ
+0C3     14MI RET
+  0     10MI ROL
+  8     10MI ROR
+ 9E      1MI SAHF
+ 38     10MI SAR
+  0 18  13MI SBB
+0AE      5MI SCAS
+ 20     10MI SHL
+ 28     10MI SHR
+0F9      1MI STC
+0FD      1MI STD
+0FB      1MI STI
+0AA      6MI STOS
+  0 28  13MI SUB
+ 9B      1MI WAIT
+0D7      1MI XLAT
+  2 30  13MI XOR
+0C2     14MI +RET
+
+( Structures conditionnelles )
+
+: A?>MARK ( --- fl adr )
+  TRUE HERE 0 C,
+;
+
+: A?>RESOLVE ( fl adr -- )
+  HERE OVER 1+ -
+  SWAP C! ?CONDITION
+;
+
+: A?<MARK ( --- fl adr )
+  TRUE HERE
+;
+
+: A?<RESOLVE ( fl adr --- )
+  HERE 1+ - C, ?CONDITION
+;
+
+' A?>MARK    ASSEMBLER IS ?>MARK
+' A?>RESOLVE ASSEMBLER IS ?>RESOLVE
+' A?<MARK    ASSEMBLER IS ?<MARK
+' A?<RESOLVE ASSEMBLER IS ?<RESOLVE
+
+IBASE HEX
+
+75 CONSTANT 0=    74 CONSTANT 0<>    79 CONSTANT 0<
+78 CONSTANT 0>=   7D CONSTANT <      7C CONSTANT >=
+7F CONSTANT <=    7E CONSTANT >      73 CONSTANT U<
+72 CONSTANT U>=   77 CONSTANT U<=    76 CONSTANT U>
+71 CONSTANT OV
+
+: IF
+  C, ?>MARK
+;
+
+: THEN
+  ?>RESOLVE
+;
+
+: ELSE
+  0EB
+  IF
+    2SWAP
+  THEN
+;
+
+: BEGIN
+  ?<MARK
+;
+
+: UNTIL
+  C, ?<RESOLVE
+;
+
+: AGAIN
+  0EB UNTIL
+;
+
+: WHILE
+  IF
+;
+
+: REPEAT
+   2SWAP AGAIN
+  THEN
+;
+
+: DO
+  # CX MOV
+  HERE
+;
+
+: NEXT
+  >NEXT #) JMP
+;
+
+: 1PUSH
+  APUSH #) JMP
+;
+
+: 2PUSH
+  DPUSH #) JMP
+;
+
+IBASE DECIMAL
+
+ONLY FORTH DEFINITIONS
+
+( D‚finitions d'outils compl‚mentaires pour l'‚x‚cution de routines assembleur )
+
+: ASM[
+  ( pr‚cŠde une s‚quence assembleur dans une d‚finition )
+  IBASE @ OBASE @
+  CONTEXT @ HERE 6 + ,
+  COMPILE BRANCH HERE 0 , HERE 2+ ,
+  ALSO ASSEMBLER [COMPILE] [
+; IMMEDIATE
+
+: ]FORTH
+  ( Termine une s‚quence assembleur dans une d‚finition )
+  [COMPILE] ALIGN 
+  HERE SWAP ! CONTEXT !
+  OBASE ! IBASE !
+  [COMPILE] ]
+  PREVIOUS
+;
+
+EOF
+
+

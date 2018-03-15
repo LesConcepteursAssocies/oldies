@@ -1,0 +1,128 @@
+                      GUIDE DU PROGRAMMEUR DE NEOSERV
+                      ===============================
+
+Introduction
+------------
+
+Pour pouvoir d‚velopper des applications, le serveur dispose d'un langage
+de programmation puissant et souple.
+
+La syntaxe g‚n‚rale est similaire … ce que l'on peut rencontrer sur les
+systŠmes FORTH, POSTSCRIPT, HP (calculettes), et se nomme R.P.N (pour
+Reverse Polish Notation) ou Notation Polonaise Inverse.
+
+                        Le principe en est le suivant:
+       La majorit‚ des instructions sont pr‚c‚d‚es de leurs paramŠtres.
+
+Pour pouvoir op‚rer correctement,  cette syntaxe utilise une structure
+de donn‚e trŠs importante, LA PILE. C'est sur cette pile (g‚r‚e suivant
+la norme LIFO, dernier entr‚ premier sorti) que sont d‚pos‚s les divers
+paramŠtres n‚c‚ssaires aux instructions, ainsi que les divers r‚sultats
+g‚n‚r‚s par celles-ci.
+
+Exemples : 3 3 +        // Addition de deux nombres, le r‚sultat (6) est
+                        // Empil‚
+           50 5 / 3 +   // 50 est divis‚ par 5, le r‚sultat de cette division
+                        // est augment‚ de 3. Le nouveau r‚sultat est empil‚.
+
+           "TOTO.PAG" SendPage   // La page de nom "TOTO.PAG" est envoy‚ au minitel
+                                 // par l'instruction SENDPAGE.
+
+Vous voyez, c'est pas compliqu‚ !. Il suffit de savoir que toute valeur entr‚e
+est automatiquement empil‚e sur la pile de donn‚e, et que tout r‚sultat g‚n‚r‚
+l'est tout autant (empil‚ !).
+En outre, la R.P.N n'est pas sans quelques avantages, en particulier la
+simplification des expressions arithm‚tiques, par la suppression des 
+parenthŠses.
+
+Exemple : l'expression (((5+3)*4)/(3+4))*5 devient,
+                       5 3 + 4 * 3 4 + / 5 *
+
+La priorit‚ des op‚rateurs est au bon vouloir du d‚veloppeur, puisqu'il lui
+suffit tout simplement d'inverser un calcul pour changer la-dite priorit‚.
+
+En r‚sum‚, la R.P.N est simple d'emploi (pas plus compliqu‚e qu'un autre
+langage), et est indissociable (dans sa forme langage) de la PILE DE DONNEES.
+
+Ecriture des programmes
+-----------------------
+
+Un programme est constitu‚ de diverses PROCEDURES/FONCTIONS, DECLARATION DE
+VARIABLES, DIRECTIVES DIVERSES, organis‚es de la fa‡on suivante :
+
+<Directives de compilation (#USE...)>
+
+<D‚claration des variables>
+
+: <Proc1>
+   corps de la proc‚dure ...
+;
+
+: <Procn>
+   ...
+;
+
+: MAIN
+  Proc‚dure principale
+;
+
+Les sources peuvent ˆtre ‚crits avec n'importe quel ‚diteur de textes.
+
+A ce stade, on peut distinguer 2 types de programmes (cette distinction est
+purement abitraire, NeoServ n'en fait aucune en fait) :
+
+- les MODULES, ou LIBRAIRIES, qui rassemblent diverses proc‚dures, utilisables
+  par plusieurs APPLICATIONS.
+
+- les APPLICATIONS, qui repr‚sentent les applications t‚l‚matiques proprement
+  dite.
+
+Dans toute APPLICATION, il doit exister une proc‚dure de nom "MAIN", qui
+repr‚sente le point d'entr‚e de celle-ci.
+C'est cette proc‚dure qui est appel‚e … chaque nouvelle connexion d'un
+minit‚liste.
+Les MODULES/LIBRAIRES, elles, n'ont pas a contenir de proc‚dure MAIN (c'est la
+la seule "diff‚rence" notable entre module et application), puisque l'on peut
+appeler n'importe quelle proc‚dure contenue dans n'importe quel ordre.
+
+Exemple : conception de l'application 3615 DEMO.
+          Source DEMO.NPG
+          // R‚f‚rencement des LIBRAIRES/MODULES que l'application
+          // DEMO va utiliser
+          #USE BAL QUIZZ
+          // D‚claration des variables locales au connect‚
+          LOCAL CHAR NOM PRENOM
+
+          // Proc‚dures
+          : SAINOM
+             " Entrez votre nom" print
+             INPUT
+             NOM :=
+          ;
+
+          : SAIPRENOM
+             " Entrez votre pr‚nom" print
+             INPUT
+             PRENOM :=
+          ;
+
+          // La proc‚dure principale.
+          : MAIN
+             CLS
+             " Bonjour" print
+             SAINOM
+             SAIPRENOM
+             ...
+             // Appel du menu g‚n‚ral des boites aux lettres
+             BAL::MENUGEN
+             ...
+          ;
+
+Pour ex‚cuter l'application DEMO, il suffit de la charger dans NeoServ,
+de la fa‡on suivante :
+
+   LOAD DEMO
+
+Ensuite, pour se connecter en local … l'application DEMO, il suffit de
+taper "DEMO" sur le minitel local, puis d'appuyer sur SHIFT+CONNEXION/FIN.
+

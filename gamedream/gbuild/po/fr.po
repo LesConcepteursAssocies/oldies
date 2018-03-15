@@ -1,0 +1,556 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#: ../src/GBmainmenu.c:72 ../src/GBmainmenu.c:89 ../src/GBmainmenu.c:100
+#: ../src/GBmainmenu.c:111 ../src/GBmainmenu.c:122 ../src/GBmainmenu.c:137
+#: ../src/GBmainmenu.c:154 ../src/GBmainmenu.c:165 ../src/GBmainmenu.c:180
+#: ../src/GBmainmenu.c:194 ../src/GBmainmenu.c:211 ../src/GBmainmenu.c:226
+#: ../src/GBmainmenu.c:244
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2000-01-19 09:39+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+#: ../src/GBcamera.c:54
+#, c-format
+msgid "camera type=%d px=%f py=%f pz=%f rx=%f ry=%f rz=%f ax=%f ay=%f az=%f\n"
+msgstr ""
+
+#: ../src/GBcamera.c:110
+#, c-format
+msgid "follow px=%f py=%f pz=%f rx=%f ry=%f rz=%f ax=%f ay=%f az=%f\n"
+msgstr ""
+
+#: ../src/GBglarea.c:104
+msgid " BOUTON 1"
+msgstr ""
+
+#: ../src/GBglarea.c:107
+msgid " BOUTON 2"
+msgstr ""
+
+#: ../src/GBglarea.c:110
+msgid " BOUTON 3"
+msgstr ""
+
+#: ../src/GBglarea.c:123
+#, c-format
+msgid "GL_VENDOR: %s\n"
+msgstr ""
+
+#: ../src/GBglarea.c:125
+#, c-format
+msgid "GL_RENDERER: %s\n"
+msgstr ""
+
+#: ../src/GBglarea.c:127
+#, c-format
+msgid "GL_VERSION: %s\n"
+msgstr ""
+
+#: ../src/GBglarea.c:129
+#, c-format
+msgid "GL_EXTENSIONS: %s\n"
+msgstr ""
+
+#: ../src/GBglarea.c:141
+msgid "init openGL\n"
+msgstr ""
+
+#: ../src/GBglarea.c:165
+msgid "draw openGL\n"
+msgstr ""
+
+#: ../src/GBglarea.c:187
+msgid "hello"
+msgstr ""
+
+#: ../src/GBglarea.c:190
+msgid "coucou"
+msgstr ""
+
+#: ../src/GBglarea.c:193
+msgid "bonjour"
+msgstr ""
+
+#: ../src/GBglarea.c:196
+msgid "y=-2"
+msgstr ""
+
+#: ../src/GBglarea.c:199
+msgid "y=-3"
+msgstr ""
+
+#: ../src/GBglarea.c:202
+msgid "y=-4"
+msgstr ""
+
+#: ../src/GBglarea.c:205
+msgid "y=-5"
+msgstr ""
+
+#: ../src/GBglarea.c:208
+msgid "y=-6"
+msgstr ""
+
+#: ../src/GBglarea.c:211
+msgid "y=-7"
+msgstr ""
+
+#: ../src/GBglarea.c:233
+msgid "reshape openGL\n"
+msgstr ""
+
+#: ../src/GBglarea.c:263 ../src/GBglarea.c:265
+msgid "glarea"
+msgstr ""
+
+#: ../src/GBglarea.c:274
+msgid "realize"
+msgstr ""
+
+#: ../src/GBglarea.c:276
+msgid "expose_event"
+msgstr ""
+
+#: ../src/GBglarea.c:278
+msgid "configure_event"
+msgstr ""
+
+#: ../src/GBglarea.c:281
+msgid "button_press_event"
+msgstr ""
+
+#: ../src/GBglarea.c:282
+msgid "button_release_event"
+msgstr ""
+
+#: ../src/GBglarea.c:283
+msgid "motion_notify_event"
+msgstr ""
+
+#: ../src/GBglfont.c:45
+msgid "-adobe-helvetica-medium-r-normal--18-*-*-*-p-*-iso8859-1"
+msgstr ""
+
+#: ../src/GBglfont.c:48
+msgid "fixed"
+msgstr ""
+
+#: ../src/GBglfont.c:51
+msgid "pas de font disponible...\n"
+msgstr ""
+
+#: ../src/GBhelp.c:49
+msgid "APropos_dialog1"
+msgstr ""
+
+#: ../src/GBhelp.c:50
+msgid "A propos..."
+msgstr ""
+
+#: ../src/GBhelp.c:55
+msgid "dialog_vbox1"
+msgstr ""
+
+#: ../src/GBhelp.c:61
+msgid "label1"
+msgstr ""
+
+#: ../src/GBhelp.c:66
+msgid "dialog_action_area1"
+msgstr ""
+
+#: ../src/GBhelp.c:70
+msgid "OK"
+msgstr ""
+
+#: ../src/GBhelp.c:72
+msgid "button1"
+msgstr ""
+
+#: ../src/GBhelp.c:76 ../src/GBmisc.c:114 ../src/GBmisc.c:115
+msgid "clicked"
+msgstr ""
+
+#: ../src/GBinterface.c:49 ../src/GBinterface.c:50
+msgid "mainwindow"
+msgstr ""
+
+#: ../src/GBinterface.c:53
+msgid "delete_event"
+msgstr ""
+
+#: ../src/GBinterface.c:69 ../src/GBinterface.c:71
+msgid "vbox1"
+msgstr ""
+
+#: ../src/GBinterface.c:94
+msgid "scrolledwindow1"
+msgstr ""
+
+#: ../src/GBinterface.c:101 ../src/GBmisc.c:60
+msgid "text1"
+msgstr ""
+
+#: ../src/GBinterface.c:106
+msgid "tooltips"
+msgstr ""
+
+#: ../src/GBmain.c:39
+msgid "openGL n'est pas supporté par votre système\n"
+msgstr ""
+
+#: ../src/GBmainmenu.c:63 ../src/GBmainmenu.c:65
+msgid "mainmenu"
+msgstr ""
+
+#: ../src/GBmainmenu.c:73
+msgid "_Projet"
+msgstr ""
+
+#: ../src/GBmainmenu.c:74 ../src/GBmainmenu.c:91 ../src/GBmainmenu.c:102
+#: ../src/GBmainmenu.c:113 ../src/GBmainmenu.c:124 ../src/GBmainmenu.c:139
+#: ../src/GBmainmenu.c:156 ../src/GBmainmenu.c:167 ../src/GBmainmenu.c:182
+#: ../src/GBmainmenu.c:196 ../src/GBmainmenu.c:213 ../src/GBmainmenu.c:228
+#: ../src/GBmainmenu.c:246
+msgid "activate_item"
+msgstr ""
+
+#: ../src/GBmainmenu.c:75 ../src/GBmainmenu.c:77
+msgid "projet1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:80
+msgid "Gestion d'un projet"
+msgstr ""
+
+#: ../src/GBmainmenu.c:83 ../src/GBmainmenu.c:85
+msgid "projet1_menu"
+msgstr ""
+
+#: ../src/GBmainmenu.c:90
+msgid "_Nouveau..."
+msgstr ""
+
+#: ../src/GBmainmenu.c:92 ../src/GBmainmenu.c:94
+msgid "new1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:97
+msgid "Creation d'un nouveau projet"
+msgstr ""
+
+#: ../src/GBmainmenu.c:98 ../src/GBmainmenu.c:109 ../src/GBmainmenu.c:120
+#: ../src/GBmainmenu.c:131 ../src/GBmainmenu.c:163 ../src/GBmainmenu.c:174
+#: ../src/GBmainmenu.c:220 ../src/GBmainmenu.c:257 ../src/GBmainmenu.c:259
+#: ../src/GBmainmenu.c:261 ../src/GBmainmenu.c:263 ../src/GBmainmenu.c:267
+#: ../src/GBmainmenu.c:269 ../src/GBmainmenu.c:273
+msgid "activate"
+msgstr ""
+
+#: ../src/GBmainmenu.c:101
+msgid "_Ouvrir..."
+msgstr ""
+
+#: ../src/GBmainmenu.c:103 ../src/GBmainmenu.c:105
+msgid "open1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:108
+msgid "Ouvre un projet existant"
+msgstr ""
+
+#: ../src/GBmainmenu.c:112
+msgid "_Sauver"
+msgstr ""
+
+#: ../src/GBmainmenu.c:114 ../src/GBmainmenu.c:116
+msgid "save1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:119
+msgid "Sauve le projet courant"
+msgstr ""
+
+#: ../src/GBmainmenu.c:123
+msgid "_Quitter"
+msgstr ""
+
+#: ../src/GBmainmenu.c:125 ../src/GBmainmenu.c:127
+msgid "exit1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:130
+msgid "Fin du programme"
+msgstr ""
+
+#: ../src/GBmainmenu.c:138
+msgid "_Objets"
+msgstr ""
+
+#: ../src/GBmainmenu.c:140 ../src/GBmainmenu.c:142
+msgid "objets1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:145
+msgid "Gestion des objets"
+msgstr ""
+
+#: ../src/GBmainmenu.c:148 ../src/GBmainmenu.c:150
+msgid "objet1_menu"
+msgstr ""
+
+#: ../src/GBmainmenu.c:155
+msgid "no_Uveau..."
+msgstr ""
+
+#: ../src/GBmainmenu.c:157 ../src/GBmainmenu.c:159
+msgid "obnew1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:162
+msgid "Insertion d'un nouvel objet"
+msgstr ""
+
+#: ../src/GBmainmenu.c:166
+msgid "ou_Vrir..."
+msgstr ""
+
+#: ../src/GBmainmenu.c:168 ../src/GBmainmenu.c:170
+msgid "obopen1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:173
+msgid "Ouvre un objet..."
+msgstr ""
+
+#: ../src/GBmainmenu.c:181
+msgid "_Textures"
+msgstr ""
+
+#: ../src/GBmainmenu.c:183 ../src/GBmainmenu.c:185
+msgid "textures1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:188
+msgid "Gestion des textures"
+msgstr ""
+
+#: ../src/GBmainmenu.c:195
+msgid "o_Utils"
+msgstr ""
+
+#: ../src/GBmainmenu.c:197 ../src/GBmainmenu.c:199
+msgid "outils1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:202
+msgid "Outils..."
+msgstr ""
+
+#: ../src/GBmainmenu.c:205 ../src/GBmainmenu.c:207
+msgid "outils1_menu"
+msgstr ""
+
+#: ../src/GBmainmenu.c:212
+msgid "o_Ptions..."
+msgstr ""
+
+#: ../src/GBmainmenu.c:214 ../src/GBmainmenu.c:216
+msgid "otopt1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:219
+msgid "Options du projet courant"
+msgstr ""
+
+#: ../src/GBmainmenu.c:227
+msgid "_Aide"
+msgstr ""
+
+#: ../src/GBmainmenu.c:229 ../src/GBmainmenu.c:231
+msgid "aide1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:234
+msgid "Aide"
+msgstr ""
+
+#: ../src/GBmainmenu.c:238 ../src/GBmainmenu.c:240
+msgid "aide1_menu"
+msgstr ""
+
+#: ../src/GBmainmenu.c:245
+msgid "_A propos..."
+msgstr ""
+
+#: ../src/GBmainmenu.c:247 ../src/GBmainmenu.c:249
+msgid "about1"
+msgstr ""
+
+#: ../src/GBmainmenu.c:252
+msgid "A propos de gbuild..."
+msgstr ""
+
+#: ../src/GBmisc.c:42
+#, c-format
+msgid "Widget non trouvé: %s"
+msgstr ""
+
+#: ../src/GBmisc.c:99
+msgid "fileselection"
+msgstr ""
+
+#: ../src/GBmisc.c:104
+msgid "file_ok_button"
+msgstr ""
+
+#: ../src/GBmisc.c:109
+msgid "file_cancel_button"
+msgstr ""
+
+#: ../src/GBmisc.c:125
+msgid "GBInit\n"
+msgstr ""
+
+#: ../src/GBmisc.c:126
+msgid "pixmaps/"
+msgstr ""
+
+#: ../src/GBmisc.c:127
+msgid "Guillaumaud Philippe"
+msgstr ""
+
+#: ../src/GBmisc.c:131
+msgid " "
+msgstr ""
+
+#: ../src/GBmisc.c:135
+#, c-format
+msgid ""
+"%s\n"
+"3D Game's Builder\n"
+"%s\n"
+"1999 - 2000"
+msgstr ""
+
+#: ../src/GBmisc.c:143
+msgid "SORTIE\n"
+msgstr ""
+
+#: ../src/GBobjets.c:37
+#, c-format
+msgid "Objet à ouvrir: %s\n"
+msgstr ""
+
+#: ../src/GBobjets.c:51
+#, c-format
+msgid "Objet à sauver: %s\n"
+msgstr ""
+
+#: ../src/GBobjets.c:72
+msgid "Ouverture d'un objet\n"
+msgstr ""
+
+#: ../src/GBobjets.c:73
+msgid "Ouvrir un Objet"
+msgstr ""
+
+#: ../src/GBobjets.c:84
+msgid "Sauvegarde d'un objet\n"
+msgstr ""
+
+#: ../src/GBobjets.c:85
+msgid "Sauver un Objet"
+msgstr ""
+
+#: ../src/GBobjets.c:94
+msgid "Création d'un objet\n"
+msgstr ""
+
+#: ../src/GBstatusbar.c:29 ../src/GBstatusbar.c:31
+msgid "statusbar1"
+msgstr ""
+
+#: ../src/GBtoolbar.c:33 ../src/GBtoolbar.c:35
+msgid "toolbar1"
+msgstr ""
+
+#: ../src/GBtoolbar.c:39
+msgid "Quitter"
+msgstr ""
+
+#: ../src/GBtoolbar.c:39
+msgid "exit.xpm"
+msgstr ""
+
+#: ../src/GBtoolbar.c:40
+msgid "Nouveau projet"
+msgstr ""
+
+#: ../src/GBtoolbar.c:40
+msgid "new.xpm"
+msgstr ""
+
+#: ../src/GBtoolbar.c:41
+msgid "Ouvrir un projet"
+msgstr ""
+
+#: ../src/GBtoolbar.c:41
+msgid "file.xpm"
+msgstr ""
+
+#: ../src/GBtoolbar.c:42
+msgid "Sauver le projet courant"
+msgstr ""
+
+#: ../src/GBtoolbar.c:42
+msgid "save.xpm"
+msgstr ""
+
+#: ../src/GBtoolbar.c:45
+msgid "Point de vue"
+msgstr ""
+
+#: ../src/GBtoolbar.c:45
+msgid "viewpoint.xpm"
+msgstr ""
+
+#: ../src/GBworld.c:37
+#, c-format
+msgid "Fichier à ouvrir: %s\n"
+msgstr ""
+
+#: ../src/GBworld.c:51
+#, c-format
+msgid "Fichier à sauver: %s\n"
+msgstr ""
+
+#: ../src/GBworld.c:72
+msgid "Ouverture d'un projet\n"
+msgstr ""
+
+#: ../src/GBworld.c:73
+msgid "Ouvrir un Projet"
+msgstr ""
+
+#: ../src/GBworld.c:84
+msgid "Sauvegarde d'un projet\n"
+msgstr ""
+
+#: ../src/GBworld.c:85
+msgid "Sauver un Projet"
+msgstr ""
+
+#: ../src/GBworld.c:107
+msgid "Création d'un projet\n"
+msgstr ""

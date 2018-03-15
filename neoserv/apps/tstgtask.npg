@@ -1,0 +1,23 @@
+//
+// test tƒche globale
+//
+number pnum
+local number lnum
+
+: gtask
+   begin
+      timer 10 % 0 ==
+      if
+         pnum ++
+      endif
+   again
+;
+
+: main
+   cls
+   " test tƒche globale" print cr
+   wait
+   " pnum = " print pnum print cr
+   wait
+;
+

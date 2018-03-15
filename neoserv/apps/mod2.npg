@@ -1,0 +1,15 @@
+//
+// test appels inter modules
+//
+// MOD2.TFH
+
+local char toto := " toto de mod2.tfh"
+
+: proc
+   " vous etes dans proc de mod2.tfh" print
+   wait
+   toto print
+   wait
+;
+
+

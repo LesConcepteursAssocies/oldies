@@ -1,0 +1,181 @@
+Introduction.
+-------------
+
+Ce chapitre comprend les sources de quelques jeux, de diff‚rentes cat‚gories
+(divertissement, arcade, r‚flexion), utilisants les ressources graphiques
+disponibles sur les PC.
+
+Rappels sur les modes graphiques disponibles sur PC.
+----------------------------------------------------
+
+L'univers des PC est peupl‚ de diff‚rentes cartes graphiques, offrants chacunes
+un certain nombre de possibilit‚s, et qui ont leur propre mode de programmation.
+
+Seuls ceux utilis‚s dans les programmes ci-aprŠs seront d‚taill‚s.
+
+Mode graphique C.G.A.
+---------------------
+
+Ce mode est le plus ancien, il a donc beaucoup moins de possibilit‚s que les
+modes r‚cents, mais est encore utilis‚ de nos jours.
+
+Suivant le mode s‚lectionn‚, on dispose d'une r‚solution et d'un nombre de
+couleurs disponibles plus ou moins important.
+
+R‚capitulatif des modes C.G.A :
+-------------------------------
+
+Mode   R‚solution   Nombre de couleurs
+4       320 x 200          4
+5       320 x 200          4
+6       640 x 200          2
+
+Dans les modes 4 et 5, on peut choisir entre deux jeux de couleurs,
+ou palette, dont voici les caract‚riqtiques :
+
+Palette    Couleurs
+0          0 (noir)
+           1 (vert)
+           2 (rouge)
+           3 (jaune)
+1          0 (noir)
+           1 (cyan)
+           2 (magenta)
+           3 (blanc)
+
+La m‚moire de l'‚cran C.G.A commence … l'adresse de segment 0B800h
+("h" pour h‚xad‚cimal), et est entrelac‚e en lignes paires et impaires,
+les lignes impaires ‚tant stock‚es … partir de l'adresse 0BA000h.
+
+La m‚moire ‚cran peut ˆtre repr‚sent‚e de la fa‡on suivante :
+
+0B800  ->Ligne 0
+       ->Ligne 2
+       ->Ligne 4
+           .
+           .
+           .
+0BA00  ->Ligne 1
+       ->Ligne 3
+       ->Ligne 5
+           .
+           .
+           .
+
+Dans les modes 4 et 5, chaque point est cod‚ sur 2 bits (4 couleurs),
+un octet contiendra donc le codage de 4 points. Une ligne de 320 points
+repr‚sente 80 octets.
+
+Mode graphique E.G.A.
+---------------------
+
+Le mode E.G.A est plus complet, en matiŠre de r‚solution et de couleurs
+disponibles, mais sa programmation est plus complexe. Chaque carte possŠde
+sa propre quantit‚ de m‚moire, qui peut aller de 64 … 256 Ko, en fonction
+du modŠle.
+
+R‚capitulatif des modes E.G.A :
+-------------------------------
+
+Mode   R‚solution   Nombre de couleurs
+13      320 x 200          16
+14      640 x 200          16
+16      640 x 350          16
+
+La m‚moire de l'‚cran E.G.A est organis‚e en 4 "plans de bits", chacun de
+ces plans contenant un bit de la couleur de chaque point cod‚, et commence
+… l'adresse de segment 0A000h.
+
+La m‚moire ‚cran peut ˆtre repr‚sent‚e de la fa‡on suivante :
+
+0A000h  Plan 1 Bit 1 point 0
+               Bit 1 point 1
+                    .
+                    .
+                    .
+        Plan 2 Bit 2 point 0
+               Bit 2 point 1
+                    .
+                    .
+                    .
+        Plan 3 Bit 3 point 0
+               Bit 3 point 1
+                    .
+                    .
+                    .
+        Plan 4 Bit 4 point 0
+               Bit 4 point 1
+                    .
+                    .
+                    .
+
+A un moment donn‚, un seul des 4 plans est adressable, cet adressage ‚tant
+effectu‚ par l'interm‚diaire des registres pre‚sents sur la carte E.G.A.
+
+Un point est cod‚ sur 4 bits (chaque bit se trouvant dans un plan diff‚rent),
+et en fonction du mode choisi et de la m‚moire disponible sur la carte,
+plusieurs pages seront disponibles (8 pages en mode 13, 4 pages en mode 14,
+2 pages en mode 16, ceci avec une carte disposant de 256 Ko de m‚moire).
+
+Adresses des pages disponibles :
+
+Mode 13  Page 0  0A000
+         Page 1  0A200
+         Page 2  0A400
+         Page 3  0A600
+         Page 4  0A800
+         Page 5  0AA00
+         Page 6  0AC00
+         Page 7  0AE00
+Mode 14  Page 0  0A000
+         Page 1  0A400
+         Page 2  0A800
+         Page 3  0AC00
+Mode 16  Page 0  0A000
+         Page 1  0A800
+
+Couleurs disponibles en mode E.G.A :
+
+0    Noir
+1    Bleu sombre
+2    Vert sombre
+3    Turquoise
+4    Rouge sombre
+5    Violet
+6    Brun
+7    Gris clair
+8    Gris fonc‚
+9    Bleu
+10   Vert clair
+11   Cyan
+12   Rouge
+13   Magenta
+14   Jaune
+15   Blanc
+
+Lutins graphiques.
+------------------
+
+Dans la plupart des programmes graphiques, et des jeux en particulier,
+L'affichage des divers ‚l‚ments du programme (personnages, d‚cors, ic“nes,
+curseur, ...) s'effectue avec ce que l'on appelle des lutins (ou sprites en
+anglais).
+
+Un lutin est simplement un dessin point par point (appel‚ aussi image bitmap)
+de taille et de forme variable. Ce dessin peut ˆtre repr‚sent‚ par une matrice
+comprenant une certain nombre de lignes et de colonnes, ou chaque case contient
+le code de la couleur du point correspondant, dans le mode graphique courant.
+
+Dans les programmes qui suivent, on utilise des lutins de 2 tailles,
+8 x 8 points et 16 x 16 points, ce qui a 2 avantages :
+
+- Les routines d'affichage sont sp‚cialement con‡ues pour les tailles choisies,
+  d'o— une ‚x‚cution optimale.
+
+- L'ensemble des lutins peut ˆtre stock‚ dans un tableau, ce qui permet un accŠs
+  trŠs rapide.
+
+Dans le cas d'un programme manipulant des lutins de tailles et formes
+diff‚rentes, la routine d'affichage peut ˆtre con‡ue de fa‡on plus g‚n‚rale.
+
+

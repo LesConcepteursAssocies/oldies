@@ -1,0 +1,99 @@
+                 DETERMINATION DU TYPE DE PROCESSEUR PRESENT
+                 -------------------------------------------
+
+Ce programme permet de savoir avec quel type de micro-processeur le systŠme
+travaille. 
+
+
+PRINCIPES ET FONCTIONNEMENT DU PROGRAMME.
+-----------------------------------------
+
+Le programme renvoie un code num‚rique, correspondant au type de processeur
+d‚tect‚.
+
+Le codage est le suivant :
+
+0 = 8088
+1 = 8086
+2 = NEC V20 (clone 8088)
+3 = NEC V30 (clone 8086)
+4 = 80188
+5 = 80186
+6 = 80286
+7 = 80386
+
+D‚terminer le type de æP pr‚sent peut s'av‚rer trŠs utile pour un certain
+nombre de choses (boucles de ralentissement dans certains programmes,
+directives de compilation ‚volu‚e, assemblage et/ou compilation
+conditionnel, etc...).
+
+Vous savez tous qu'il existe toute une gamme de micro-processeurs ‚quipants
+les PC'S, allant du 8088 (si,si !) au 80486, en passant par les NEC V20 et V30.
+
+Chacune de ces puces, compatibilit‚ oblige, possŠde un nombre fini de
+registres (flags et autres), un bus de donn‚es et d'adresses de largeur
+variable (8 bits de donn‚es sur les x88, 16 bits sur les x86, 32 bits sur
+les tous derniers de la famille, 386 et 486).
+
+Pour trouver sur lequel des ces æP il se trouve, le programme utilise en
+fait certaines des diff‚rences rencontr‚es sur ces puces.
+
+80286 ou 80386 ?
+----------------
+
+En regardant le registre des FLAGS, on peut facilement trouver sur lequel
+de ces deux æP l'on se trouve.
+
+En effet, les bits 12 … 15 de ce registre ne sont utilis‚s que depuis le
+80286 (… cause de l'apparition du mode prot‚g‚).
+sur les modŠles inf‚rieurs de la gamme, ces bits sont syst‚matiquement
+positionn‚s … 1.
+
+Le test consiste donc … fixer … 0 le registre des flags, puis … regarder
+si ces bits sont … 1, auquel cas l'on n'a pas affaire … un 286 ou 386.
+
+Ensuite, il suffit de savoir que le 80286 met … 0 les bits 12 a 14,
+contrairement au 80386, ce que regarde le test suivant (7000h dans le
+registre des flags).
+
+80188 80186 ?
+-------------
+
+Sur ces deux æP, l'instruction de d‚calage a ‚t‚ modifi‚e, par un masquage
+des trois bits sup‚rieurs du registre CL, pour n'autoriser qu'un maximum
+de 16 d‚calages (17 en passant par le carry flag).
+
+Il suffit donc d'essayer d'effectuer un nombre sup‚rieur de d‚calages 
+(d‚caler FFh 21h fois), et de regarder le r‚sultat (07h sur 80188 ou 80186,
+0 sur les autres).
+
+V20, V30, 8088, 8086 ?
+----------------------
+
+Les æP V20 et V30 sont des clones des æP 8088 et 8086 respectivement.
+Il possŠdent un jeu d'instruction identique, mais sont un peu plus rapides.
+
+Ces æP ‚liminent aussi un petit "bug" des deux autres, ce qui permet de
+deviner sur lequel on se trouve.
+
+En effet, lorsqu'une interruption survient sur un 8088 ou 8086 pendant que
+l'on effectue une op‚ration de type REP LODS avec segment override, la
+reprise de cette instruction n'est pas effectu‚e. On peut s'en rendre compte
+en regardant le contenu du registre CX, qui est diff‚rent de 0 sur ces æP.
+
+x88 ou x86 ?
+------------
+
+Le dernier test est effectu‚ pour tous les processeurs (sauf les 286 et 386)
+et consiste … d‚terminer si l'on est en pr‚sence d'un æP dot‚ d'un bus 8 bits
+(x88) ou d'un bus 16 bits (x86).
+
+Il est ‚vident que rien ne permet de connaitre la largeur d'un bus de donn‚es,
+mais la longueur de la file d'attente … l'int‚rieur du æP d‚pend directement
+de cette largeur (6 octets sur les x86, 4 sur les x88).
+
+Donc, l'instruction d'incr‚mentation (DX INC) se trouvera hors de cette file
+d'attente sur un æP dot‚ d'un bus 8 bits (x88) et sera remplac‚e par
+l'instruction STI lors du test.
+
+

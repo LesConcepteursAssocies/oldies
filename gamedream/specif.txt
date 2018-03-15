@@ -1,0 +1,27 @@
+Projet GameDream
+
+créateur de mondes 3D: gBuild
+
+Menu projet (menu de base):
+	- nouveau projet
+	- Chargement d'un projet
+	- sauvegarde d'un projet
+
+propriétés d'un objet:
+	- type (simple genre CUBE, SPHERE, TORE
+			complexe avec un nombre de faces variables)
+	- nombre de faces (1 pour une sphère, 6 pour un cube, ...)
+	- pointeur sur les descripteurs des faces (voir plus bas)
+	- comportement (définit le "role" de l'objet dans le monde 3D, genre:
+	  	- statique (immobile, exemple une maison, un obstacle simple...)
+		  défini les objets qui n'influencent pas le reste du monde
+		- dynamique, défini les objets ayants une action ou un effet sur le
+		  monde, exemple: les "ennemis" d'un jeu, les objets animés genre
+animaux, décors, etc...
+
+propriétés d'une face:
+	- nombre de sommets (un sommet est un triplet de coordonnées X,Y,Z)
+	- type remplissage: COULEUR, ou TEXTURE
+		- si COULEUR, indiquer la couleur de la face
+		- si TEXTURE, indiquer le nom de la texture
+

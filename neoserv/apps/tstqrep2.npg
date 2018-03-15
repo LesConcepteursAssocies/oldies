@@ -1,0 +1,15 @@
+//
+// Test module support technique
+//
+
+#use modules\qrep\qrep
+
+: main
+   cls
+   " QREP2: test support technique" print cr
+   wait
+   qrep::menugen
+   cr " retour" print cr
+   wait
+;
+

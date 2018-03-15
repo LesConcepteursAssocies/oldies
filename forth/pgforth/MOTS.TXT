@@ -1,0 +1,134 @@
+Vocabulaire FORTH
+
+            OUT-WORDS   (OUT-WORDS) SAVE-SYSTEM 'BUFFER     ]FORTH      
+ ASM[       ;CODE       CODE        AVOC        DOES?       LABEL       
+ ASSEMBLER  DIR         .TIME       .DATE       .SIZE       .NAME       
+ 0.R        DIR.REPS    DIR.FILES   DIR.SIZE    *.*         DUMP        
+ D.2        SEGMENT>    WORDS       #WORDS      LARGEST     ?TAB        
+ ?CR        ?LINE       STOP?       RMARGIN     LMARGIN     ARRAY       
+ CARRAY     ROOT        INCLUDE     GETLINE     .LINE       GET         
+ OPEN       ?OPEN       PATHNAME!   ALLCLOSE    CLOSE       DEL         
+ CHDIR      RMDIR       MKDIR       DRIVE?      ASCII0      GET-DTA     
+ SET-DTA    LINE#       PATHNAME    BUFFER      EOF         E:          
+ D:         C:          B:          A:          SELECT      ?DOSERR     
+ DOS        (GETLINE)   (SEEK)      (FREE)      (SEARCH)    (SEARCH0)   
+ (REN)      (MAKE)      (PUT)       (GET)       (CLOSE)     (OPEN)      
+ (AUXOUT)   (AUXIN)     (STDPRN)    (STDOUT)    (STDIN)     (?LEAVE)    
+ ?LEAVE     (LEAVE)     LEAVE       K           J           I           
+ (+LOOP)    +LOOP       (LOOP)      LOOP        (?DO)       ?DO         
+ (DO)       DO          REPEAT      WHILE       AGAIN       UNTIL       
+ BEGIN      THEN        ELSE        IF          ?BRANCH     BRANCH      
+ ?<RESOLVE  ?<MARK      ?>RESOLVE   ?>MARK      <RESOLVE    <MARK       
+ >RESOLVE   >MARK       ?CONDITION  DEFINITIONS VOCABULARY  (VOC)       
+ DOES>      (DOES>)     (;CODE)     ;USES       (;USES)     HERE        
+ ."         !"          ,"          (.")        "           (")         
+ DLITERAL   (DLIT)      LITERAL     (LIT)       IS          (IS)        
+ DEFER      (DEFER)     STRING      (STRING)    2VARIABLE   (2VARIABLE) 
+ VARIABLE   (VARIABLE)  2CONSTANT   (2CONSTANT) CONSTANT    (CONSTANT)  
+ CREATE     (CREATE)    "CREATE     EVEN        [']         CONTROL     
+ ASCII      [COMPILE]   IMMEDIATE   COMPILE     C,          ,           
+ ALLOT      [           ]           ;           :           (:)         
+ REVEAL     HIDE        ALIGN       ?CSP        !CSP        EXIT        
+ CODE-REF   >NEXT       APUSH       DPUSH       EXECUTE     FORGET      
+ (FORGET)   TRIM        ?MISSING    (?MISSING)  '           DEFINED     
+ ?UPPERCASE FIND        (FIND)      HASH        INTERPRET   RUN         
+ >LINK      >NAME       >BODY       LINK>       NAME>       BODY>       
+ L>NAME     N>LINK      TRAVERSE    DONE?       ?STACK      (STATUS)    
+ STATUS     QUIT        BOOT        BYE         COLD        PRESENTE    
+ WARM       ABORT"      (ABORT")    (?ERROR)    ?ERROR      (ABORT)     
+ ABORT      NOOP        >TYPE       .(          (           WORD        
+ 'WORD      PARSE       PARSE-WORD  /STRING     SCAN        SKIP        
+ (SOURCE)   SOURCE      QUERY       EXPECT      CHAR        (CHAR)      
+ CR-IN      P-IN        RES-IN      BACK-UP     DEL-I       BS-IN       
+ BEEP       BACKSPACES  SPACES      SPACE       PERFORM     REPLICATE   
+ TYPE       CR          CRLF        HOME        DARK        INVERS      
+ BLINK      UNDERL      BOLD        ATTOFF      (ATTRIB)    EMIT        
+ (EMIT)     (PRINT)     (CONSOLE)   (CONS)      KEY?        KEY         
+ (KEY)      (KEY?)      .ID         D.R         D.          (D.)        
+ UD.R       UD.         (UD.)       .R          .           (.)         
+ U.R        U.          (U.)        #S          #           SIGN        
+ #>         <#          HOLD        NUMBER      (NUMBER)    NUMBER?     
+ BOUNDS     (NUMBER?)   CONVERT     DOUBLE?     DIGIT       ESEGMENT    
+ SSEGMENT   DSEGMENT    CSEGMENT    COMPARE     CAPS-COMP   COMP        
+ -TRAILING  ?CHAR       UPC         UPPER       LENGTH      COUNT       
+ BLANK      ERASE       FILL        LMOVE>      LMOVE       LCMOVE>     
+ LCMOVE     UM/MOD      U*D         UM*         */MOD       */          
+ /MOD       MOD         /           *           MU/MOD      M/MOD       
+ *D         DMAX        DMIN        D>          D<          DU<         
+ D=         D0=         D-          D2/         D2*         DABS        
+ S>D        ?DNEGATE    DNEGATE     D+          2ROT        4DUP        
+ 3DUP       2OVER       2SWAP       2DUP        2DROP       WITHIN      
+ BETWEEN    MAX         MIN         >           <           U>          
+ U<         <>          0<>         0>          0<          0=          
+ =          1-!         1+!         2-          1-          2+          
+ 1+         8*          U2/         2/          2*          3           
+ 2          1           0           -!          +!          ABS         
+ ?NEGATE    NEGATE      -           +           OFF         ON          
+ CTOGGLE    CRESET      CSET        FALSE       TRUE        NOT         
+ XOR        OR          AND         R@          >R          R>          
+ FLIP       NIP         TUCK        ROLL        PICK        -ROT        
+ ROT        OVER        SWAP        ?DUP        DUP         DROP        
+ RDEPTH     DEPTH       RP!         RP@         SP!         SP@         
+ PLACE      MOVE        CMOVE>      CMOVE       LC@         L@          
+ LC!        L!          2!          !           C!          2@          
+ @          C@          HEX         DECIMAL     OCTAL       BINARY      
+ BUFFERS    DTA         ERRMSG      $PAD        C-C-F       TIB         
+ STDPRN     AUXOUT      AUXIN       STDOUT      STDIN       PAD         
+ C/L        BELL        BS          BL          #THREADS    #VOCS       
+ READ-WRITE WRITE       READ        C/PATH      LBUF        #FILES      
+ FILES      #TIB        FENCE       C-C         RP0         SP0         
+ STATUS?    ATTRIBUTS   >IN         'TIB        PRINTING    #LINE       
+ #OUT       SPAN        WIDTH       END?        PRIOR       LAST        
+ VOC-LINK   CONTEXT     CURRENT     CAPS        HLD         DPL         
+ OBASE      IBASE       USER        WARNING     DP          CSP         
+ STATE      ECHO        HANDLE      EOF?        TOS         FORTH 
+491 mots
+
+Vocabulaire ASSEMBLER
+
+            2PUSH       1PUSH       NEXT        DO          REPEAT      
+ WHILE      AGAIN       UNTIL       BEGIN       ELSE        THEN        
+ IF         OV          U>          U<=         U>=         U<          
+ >          <=          >=          <           0<=         0<          
+ 0<>        0=          A?<RESOLVE  A?<MARK     A?>RESOLVE  A?>MARK     
+ +RET       XOR         XLAT        WAIT        SUB         STOS        
+ STI        STD         STC         SHR         SHL         SCAS        
+ SBB        SAR         SAHF        ROR         ROL         RET         
+ REPZ       REPNZ       REP         RCR         RCL         PUSHF       
+ PUSH       POPF        POP         OUT         OR          NOT         
+ NOP        NEG         MUL         MOVS        LOOPNE      LOOPE       
+ LOOP       LODS        LOCK        LES         LEA         LDS         
+ LAHF       JS          JPO         JPE         JO          JNS         
+ JNO        JNE         JMP         JLE         JL          JGE         
+ JG         JE          JCXZ        JBE         JB          JAE         
+ JA         IRET        INTO        INC         IN          IMUL        
+ IDIV       HLT         DIV         DEC         DAS         DAA         
+ CWD        CMPS        CMP         CMC         CLI         CLD         
+ CLC        CBW         CALL        AND         ADD         ADC         
+ AAS        AAM         AAD         AAA         MOV         SS:         
+ ES:        DS:         CS:         XCHG        SEG         INT         
+ ESC        TEST        13MI        14MI        12MI        11MI        
+ 10MI       9MI         8MI         7MI         6MI         5MI         
+ 4MI        3MI         2MI         1MI         ?FAR        FAR         
+ WR/SM,     R/M,        WMEM,       MEM,        B/L?        RR,         
+ ,/C,       SIZE,       W,          OP,         BYTE        RMID        
+ RLOW       BIG?        REG?        #?          SEG?        MEM?        
+ R16?       R8?         MD          [W]         W           [IP]        
+ IP         [RP]        RP          S#)         #)          #           
+ DS         SS          CS          ES          [DI+BP]     [SI+BP]     
+ [DI+BX]    [SI+BX]     [BX]        [BP]        [DI]        [SI]        
+ [BP+DI]    [BP+SI]     [BX+DI]     [BX+SI]     DI          SI          
+ BP         SP          BX          DX          CX          AX          
+ BH         DH          CH          AH          BL          DL          
+ CL         AL          REGS        ?<RESOLVE   ?<MARK      ?>RESOLVE   
+ ?>MARK     HERE        ,           C,          C;          END-CODE    
+ SIZE       LOGICAL     INTER 
+218 mots
+
+Vocabulaire ROOT
+
+            VOCS        ORDER       FORTH       DEFINITIONS PREVIOUS    
+ SEAL       ONLY        ALSO 
+8 mots
+
+

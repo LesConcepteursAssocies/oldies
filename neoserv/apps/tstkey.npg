@@ -1,0 +1,25 @@
+//
+// tests touches fonctions
+
+: main
+  cls
+  " test touches " print cr
+  wait
+  " appuyez sur une touche" print
+  begin
+     wait
+     5 1 locate "           " print
+     6 1 locate "           " print
+     7 1 locate "           " print
+     8 1 locate "           " print
+     fkey
+     case
+        fksuite of 5 1 locate " SUITE" print endof
+        fkenvoi of 6 1 locate " ENVOI" print endof
+        fkretour of 7 1 locate " RETOUR" print endof
+        fksommaire of 8 1 locate " SOMMAIRE" print endof
+        drop
+     endcase
+  again
+;
+

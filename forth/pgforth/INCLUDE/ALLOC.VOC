@@ -1,0 +1,172 @@
+\ ------------------------------------------------------------------------------
+\                Allocation de la m‚moire et accŠs au SHELL.
+\ ------------------------------------------------------------------------------
+
+ONLY FORTH ALSO DEFINITIONS
+
+CR .( Chargement des utilitaires d'accŠs au SHELL )
+
+IBASE @
+IBASE HEX
+
+\ Empile l'adresse de segment su PSP.
+: PSP  ( --- adr )
+  CSEGMENT 10 - 
+;
+
+\ Empile l'adresse de segment du bloc d'environnement de Le_Forth.
+: SEG-ENV  ( --- adr )
+  PSP 2C L@
+;
+
+: MEM-BLOCK 
+  CSEGMENT 11 - 
+;
+
+: LAST-BLOCK? 
+  MEM-BLOCK 0 LC@ 5A = 
+;
+
+: SEG-BLOCK 
+  MEM-BLOCK 1 L@ 
+;
+
+: SIZE-BLOCK 
+  MEM-BLOCK 3 L@ 
+;
+
+\ D‚termination de la taille n‚c‚ssaire en paragraphes
+CODE (SET-SIZE)  ( nb_parg --- )
+  BX POP
+  ES PUSH
+  CS AX MOV
+  17 # AX SUB
+  AX ES MOV
+  4A # AH MOV
+  21 INT
+  ES POP
+  NEXT
+END-CODE
+
+: SET-SIZE
+  DUP 3000 < ABORT" SET-SIZE: Violation de l'espace m‚moire."
+  (SET-SIZE)
+;
+
+CREATE COMMAND.COM 50 ALLOT
+
+\ R‚cup‚ration de COMSPEC
+
+: COMSPEC!  ( --- )
+  COMMAND.COM 1+ >R
+  SEG-ENV 8
+  BEGIN
+    2DUP LC@         ( seg off car --- )
+    SWAP 1+ SWAP     ( seg off+1 car --- )
+    DUP 0<>
+  WHILE
+    R@ C! R> 1+ >R
+  REPEAT
+  R> C!
+  9 - COMMAND.COM C! ( Calcule et stocke la longueur de COMSPEC )
+  DROP
+;
+
+\ Block de paramŠtres … passer au programme.
+
+CREATE PARAM-BLOCK
+  0  ,             ( Environnement par d‚faut. )
+  0  ,  0 ,        ( Pointeur sur la commande. )
+  -1 , -1 ,        ( Pas de FCB1. )
+  -1 , -1 ,        ( Pas de FCB2. )
+  0  ,  0 ,        ( Pointeur de pile. )
+
+CODE (COMMAND)  ( seg_fic off_fic param_blk --- flag )
+  BX POP
+  DX POP
+  AX POP
+  DI PUSH
+  SI PUSH
+  BP PUSH
+  ES PUSH
+  DS PUSH
+  DS PUSH
+  ES POP
+  AX DS MOV
+  ' PARAM-BLOCK # DI MOV
+  CS:
+  SP 10 [DI] MOV
+  SS AX MOV
+  CS:
+  AX 12 [DI] MOV
+  4B00 # AX MOV
+  21 INT
+  ' PARAM-BLOCK # DI MOV
+  CS:
+  12 [DI] DX MOV
+  DX SS MOV
+  CS:
+  10 [DI] SP MOV
+  DS POP
+  ES POP
+  BP POP
+  SI POP
+  DI POP
+  U>=
+  IF
+    0 # AX MOV  ( Si le 'Carry flag' est … z‚ro, pas d'erreur )
+  THEN
+  1PUSH
+END-CODE
+
+: COMMAND"
+  02 PSP 80 LC!
+  ASCII / PSP 81 LC!
+  ASCII C PSP 82 LC!
+  ASCII " WORD       ( --- chn )
+  DUP C@             ( chn --- lon&3F )
+  OVER C!            ( chn --- )
+  DUP DUP C@ + 1+    ( chn --- chn+lon+1 )
+  13 SWAP C!         ( chn --- )
+  DSEGMENT OVER      ( chn --- DS chn )
+  DUP 1+ SWAP        ( chn DS --- chn+1 chn )
+  PSP 83             ( chn DS chn+1 chn --- PSP 83 )
+  ROT C@ 1+          ( chn DS chn+1 PSP 83 --- lon+1 )
+  LMOVE              ( chn --- )
+  C@ PSP 80 LC@ +
+  PSP 80 LC!         ( lon=lon+3 --- )
+  PSP 80
+  PARAM-BLOCK 2 + !
+  PARAM-BLOCK 4 + !
+;
+
+\ Appels au DOS
+: SHELL"
+  COMMAND"
+  DSEGMENT COMSPEC!
+  COMMAND.COM COUNT DROP
+  PARAM-BLOCK
+  (COMMAND) ?DOSERR
+;
+
+IBASE DECIMAL
+
+\ Interpr‚tation de la ligne de commande pass‚e avec Le_Forth
+
+\ Test la pr‚sence d'une ligne de commande
+: CMDLINE?  ( --- flag )
+  PSP 128 LC@
+  0<>
+;
+
+: CMDLINE
+  PSP 128 2DUP LC@ 2+          \ Transfert de la ligne de commande dans le
+  DSEGMENT BUFFERS ROT LCMOVE  \ flux d'entr‚e.
+  >IN OFF RUN                  \ Interpr‚tation.
+;
+
+IBASE !
+
+EOF
+
+

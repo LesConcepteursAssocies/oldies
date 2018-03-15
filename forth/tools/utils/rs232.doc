@@ -1,0 +1,333 @@
+                          Gestion de l'interface s‚rie
+                          ----------------------------
+
+Ce programme permet de g‚rer l'interface s‚rie des PC's, par la mise en place
+d'une interruption.
+
+PRINCIPES DE GESTION DE L'INTERFACE SERIE.
+------------------------------------------
+
+Les micro ordinateurs de type PC et compatibles possŠdent en standard une
+(au moins) interface s‚rie de type RS232, qui permet de connecter diff‚rents
+p‚riph‚riques (souris, imprimante, scanner, tablette … digitaliser, ...).
+
+Au niveau du D.O.S, cette interface s‚rie est accessible comme un p‚riph‚rique
+de sortie normal, et porte le nom de COM1. Ainsi, des commandes du type
+"COPY Nomfichier.ext COM1:" sont possibles.
+
+L'interface s‚rie possŠde un certain nombre de paramŠtres (vitesse, nombre
+de bits de stop, parit‚) qui sont r‚glables (toujours au niveau du D.O.S) par
+l'interm‚diaire de la commande MODE.
+
+En g‚n‚ral, un PC peut poss‚der de 1 … 4 ports s‚rie, nomm‚s COM1 … COM4.
+
+GESTION MATERIELLE DE L'INTERFACE SERIE.
+----------------------------------------
+
+L'interface s‚rie est g‚r‚e, sur la carte mŠre du PC ou sur une carte
+d'extension, par un composant sp‚cialis‚ appel‚ Contr“leur de Communication
+Asynchrone, aussi d‚sign‚ par les lettres U.A.R.T (Universal Asynchronous
+Receiver Transmiter).
+
+Ce composant, comme son nom l'indique, est charg‚ d'un certain nombre de
+choses :
+  - Envoi et r‚ception de caractŠres sur le port s‚rie, en mode asynchrone,
+    ce qui signifie que l'emmetteur ne travaille pas forc‚ment … la mˆme
+    vitesse que le r‚cepteur.
+  - Gestion des diff‚rents signaux ‚lectroniques n‚c‚ssaires … la transmission
+    et … la r‚ception.
+  - Gestion des signaux principaux n‚c‚ssaires pour la connection … un modem.
+
+L'U.A.R.T des PC, qui est en g‚n‚ral le 8250, composant fabriqu‚ par INTEL
+(entre autre), est en outre un composant "intelligent" ce qui signifie qu'il
+possŠde un certain nombre de registres, dans lesquels ont peut lire et ‚crire,
+et qui permettent de param‚trer son mode fonctionnement g‚n‚ral (vitesse,
+parit‚, ...). Ce type de composant est aussi appel‚ composant programmable.
+
+Les registres du 8250 sont les suivants :
+
+- Un Registre de Contr“le de Ligne,
+  =================================
+  utilis‚ pour initialiser les paramŠtres de communication. Les 8 bits de ce
+  registre ont la signification suivante :
+  - Bits 0 - 1 : Contiennent la longueur d'un mot :
+                 00 = Mots de 5 Bits
+                 01 = Mots de 6 Bits
+                 10 = Mots de 7 Bits
+                 11 = Mots de 8 Bits
+  - Bit 2      : Contient le nombre de bits d'arret :
+                 0  = 1 Bits d'arret
+                 1  = 2 Bits d'arret
+  - Bit 3      : Valide la parit‚ :
+                 0  = Pas de parit‚
+                 1  = 1 Bit de parit‚ est ‚mis
+  - Bit 4      : Type de parit‚ :
+                 0  = Parit‚ paire
+                 1  = Parit‚ impaire
+  - Bit 5      : Mode de la parit‚ :
+                 0  = Parit‚ for‡‚e au 0 logique
+                 1  = Parit‚ for‡‚e au 1 logique
+  - Bit 6      : Signal break. Un espace (0 logique) est ‚mis tant que ce
+                 bit est … 0.
+  - Bit 7      : AccŠs … la bascule de division, qui sert … r‚gler la vitesse
+                 de transmission. Quand ce Bit est … 1, Une op‚ration de
+                 lecture ou d'‚criture provoquera un accŠs aux bascules de
+                 division du g‚n‚rateur de vitesse du 8250.
+                 Ce diviseur est compos‚ de deux octets, accessibles par
+                 l'interm‚diaire de deux registres (un pour l'octet fort, un
+                 pour l'octet faible). Ces deux registres sont aussi app‚l‚s
+                 des LATCH (bascules), LATCHH pour l'octet fort, LATCHL pour
+                 l'octet faible.
+                 Le nombre contenu dans ce mot est divis‚ par la fr‚quence
+                 de l'horloge d'entr‚e (1,8432 MHz) du 8250. La fr‚quence
+                 r‚sultante vaut 16 fois la vitesse de transfert.
+                 Il n'y a pas de limitation au nombre pouvant ˆtre stock‚.
+                 Voici les valeurs (en h‚xa.) … utiliser pour les vitesses
+                 standards :
+                 +-------------------+--------+--------+
+                 |      Vitesse      | LATCHH | LATCHL |
+                 +-------------------+--------+--------+
+                 |      300 Bauds    |  80    |    1   |
+                 |     1200 Bauds    |  60    |    0   |
+                 |     2400 Bauds    |  30    |    0   |
+                 |     4800 Bauds    |  18    |    0   |
+                 |     9600 Bauds    |  0C    |    0   |
+                 +-------------------+--------+--------+
+                 En stockant 0001 dans le mot, on atteint la vitesse de
+                 115200 Bauds !.
+
+- Un Registre de Contr“le du Modem,
+  =================================
+  utilis‚ pour contr“ler les signaux ‚mis vers un modem par le 8250. Les 8 bits
+  de ce registre ont la signification suivante :
+  - Bit 0      : Permet de mettre la sortie DTR (Data Terminal Ready, ou Poste
+                 de Donn‚es Prˆt) dans l'‚tat suivant :
+                 0  = Mise … 1 du signal DTR. Le 8250 demande ainsi … l'autre
+                      appareil connect‚ de ne pas ‚mettre.
+                 1  = Mise … 0 du signal DTR. L'autre appareil peut recommencer
+                      … ‚mettre.
+  - Bit 1      : Idem que le Bit 0, mais pour le signal RTS (Request To Send,
+                 ou demande d'‚mmission).
+  - Bit 2      : Contr“le du signal OUT1. Ce signal n'est pas utilis‚ par
+                 les cartes s‚rie des PC.
+  - Bit 3      : Contr“le du signal OUT2. Ce signal n'est pas utilis‚ par
+                 les cartes s‚rie des PC, mais, par une bizzarerie de
+                 conception, ce bit DOIT ETRE MIS A 1 si on veut g‚rer les
+                 communications par interruptions.
+  - Bit 4      : Valide le mode de test (loop).
+  - Bits 5 - 7 : Doivent ˆtres mis … 0.
+
+- Un Registre de Validation des Interruptions,
+  ============================================
+  qui permet de faire g‚n‚rer une interruption par le 8250, … chaque fois que
+  survient un ‚v‚nement. Chaque Bit de ce registre valide l'interruption
+  correspondant … l'‚v‚nement donn‚ :
+  - Bit 0      : Un 1 valide l'interruption "donn‚e disponible".
+  - Bit 1      : Un 1 valide l'interruption "registre de saisie de l'‚mmetteur
+                 vide".
+  - Bit 2      : Un 1 valide l'interruption "Etat de la ligne de r‚ception".
+  - Bit 3      : Un 1 valide l'interruption "Etat du modem".
+  - Bits 4 - 7 : Doivent ˆtres mis … 0.
+
+- Un Registre d'Etat de la Ligne,
+  ===============================
+  qui fourni des informations relatives … l'‚mmission et … la r‚ception des
+  caractŠres sur le port. Les 8 bits de ce registre ont la signification
+  suivante :
+  - Bit 0      : DR (Data Ready, ou Donn‚e Prˆte), est mis … 1 par le 8250
+                 quand un caractŠre … ‚t‚ re‡u dans le tampon de r‚ception.
+                 Il est maintenu … 1 tant que ce caractŠre n'a pas ‚t‚ lu.
+  - Bit 1      : OE (Overrun Error, ou Erreur de Cadence), est mis … 1 si
+                 un caractŠre a ‚t‚ re‡u avant que le pr‚c‚dent n'ait ‚t‚ lu.
+  - Bit 2      : PE (Parity Error, ou Erreur de Parit‚), est mis … 1 si une
+                 erreur de parit‚ est survenue.
+  - Bit 3      : FE (Frame Error, ou Erreur de Trame), est mis … 1 si aucun
+                 bit d'arret valide n'a ‚t‚ re‡u.
+  - Bit 4      : BI (Break Interrupt, ou Signal de Break), est mis … 1 si un
+                 signal d'interruption a ‚t‚ re‡u.
+  - Bit 5      : THRE (Transmitter Holding Register Empty, ou Registre de
+                 Saisie de l'Emmetteur Vide), est mis … 1 si le 8250 est prˆt
+                 … recevoir un caractŠre pour l'‚mettre.
+  - Bit 6      : TSRE (Transmitter Shift Register Empty, ou Registre … D‚calage
+                 de l'Emmetteur Vide), est mis … 1 si le 8250 n'est pas engag‚
+                 dans le processus d'‚mmission d'un caractŠre. Ce bit sert …
+                 la proc‚dure de conversion parallŠle/s‚rie et n'est en principe
+                 pas test‚ par les logiciels de communication.
+  - Bit 7      : R‚serv‚, mis en permanence … 0.
+
+- Un Registre d'Etat du Modem,
+  ============================
+  qui fourni des informations relatives aux lignes de contr“le de flux. Les 8
+  bits de ce registre ont la signification suivante :
+  - Bit 0      : Delta CTS, est mis … 1 si l'‚tat de la ligne "Prˆt … ‚mettre"
+                 a chang‚.
+  - Bit 1      : Delta DSR, est mis … 1 si l'‚tat de la ligne "Poste de Donn‚es
+                 Prˆt" a chang‚.
+  - Bit 2      : TERI (Trailing Edge Ring Indicator, ou Front ArriŠre de
+                 l'Indicateur d'Appel), est mis … 1 si l'indicateur d'appel
+                 est pass‚ de l'‚tat haut … l'‚tat bas.
+  - Bit 3      : Delta RLSD (Receive Line Signal Detect) est mis … 1 si l'‚tat
+                 de la ligne "D‚tection Signal de la Ligne de R‚ception" a
+                 chang‚.
+  - Bit 4      : CTS, est mis … 1 si la ligne "Prˆt … ‚mettre" est … l'‚tat
+                 haut.
+  - Bit 5      : DSR, est mis … 1 si la ligne "Poste de Donn‚s Prˆt" est …
+                 l'‚tat haut.
+  - Bit 6      : RI, est mis … 1 si la ligne "Indicateurd'Appel" est … l'‚tat
+                 haut.
+  - Bit 7      : RSLD, est mis … 1 si la ligne "D‚tection Signal de la Ligne
+                 de R‚ception" est … l'‚tat haut.
+
+- Un Registre d'Identification des Interruptions,
+  ===============================================
+  qui fourni des indications sur l'‚tat courant des interruptions en attente.
+  Les 3 premiers bits de ce registre ont la signification suivante
+  (les autres sont toujours … 0) :
+  - Bit 0      : est mis … 1 si une interruption est en attente. Dans ce cas
+                 les bits 1 et 2 ont la signification suivante :
+                 00 = Etat du Modem.
+                 01 = Registre de saisie de l'‚mmetteur vide.
+                 10 = Donn‚e re‡ue disponible.
+                 11 = Etat de la ligne.
+
+- Un Registre Tampon de R‚ception,
+  ================================
+  qui contient le caractŠre re‡u.
+
+- Un Registre Tampon d'Emission,
+  ==============================
+  qui contient le caractŠre … ‚mettre.
+
+Du fait de sa "programmabilit‚", le 8250 est accessible par l'interm‚diaire
+d'un certain nombre d'adresses dans l'espace des entr‚es/sorties du PC.
+Ces adresses seront diff‚rentes en fonction du port s‚rie g‚r‚ (COM1, COM2,
+COM3, COM4).
+
+Voici les adresses d'accŠs pour les deux ports COM1 et COM2 :
+
++---------+---------+----------------------------------------------+
+|  COM1   |  COM2   |             Registre point‚                  |
++---------+---------+----------------------------------------------+
+|  03F8   |  02F8   | Registre de Transmission                     |
+|  03F8   |  02F8   | Registre de R‚ception                        |
+|  03F8   |  02F8   | Octet Faible du diviseur                     |
+|  03F9   |  02F9   | Octet Fort du diviseur                       |
+|  03F9   |  02F9   | Registre de Validation des Interruptions     |
+|  03FA   |  02FA   | Registre d'Indentification des Interruptions |
+|  03FB   |  02FB   | Registre de Contr“le de Ligne                |
+|  03FC   |  02FC   | Registre de Contr“le du Modem                |
+|  03FD   |  02FD   | Registre d'Etat de la Ligne                  |
+|  03FE   |  02FE   | Registre d'Etat du Modem                     |
++---------+---------+----------------------------------------------+
+
+Vous avez sans doute remarqu‚ que certaines adresses pointent deux (voir trois)
+registres en mˆme temps.
+En fait, aucun conflit ne peut survenir sur ces adresses, car … un instant
+donn‚, correspondant … un ‚tat donn‚ du 8250, on n'accŠde qu'… un des
+registres point‚s (par exemple, quand on est en train de recevoir un caractŠre
+dans le registre de r‚ception, on ne peut pas en mˆme temps en envoyer un dans
+le registre d'‚mission, ou ‚crire dans l'octet faible du diviseur !).
+
+GESTION LOGICIELLE DE L'INTERFACE SERIE.
+----------------------------------------
+
+Un application devant g‚rer l'interface s‚rie d'un PC, a deux fa‡ons de
+proc‚der :
+
+- M‚thode de Scrutation.
+------------------------
+
+C'est la m‚thode la plus simple, qui consiste en fait … boucler ind‚finiment
+en testant l'‚tat de la ligne,avant d'envoyer ou de recevoir un caractŠre.
+Cette m‚thode est aussi appel‚e "polling".
+
+Le principe g‚n‚ral en est le suivant :
+L'application doit tester en permanence (ce qui peut s'av‚rer trŠs g‚nant
+dans un systŠme monoprocesseur et/o— monotƒche) si un caractŠre est disponible
+et dans ce cas doit proc‚der … son extraction du tampon de r‚ception, ou … sa
+mise en place dans le tampon d'‚mission.
+Elle doit aussi faire part … l'‚metteur de l'‚tat de ses diff‚rents signaux.
+
+C'est au programmeur de prendre en charge toute la gestion de l'interface
+s‚rie, que ce soit au niveau des diff‚rents signaux … examiner, qu'au
+niveau des contr“les … effectuer (en fonction des protocoles de communication).
+
+Cette m‚thode n'est pas, … mon sens, la plus pratique, car, dans le cas d'une
+vitesse ‚lev‚e, des caractŠres peuvent ˆtres perdus si les traitements entre
+chacun de ceux-ci sont longs.
+
+On peut n‚anmoins l'utiliser dans le cas de pilotage de p‚riph‚riques ne
+n‚c‚ssitant pas un contr“le de flux complexe (du genre imprimantes, par
+exemple).
+
+- M‚thode par interruption.
+---------------------------
+
+Un peut plus complexe … mettre en oeuvre que la m‚thode pr‚c‚dente, la m‚thode
+par interruption est aussi la plus souple et la plus puissante.
+
+Le principe g‚n‚ral en est le suivant :
+L'application met en place une interruption qui va ˆtre charg‚e de g‚rer un
+certain nombre d'‚v‚nements (par une initialisation correcte du masque des
+interruptions du 8250).
+
+Ensuite, … chaque fois que se produiront le o— les ‚v‚nements programm‚s, une
+interruption surviendra, qui sera prise en compte par la routine install‚e, et
+ceci de fa‡on complŠtement transparente … l'application principale.
+
+Celle-ci n'aura juste qu'… tester de temps en temps, un ‚tat particulier de
+l'interruption (du type flag, ou position d'un pointeur comme dans le programme
+de test fourni) pour savoir si un ou plusieurs caractŠres sont disponibles.
+
+Cette m‚thode est aussi la seule permettant de g‚rer des vitesses non standard,
+pouvant aller jusqu'… 115200 Bauds, par une programmation complŠte du 8250.
+
+FONCTIONNEMENT GENERAL DU PROGRAMME.
+------------------------------------
+
+Le programme fourni utilise la m‚thode par interruption.
+
+On commence d'abord par d‚finir un certain nombre de constantes, qui vont
+contenir les adresses d'accŠs aux diff‚rents registres du 8250.
+
+Ensuite, on cr‚‚ un buffer circulaire, ce qui signifie que le pointeur, une
+fois arriv‚ … la fin du buffer, retourne au d‚but.
+
+On initialise ensuite l'interruption (mot STIIRQ4), en masquant l'IRQ
+correspondante dans le registre de masque d'interruption du 8259, le contr“leur
+g‚n‚rale des interruptions des PC. Cette validation est obligatoire, car les
+interruptions de communication (IRQ3 et IRQ4) sont masqu‚es par d‚faut.
+On valide par la mˆme occasion l'interruption "donn‚e prˆte" du 8250.
+
+Le mot CLIIRQ4 effectue l'op‚ration inverse.
+
+Le mot INITRS232 effectue l'initialisation proprement dite du 8250.
+On accŠde dans un premier temps au diviseur, pour initialiser la vitesse de
+transmission (9600 Bauds dans le programme). La formule de calcul utilis‚e
+pour trouver un diviseur correspondant … une vitesse donn‚e est la suivante :
+
+                             115200 / Vitesse
+
+Ensuite, on configure les paramŠtres g‚n‚raux de la ligne (bits de stop,
+parit‚, ...).
+On valide ensuite les signaux RTS, DSR, OUT1, OUT2.
+
+Le fonctionnement de l'interruption proprement dite (RSINPUT) est relativement
+simple :
+
+  - On regarde d'abord si l'interruption fait partie de celles programm‚es.
+  - Si oui, on regarde quel ‚v‚nement est survenu (dans notre cas, seule la
+    r‚ception de donn‚e est programm‚e).
+  - Ensuite, on effectue le traitement correspondant (ici, stockage du caractŠre
+    re‡u dans le buffer circulaire, puis mise … jour du pointeur).
+  - Ensuite, on sort de l'interruption, en envoyant un accus‚ de r‚ception
+    au contr“leur d'interruption 8259, ce qui est obligatoire pour que celui-ci
+    puisse prendre en compte une nouvelle interruption (mot RSINPUT>).
+
+Cette interruption peut ˆtre utilis‚e pour g‚rer COM1 ou COM2.
+
+Les mots utilisables par l'application sont RSEMIT, pour envoyer un caractŠre,
+RSKEY?, pour tester si un caractŠre est disponible, et RSKEY pour lire ce
+caractŠre dans le buffer de r‚ception.
+
+

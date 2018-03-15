@@ -1,0 +1,108 @@
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+// PA                                                                        //
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+// Version 1.03                                                              //
+//                                                                           //
+// Module principal des petites annonces                                     //
+//                                                                           //
+// Date de cration     : 11/05/95                                           //
+// Date de Mise … jour  : 17/05/95                                           //
+//                                                                           //
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+
+#use modules\pagp\pagp.npg
+
+#PATHVTX jeux\VTX
+
+PUBLIC
+      Char _PSWD := "FORTH"
+
+LOCAL
+     Char Acces3614
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Accs restreint }
+//
+: AccesT2
+   1
+   " ACCEST2.VTX" sendpage
+   cursoron
+
+   begin
+        16 32 locate fdheight setfont
+        "  " Acces3614 :=
+        Acces3614 InputVar
+        Acces3614 alltrim display
+        Acces3614 alltrim _PSWD ==
+        if
+         " OK" line0
+         drop true dup
+
+         else
+             1 + dup 3 >
+             if
+               " Fin de communication" line0
+
+               // Dconnexion
+               " \27\57\103" print
+               false
+
+             else
+
+                 false
+
+             endif
+
+         endif
+
+   until
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Affichage de la page d'intro }
+//
+: intro
+
+   " ANN.VTX" SendPage
+   wait
+   fkey fkguide ==
+   if
+     " MODULES\PAGES\EDITEUR.VTX" SendPage
+     wait
+
+   endif
+
+;
+
+: main
+
+  palier
+  case
+      82 of                     // 3614
+
+         AccesT2
+         Intro
+
+      endof
+
+      99 of
+
+         " PA - Version 1.03 - 15/05/95" line0
+
+      endof
+
+      drop
+      Intro
+
+   endcase
+
+   " jeux" pagp.FiltreService :=
+   pagp::menugen
+
+;

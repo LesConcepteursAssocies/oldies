@@ -1,0 +1,28 @@
+//
+//
+// 様様様様様様様様様様様様様様様様様様様様様様様様様様様様様様様様様様様様様様
+//
+// Convertit un nombre de secondes en temps
+// Empile HH MM SS
+//
+: SecToTime  // nbs --- ss mm hh
+   dup 3600 / int
+   over over 3600 * -
+   60 / int
+   rot 3 pick 3600 * -
+   over 60 * - int
+   swap rot
+;
+
+: main
+   cls " sectotime" print
+   begin
+     5 1 locate " entrez un nombre " print
+     input cr
+     val sectotime
+     print cr
+     print cr
+     print cr
+   again
+;
+

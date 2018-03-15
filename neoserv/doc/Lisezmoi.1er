@@ -1,0 +1,72 @@
+                              NEOSERV v1.1 r‚vision 0
+                              -----------------------
+
+N‚oServ est un serveur d'applications t‚l‚matiques, fonctionnant sur les
+r‚seaux TRANSPAC (X25), RTC, LOCAL (minitels connect‚s sur les ports s‚rie
+du PC).
+
+INSTALLATION
+------------
+
+N‚oServ fonctionne sur des micro-ordinateurs de type IBM AT/PS2 ou 100 %
+compatibles ‚quip‚s de :
+
+   - un processeur 80386 ou sup‚rieur,
+   - un systŠme d'exploitation MS-DOS 3.0 ou sup‚rieur,
+   - 640 Ko de m‚moire centrale,
+   - 1 ou plusieurs Mo de m‚moire ‚tendue,
+   - un disque dur de 20 Mo ou plus.
+   - Au moins 1 port s‚rie (!)
+   - 1 Minitel (2 de pr‚f‚rence) connect‚ au port s‚rie du PC
+   Et/Ou
+   - 1 Modem (compatible HAYES) connect‚ au port s‚rie du PC
+   Et/Ou
+   - 1 Carte X25, g‚rant les paquets … la norme ASM.
+
+DETAIL DES REPERTOIRES
+----------------------
+
+  Le r‚pertoire DOC contient la documentation du serveur, ainsi que le
+  manuel de r‚f‚rence du langage de d‚veloppement.
+  Le r‚pertoire MODULES contient quelques modules (ou librairies) standards
+  ‚crits en N‚oServ (avec leur sources) utilisables imm‚diatement
+  (voir les exemples dans le r‚pertoire APPS).
+  Le r‚pertoire APPS contient divers exemples de programmes N‚oServ.
+  Le r‚pertoire APPS\NEOSERV contient un exemple d'application complŠte.
+  Le r‚pertoire OUTILS contient quelques outils de maintenance des
+  bases de donn‚es (r‚indexation, effacement).
+
+Modifier ensuite le fichier NEOSERV.INI, de fa‡on … param‚trer le port s‚rie
+sur lequel est connect‚ le minitel local (COM = 1 ou COM = 2).
+
+LANCEMENT
+---------
+
+Une fois N‚oServ install‚, le lancement de celui-ci s'effectue en tapant les
+commandes suivantes :
+
+  C: <Ù
+  CD \NEOSERV <Ù
+  N <Ù
+
+Une fois lan‡‚, N‚oServ attend des donn‚es des ports d‚finis dans le fichier
+de param‚trage (voir FICINI.TXT pour plus de d‚tail).
+
+Exemple de session :
+  N <Ù
+  Ici, on est dans la fenˆtre de saisie des commandes du serveur,
+  on va charger et compiler une application
+  LOAD APPS\TSTBAL1 <Ù
+  Une fois l'application charg‚e, il suffit de taper son nom (TSTBAL1 en
+  l'occurence) sur le minitel local, puis de faire SHIFT+CONNEXION/FIN pour
+  l'ex‚cuter.
+
+
+MODIFICATION DES BASES DE DONNEES
+---------------------------------
+
+Pour pouvoir modifier les bases de donn‚es autrement qu'avec N‚oServ, vous
+devez utiliser un logiciel supportant le format FOXPRO v2.0 (pour les index).
+
+
+Si vous avez des remarques et/ou des suggestions, ‚crivez-moi … teknik@yaka2.com

@@ -1,0 +1,134 @@
+CGA 1
+-----
+
+HRES = 320 (X = 0..319)
+VRES = 200 (Y = 0..199)
+Adresse de segment de l'‚cran : 0B800h
+
+Nombre de couleurs maximum : 4 (0..3).
+
+couleur 0 : couleur du fond (0..15).
+couleur 1 : couleur 1 de la palette courante.
+couleur 2 : couleur 2 de la palette courante.
+couleur 3 : couleur 3 de la palette courante.
+
+2 palettes de couleur:
+  palette 1 : couleur 1 : turquoise
+              couleur 2 : violet
+              couleur 3 : blanc
+  palette 2 : couleur 1 : vert
+              couleur 2 : rouge
+              couleur 3 : jaune
+
+2  Bits par point.
+4  Points par octet.
+80 Octets par ligne.
+
+Offset du point X,Y :
+
+2000h * (Y mod 2) + 80 * int(Y/2) + int(X/4)
+
+Nø du bit :
+
+6 - 2 * (X mod 4)
+
+Si cette formule renvoie 4, le point est cod‚ dans les bits 4 et 5.
+
+CGA 2
+-----
+
+HRES = 640 (X = 0..639)
+VRES = 200 (Y = 0..199)
+Adresse de segment de l'‚cran : 0B800h
+
+Nombre de couleurs maximum : 2 (0..1).
+
+1  Bit par point.
+8  Points par octet.
+80 Octets par ligne.
+
+Offset du point X,Y :
+
+2000h * (Y mod 2) + 80 * int(Y/2) + int(X/8)
+
+Nø du bit :
+
+7 - (X mod 8)
+
+Informations communes:
+---------------------
+
+Registre de s‚lection de mode : adresse 03D8h (‚criture seule) :
+
+Bit 0 : Affichage de caractŠres :
+        0 : 40x25 caractŠres
+        1 : 80x25 caractŠres
+Bit 1 : Mode vid‚o :
+        0 = mode texte
+        1 = mode graphique
+Bit 2 : Signal de couleur :
+        0 = sortir
+        1 = inhiber
+Bit 3 : = 1 pour produire un signal vid‚o.
+Bit 4 : = 1 pour le mode CGA 2
+Bit 5 : Bit 7 de l'octet d'attribut (texte) :
+        0 = couleur de fond claire
+        1 = clignoter
+
+Registre d'‚tat : adresse 03DAh (lecture seule) :
+
+Bit 0 : Signal de synchro. horizontale :
+        0 = momentan‚ment d‚sactiv‚
+        1 = momentan‚ment activ‚
+Bit 1 : = 1 pour crayon optique inhib‚
+Bit 2 : = 0 pour crayon optique activ‚
+Bit 3 : Signal de synchro. verticale :
+        0 = momentan‚ment d‚sactiv‚
+        1 = momentan‚ment activ‚
+
+Registre de s‚lection de couleur : adresse 03D9h (‚criture seule).
+
+Bit 0 - 3 : couleur du fond en mode CGA 1 et en mode texte 40x25.
+            pour les autres modes texte, c'est la couleur du cadre
+Bit 4     : = 1 pour couleur de fond intense en mode texte
+Bit 5     : Nø de la palette de couleur pour le mode CGA 1
+
+AccŠs au contr“leur graphique 6845 :
+
+Registre d'index    : adresse 03D4h
+Registre de donn‚es : adresse 03D5h
+
+Contenu des registres du 6845 (aprŠs initialisation) :
+---------+----------------------------------------------+---------------------+
+Registre |                 Signification                |       Contenu       |
+         |                                              | texte | texte | grph|
+         |                                              | 40x25 | 80x25 | 1-2 |
+---------+----------------------------------------------+-------+-------+-----+
+  00     | Total de caractŠres horizontalement          |  56   | 113   | 56  |
+  01     | CaractŠres affich‚s horizontalement          |  40   |  80   | 40  |
+  02     | Signal de synchro. horizontal aprŠs ... car. |  45   |  90   | 45  |
+  03     | Dur‚e du signal de synchro. horizontal en    |       |       |     |
+         | caractŠres                                   |  10   |  10   | 10  |
+  04     | Total de caractŠres verticalement            |  31   |  31   | 127 |
+  05     | Nombre ajust‚ de caractŠres verticalement    |   6   |   6   | 6   |
+  06     | CaractŠres affich‚ verticalement             |  25   |  25   | 100 |
+  07     | Signal de synchro. vertical aprŠs ... car.   |  28   |  28   | 112 |
+  08     | Mode d'entrelacement                         |   2   |   2   |   2 |
+  09     | Nombre de lignes de grille (de balayage)     |       |       |     |
+         | par ligne de l'‚cran                         |   7   |   7   |   1 |
+  10     | Ligne de d‚part du curseur clignotant de     |       |       |     |
+         | l'‚cran                                      |   6   |   6   |   6 |
+  11     | Ligne de fin du curseur clignotant de l'‚cran|   7   |   7   |   7 |
+  12     | Adresse de d‚part de la page ‚cran affich‚e  |       |       |     |
+         | (octet fort)                                 |   0   |   0   |   0 |
+  13     | Adresse de d‚part de la pag ‚cran affich‚e   |       |       |     |
+         | (octet faible)                               |   0   |   0   |   0 |
+  14     | Adresse de caractŠre du curseur clignotant   |       |       |     |
+         | de l'‚cran (octet fort)                      |   0   |   0   |   0 |
+  15     | Adresse de caractŠre du curseur clignotant   |       |       |     |
+         | de l'‚cran (octet faible)                    |   0   |   0   |   0 |
+  16     | Position du crayon optique (octet fort)      |   ?   |   ?   |   ? |
+  17     | Position du crayon optique (octet faible)    |   ?   |   ?   |   ? |
+---------+----------------------------------------------+-------+-------+-----+
+
+

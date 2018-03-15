@@ -1,0 +1,133 @@
+                     GESTION DE LA MEMOIRE A LA NORME EMS.
+                     -------------------------------------
+
+Ce programme permet de g‚rer la m‚moire ‚tendue, respectant les sp‚cifications
+de la norme L.I.M E.M.S.
+
+GENERALITES
+-----------
+
+Le besoin d'avoir plus de m‚moire que ne peut en offrir un PC de base
+(8088,...) s'est fait sentir trŠs rapidement.
+
+Pour rappel, un æP de la gamme 80xxx ne peut adresser, sous D.O.S
+(compatibilit‚ oblige) qu'1 Mo de m‚moire (bus d'adresse sur 20 Bits).
+
+Pour pallier … cet ‚t…t de fait, les 3 grands de l'industrie informatique
+que sont LOTUS, INTEL et MICROSOFT ont ‚tablie une norme de gestion de m‚moire
+‚tendue, appel‚e norme L.I.M (les initiales des trois sus-nomm‚s) E.M.S (pour
+Expanded Memory Specification).
+
+Cette norme consiste en fait en l'ajout, dans le PC, d'une carte d'extension
+comportant un nombre variable de Mo suppl‚mentaires, ainsi qu'un driver
+(… ajouter donc dans le fichier CONFIG.SYS) charg‚ du pilotage de cette carte.
+
+PRINCIPE DE FONCTIONNEMENT
+--------------------------
+
+Sans entrer dans le d‚tail, le principe de gestion de ce type de carte est
+le suivant :
+
+Un segment (64 Ko) du Mo conventionnel est r‚serv‚ pour les accŠs … la
+m‚moire ‚tendue.
+Ce segment est appel‚ CADRE DE PAGE, et se comporte comme une fenˆtre
+qui va "glisser" sur la totalit‚ de la m‚moire ‚tendue, pour permettre
+l'accŠs … l'ensemble.
+
+Ce segment … en g‚n‚ral une place fixe (E000h, F000h, par exemple) et est
+initialis‚ par le driver (EMM, pour Expanded Memory Manager).
+
+Ce segment est lui-mˆme d‚coup‚ en "pages" de 16 Ko (4 pages donc), et il
+est possible d'avoir 4 zones correspondants … des parties diff‚rentes de 
+la carte.
+
+Un petit sch‚ma va r‚sumer tout ceci :
+
+          R.A.M                                    M‚moire EMS
+          Conventionnelle
+      +----------------------+                 +-----------------+
+      |                      |        +------->|                 |
+      |                      |        |        |-----------------|
+      |                      |        |        |                 |
+      |                      |        |        |                 |
+ CADRE|----------------------|        |        |-----------------|
+ DE   |     Page 0 (16 Ko)   |--------+  +---->|                 |
+ PAGE |----------------------|           |     |-----------------|
+      |     Page 1 (16 Ko)   |-----------+     |                 |
+      |----------------------|                 |-----------------|
+      |     Page 2 (16 Ko)   |---------------->|                 |
+      |----------------------|                 |-----------------|
+      |     Page 3 (16 Ko)   |-----+           |                 |
+      |----------------------|     |           |                 |
+      |                      |     |           |-----------------|
+      |                      |     +---------->|                 |
+      |                      |                 +-----------------+
+      |                      |                 
+      |                      |                 
+      +----------------------+
+
+La configuration de la fenˆtre (pages diff‚rentes), s'appelle le MAPPING.
+Un programme r‚sident devra, s'il veut utiliser la m‚moire ‚tendue,
+sauvegarder la configuration actuelle, avant de l'utiliser (voir les fonctions
+EMM->MAPPING, EMM-MAPPING>, EMM-SETMAPPING).
+
+Deux versions de la norme existent actuellement :
+
+  - La version 3.2, qui permet un maximum de 8 Mo de m‚moire ‚tendue.
+  - La version 4.0, qui permet un maximum de 32 Mo de m‚moire ‚tendue.
+
+Le driver, une fois install‚, prend la place d'une interruption (la 67h), et
+offre un certain nombre de fonctions, permettant aux applications d'utiliser
+les Mo … leur disposition.
+
+En FORTH, l'accŠs se fait simplement par utilisation des mots inter-segments
+(L@, LC@, LMOVE,...).
+
+L'ensemble des routines pr‚sentes forme deux couches, l'une ‚crite en code,
+appelle l'interruption, et renvoie la plupart du temps un code d'erreur
+(0 si tout s'est bien pass‚), ce code ‚tant g‚r‚ par la deuxiŠme couche
+(‚crite en FORTH).
+
+D‚tection de la m‚moire EMS.
+----------------------------
+
+C'est la premiŠre chose … faire, dans son application.
+
+Le problŠme, c'est que rien, … priori, ne permet de savoir si le PC sur lequel
+tourne le programme, possŠde de la m‚moire ‚tendue.
+
+Le seul moyen d'y parvenir, c'est d'aller voir dans le segment point‚ par
+l'interruption 67h, si un driver de gestion EMM est install‚.
+Par convention, tout driver de ce type a comme nom 'EMMXXXX0'.
+
+Ce travail est effectu‚ par le mot EMS-INST, qui initialise par la mˆme
+occasion la variable ?EMS, qui pourra ˆtre utilis‚e dans l'application.
+
+Exemple d'utilisation :
+
+   EMS?
+   IF
+     ... ( partie avec EMM )
+   ELSE
+     ... ( partie sans EMM )
+   THEN
+
+La deuxiŠme chose … faire, c'est d'aller chercher l'adresse de segment du
+cadre de page, ce que fait le mot EMM-GETFRAME, qui initialise la variable
+EMS-FRAME.
+
+Allocation de m‚moire ‚tendue.
+------------------------------
+
+Pour utiliser de la m‚moire ‚tendue, il faut proc‚der en par ‚tapes :
+
+  - Allouer la m‚moire (x fois 16 Ko)
+  - Amener dans une ou plusieurs pages physique, les pages logiques
+    ainsi allou‚es.
+  - Une fois le travail effectu‚, lib‚rer la m‚moire.
+
+CE DERNIER POINT EST TRES IMPORTANT.
+En effet, si vous oubliez de lib‚rer la m‚moire, elle restera propri‚t‚ du
+programme qui en aura fait la demande, mˆme une fois celui-ci termin‚.
+
+

@@ -1,0 +1,18 @@
+// test tlc
+#use modules\telec\tlc
+
+: main
+   cls
+   " test tlc" print cr
+   " entrez un nom de fichier" print cr
+   input
+   DUP EMPTY? !
+   IF
+      Tlc::SendFile
+      cr " retour =" print print cr
+   ELSE
+      DROP
+   ENDIF
+   WAIT
+;
+

@@ -1,0 +1,68 @@
+                   Cr‚ation et manipulation de listes chain‚es
+                   -------------------------------------------
+
+GENERALITES
+-----------
+
+La liste chain‚e constitue la plus souple des structures dynamiques de donn‚e.
+Elle permet de cr‚er toutes sortes de structures (piles, queues, ...), et de
+g‚rer celles-ci de fa‡on dynamiques.
+
+Une liste chain‚e est compos‚e des ‚l‚ments suivants :
+
+  - Une tˆte de liste.
+    Contient l'adresse du premier ‚l‚ment (appel‚ NOEUD) de la liste,
+    ou la constante NIL si celle-ci est vide.
+  - De noeuds.
+    Chaque noeud est compos‚ de deux ‚l‚ments :
+    - Un mot contenant un pointeur sur le prochain noeud de la liste, ou
+      NIL si le noeud est le dernier de la liste.
+    - Un mot qui va contenir la valeur stock‚e dans le noeud.
+
+Quelques sch‚mas vont r‚sumer tout ceci :
+
+- Liste vide :
+
+      Tˆte de liste
+    +---------------+
+    |     NIL       |
+    +---------------+
+
+- Liste avec deux ‚l‚ments :
+
+      Tˆte de liste
+    +---------------+
+    |               |
+    +---------------+
+         |
+         |
+         |        Noeud1
+         |   +------------+--------+
+         +-> |            | valeur |
+             +------------+--------+
+                 |
+                 |
+                 |          Noeud2
+                 |   +------------+--------+
+                 +-> |    NIL     | valeur |
+                     +------------+--------+
+
+OPERATIONS SUR LES LISTES CHAINEES
+----------------------------------
+
+Les op‚rations possibles sont les suivantes :
+
+  - Cr‚ation d'une tˆte de liste, avec le mot CREER-LISTE.
+  - Cr‚ation d'un noeud, avec le mot CREER-NOEUD.
+  - Insertion d'un noeud dans une liste, avec le mot INSERT-NOEUD.
+  - Suppression du premier noeud d'une liste, avec le mot REMOVE-NOEUD.
+  - Ajout d'une valeur dans une liste, avec le mot AJOUTE-LISTE.
+  - Empiler la valeur du noeud courant, avec le mot NEUD@.
+  - Se placer … la fin d'une liste, avec le mot FIN-LISTE.
+  - Calculer le nombre de noeuds d'une liste, avec le mot LEN-LISTE.
+  - Afficher les valeurs d'une liste, avec le mot .LISTE.
+
+Ce programme n'est con‡u qu'… titre exp‚rimental, le source est … votre
+disposition pour toute am‚lioration...
+
+

@@ -1,0 +1,21 @@
+// Test de 100 it‚rations par une boucle do .. loop
+
+LOCAL NUMBER ii := 0
+
+: main
+
+	cls
+	" Test de 100 it‚rations do loop ..." print cr cr
+	" d‚but : " print TIME print cr
+
+	100 0
+	do
+
+		ii ++
+	loop
+
+	" fin   : " print TIME print cr
+	" ii = " print ii print cr
+	wait
+
+;

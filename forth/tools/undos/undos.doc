@@ -1,0 +1,76 @@
+                            La face cach‚e du D.O.S
+                            =======================
+
+PREAMBULE
+---------
+
+Les diff‚rents programmes fournis ici sont tir‚ de l'‚tude du livre suivant
+(publicit‚ gratuite !) :
+
+                               UNDOCUMENTED DOS
+     A programmer's guide to reserved MS-DOS functions and data structures
+   de A. Schulman, R. J. Michels, J. Kyle, T. Paterson, D. Maxey et R. Brown
+
+aux ‚ditions Addison Wesley.
+
+GENERALITES
+-----------
+
+Vous ˆtes-vous d‚j… demand‚ ce qu'il pouvait bien se passer au coeur de votre
+PC quand vous tapez une commande, du genre DIR par exemple ?.
+
+Vous ˆtes-vous d‚j… demand‚ comment des programmes du genre de Norton Disk
+Doctor, Norton Utilities, PC TOOLS, DesqView, Side Kick, et j'en passe,
+pouvaient arriver … faire ce qu'ils font, en regard de ce que vous savez
+du D.O.S et de ces diff‚rentes fonctions ?.
+
+Vous ˆtes-vous d‚j… demand‚ comment D.O.S lui-mˆme arrive … satisfaire une
+commande du genre DIR L:, quand L'unit‚ L est une unit‚ de disque d'un serveur
+de fichier ?.
+
+Vous ˆtes-vous d‚j… demand‚ comment faisait un programme de d‚buggage, du
+genre de DEBUG, CODEVIEW, TURBO DEBUGGER, pour charger un programme sans
+l'ex‚cuter ?.
+
+Si vous avez essay‚ de comprendre ce que faisait D.O.S pour r‚pondre … la
+troisiŠme question par exemple, en consultant les diff‚rentes revues et
+documentations disponibles sur D.O.S et ses fonctions, vous avez du en
+perdre votre latin !.
+
+En fait, la plupart des programmes cit‚s utilisent certaines structures de
+donn‚es "cach‚es", dans le sens ou l'on n'a pas beaucoup d'informations
+sur celles-ci. Ils font aussi appel … un grand nombre de fonctions "cach‚es"
+du D.O.S, cach‚es dans le sens ou le concepteur de D.O.S, Microsoft, ne
+donne que peu ou pas d'informations sur ces fonctions, et dans tous les cas
+d‚conseille fortement l'usage de celles-ci.
+
+Pourtant, certaines de ces structures et fonctions cach‚es sont vitales
+pour le fonctionnement de D.O.S lui-mˆme !.
+
+Alors pourquoi en d‚conseiller l'usage ?
+Tout simplement parce que ces structures et fonctions cach‚es sont amen‚es
+… ‚voluer, grandir, disparaitre, changer, au fur et … mesure de l'‚volution
+du systŠme.
+
+Ce qui n'empŠche pas les grands ‚diteurs (ceux de Norton et autres) de les
+utiliser quand mˆme !, car certaines fonctions de leurs programmes ne sont
+possibles que grace … ces structures et fonctions cach‚es.
+
+AVERTISSEMENT
+-------------
+
+Quand bien mˆme, l'usage des programmes fournis dans ce r‚pertoire doit se
+faire avec la plus grande prudence quant aux r‚sultats escompt‚s.
+
+Sachez aussi que certaines choses sont possibles avec les fonctions
+conventionnelles de D.O.S (c'est plus dur, mais c'est faisable !), ne
+cherchez pas syst‚matiquement … utiliser les fonctions non document‚es si
+une autre solution existe...
+
+DERNIERE MINUTE
+---------------
+
+La derniŠre version du D.O.S (5.0), rend "officielles" certaines des fonctions
+et structures pr‚c‚dements cach‚es.
+
+

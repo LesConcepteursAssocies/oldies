@@ -1,0 +1,195 @@
+                       CADRE DE PILE ET VARIABLES LOCALES
+                       ----------------------------------
+
+Les outils fournis permettent … des programmes assembleur d'acc‚der de maniŠre
+non destructive aux paramŠtres empil‚s, ainsi que la cr‚ation de variables
+locales.
+
+GENERALITES
+-----------
+
+La pile est la structure la plus importante de FORTH, car FORTH est con‡u sur
+son usage intensif.
+
+FORTH travaille avec deux piles, l'une contenant les diff‚rents paramŠtres
+utilis‚s par les mots, appel‚e pile de donn‚es, et l'autre contenant les
+adresses de retour des dits mots, appel‚e pile de retour.
+
+LA PILE DE DONNEES
+------------------
+
+Tout nombre (nombre lit‚ral, CFA, ...) entr‚ au clavier (o— … partir d'un
+fichier inclu) est empil‚ sur la pile de donn‚es avant son utilisation.
+
+Tout r‚sultat d'op‚ration (final, interm‚diaire, ...) est lui aussi empil‚
+sur la pile de donn‚es.
+
+Au niveau le plus bas, la pile de donn‚es est accessible par l'interm‚diaire
+du registre SP, et est manipul‚e par les mots PUSH (empiler) et POP (d‚piler).
+
+LA PILE DE RETOUR
+-----------------
+
+Elle est utilis‚e pour stocker les adresses de retour des diff‚rents mots
+d'une d‚finition.
+
+Le moteur FORTH y stocke l'adresse du prochain CFA … ‚x‚cuter, pendant
+l'‚x‚cution d'une d‚finition.
+
+Au niveau le plus bas, la pile de retour est accessible par l'interm‚diaire
+du registre BP (RP pour le moteur interne de FORTH). Le programmeur peut
+la manipuler (avec les pr‚cautions qui s'imposent ...) par les mots >R (empiler)
+et R> (d‚piler).
+
+CADRE DE PILE
+-------------
+
+Dans certains cas (nombre de registres disponibles limit‚, par exemple), il peut
+ˆtre interressant de pouvoir acc‚der aux diff‚rents paramŠtres stock‚s sur la
+pile, sans pour cela ˆtre oblig‚ de les d‚piler.
+
+Le cadre de pile permet cela.
+
+Prenons un exemple :
+Au cours du d‚veloppement de votre super programme, vous avez besoin d'un mot
+qui va prendre deux paramŠtres, les additionner, rempiler les paramŠtres
+initiaux ainsi que le r‚sultat obtenu.
+
+En FORTH pur, ceci ne pose aucun problŠme :
+\ ADDition Non Destructive.
+: ADDND  ( n1 n2 --- n1 n2 n1+n2 )
+  2DUP +
+;
+
+Supposons maintenant que cette d‚finition ne peut ˆtre faite qu'en assembleur
+(pour des raison de rapidit‚, o— autre), et que vous n'ayez … votre disposition
+qu'un seul registre de travail ! (dur dur ...)
+
+Le cadre de pile permet de r‚soudre ceci de fa‡on ‚l‚gante :
+\ ADDition Non Destructive.
+\ Nous n'avons que le registre AX … notre disposition !.
+CODE ADDND  ( n1 n2 --- n1 n2 n1+n2 )
+  >FRAME                     \ Cr‚ation du cadre de pile
+  2 PARAM@ AX MOV            \ AX contient maintenant n1 ...
+  1 PARAM@ AX ADD            \ ... que l'on additionne avec n2
+  FRAME>                     \ Lib‚ration du cadre de pile
+  1PUSH                      \ Empilage du r‚sultat
+END-CODE
+
+Voyons, … l'aide d'un sch‚ma, comment tout cela fonctionne :
+
+Quand vous appelez le mot ADDND, la pile est dans l'‚tat suivant :
+
+            +-------------------+ <- SP
+            |        n2         |
+            +-------------------+
+            |        n1         |
+            +-------------------+  adresses hautes
+
+Le mot >FRAME Compile le code suivant :
+
+            BP PUSH
+            SP BP MOV
+
+Ce qui donne la pile suivante :
+
+            +-------------------+ <- SP=BP
+            |        BP         |
+            +-------------------+
+            |        n2         |
+            +-------------------+
+            |        n1         |
+            +-------------------+  adresses hautes
+
+SP pourra varier en fonction des diff‚rents PUSH et POP pouvant survenir.
+BP va servir de base pour l'accŠs aux diff‚rents paramŠtres. 
+
+  BP+2 pointe sur n2 (c'est … dire le sommet de la pile).
+  BP+4 pointe sur n1.
+
+c'est ce que compile le mot PARAM@.
+
+Le mots FRAME> ne fait que compiler le code permettant … BP de retrouver
+son ‚tat initial.
+
+Supprimer les paramŠtres de la pile est possible par l'interm‚diaire du mot
+-PARAM.
+
+VARIABLES LOCALES
+-----------------
+
+Pouvoir disposer, en assembleur, de variables locales peut s'av‚rer trŠs
+utile, dans de nombreux cas.
+
+Le principe en est le suivant :
+
+On r‚serve sur la pile de donn‚es un certain nombre de mots qui vont recevoir
+les diff‚rentes variables locales.
+
+Le m‚canisme de r‚servation de ces variables locales utilisant lui-mˆme celui
+de gestion de cadre de pile, l'accŠs aux paramŠtres empil‚s est possible par
+l'interm‚diaire du mot PARAM@.
+
+Prenons comme exemple un mot qui va prendre 2 paramŠtres, n1 et n2 et va
+r‚aliser l'op‚ration suivante : (n1+n2)+(n1-n2)
+
+Le code pourrait ressembler … celui-ci :
+CODE TRUC  ( n1 n2 --- (n1+n2)+(n1-n2) )
+  1 >LOCALS                  \ On r‚serve 1 variable locale
+  1 PARAM@ AX MOV            \ AX contient n2 ...
+  2 PARAM@ AX SUB            \ ... que l'on soustrait de n1
+  AX 1 LOCAL@ MOV            \ On conserve le r‚sultat
+  1 PARAM@ AX MOV            \ AX contient n2 ...
+  2 PARAM@ AX ADD            \ ... que l'on additionne … n1
+  1 LOCAL@ AX ADD            \ On effectue (n1+n2)+(n1-n2)
+  LOCALS>                    \ On libŠre l'espace occup‚ par la variable locale.
+  2 -PARAM                   \ On retire les paramŠtres de la pile.
+  1PUSH
+END-CODE
+
+Regardons les diff‚rents ‚tats de la pile :
+
+Quand vous appelez le mot TRUC, la pile est dans l'‚tat suivant :
+
+            +-------------------+ <- SP
+            |        n2         |
+            +-------------------+
+            |        n1         |
+            +-------------------+  adresses hautes
+
+La s‚quence 1 >LOCALS compile le code suivant :
+
+            BP PUSH
+            SP BP MOV
+            2 # SP SUB
+
+Ce qui donne la pile suivante :
+
+            +-------------------+ <- SP
+            |  variable locale  |
+            +-------------------+ <- BP
+            |        BP         |
+            +-------------------+
+            |        n2         |
+            +-------------------+
+            |        n1         |
+            +-------------------+  adresses hautes
+
+SP pourra varier en fonction des diff‚rents PUSH et POP pouvant survenir.
+BP va servir de base pour l'accŠs aux diff‚rents paramŠtres et variables
+locales.
+
+  BP+2 pointe sur n2 (c'est … dire le sommet de la pile).
+  BP+4 pointe sur n1.
+  BP-2 pointe sur la variable locale (c'est ce que compile le mot LOCAL@).
+
+
+Ces m‚canismes de gestion de la pile de donn‚es (cadre de pile, variables
+locales) sont ceux utilis‚s par certains langages de haut niveau (du genre
+C et PASCAL) pour le passage de paramŠtres entre les diff‚rentes proc‚dures
+et fonctions, ainsi que pour l'allocation des variables priv‚es (locales).
+
+De la … envisager une communication entre des programmes ‚crits en FORTH et
+des programmes ‚crits en C o— en PASCAL, il n'y a qu'un pas ...
+
+

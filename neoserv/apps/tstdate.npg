@@ -1,0 +1,23 @@
+//
+// test dates
+//
+
+: main
+   cls
+   " test dates" print cr
+   " date du jour             = " print date print cr
+   " date dtos                = " print date dtos print cr
+   " date dtos stod           = " print date dtos stod print cr
+   " date dtos dtoj           = " print date dtos dtoj print cr
+   " date dtos dtoj jtod      = " print date dtos dtoj jtod print cr
+   " date dtos dtoj jtod stod = " print date dtos dtoj jtod stod print cr
+   " date + 30 jours          = " print date dtos dtoj 30 + jtod stod print cr
+   " date dtos day            = " print date dtos day print cr
+   " date dtos dow            = " print date dtos dow print cr
+   " date dtos month          = " print date dtos month print cr
+   " date dtos year           = " print date dtos year print cr
+   " date dtos cdow           = " print date dtos cdow print cr
+   " date dtos cmonth         = " print date dtos cmonth print cr
+   wait
+;
+

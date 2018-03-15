@@ -1,0 +1,34 @@
+                       STRATEGIE D'ALLOCATION MEMOIRE
+                       ------------------------------
+
+Quand un programme demande au D.O.S une certaine quantit‚ de m‚moire, celui-ci
+a la possibilit‚ de le satisfaire de plusieurs fa‡ons.
+
+Ces diff‚rentes fa‡ons sont appel‚es Strat‚gie d'Allocation, et sont au nombre
+de trois (pour les versions du D.O.S inf‚rieures … 5) :
+
+- Strat‚gie "First-Fit" (par d‚faut sous D.O.S), code 0
+  Cette strat‚gie est optimis‚e sur la vitesse, et le r‚sultat est une
+  possible fragmentation de la m‚moire. Elle pr‚domine dans les systŠmes
+  mono-tache.
+  Elle consiste en la recherche du premier bloc disponible satisfaisant le
+  demandeur (taille).
+  Le balayage des MCB (voir les fichiers correspondants) commence par
+  le d‚but.
+
+- Strat‚gie "Best-Fit", code 1
+  Cette strat‚gie est optimis‚e sur le meilleur usage de la m‚moire.
+  Elle consiste en la recherche du plus petit bloc satisfaisant le demandeur
+  (taille). Elle limite de ce fait la fragmentation.
+  Le balayage des MCB (voir les fichiers correspondants) commence par
+  le d‚but.
+
+- Strat‚gie "Last-Fit", code 2
+  Cette strat‚gie est surtout utilis‚e si le bloc allou‚ doit ˆtre conserv‚
+  longtemps (pour un programme r‚sident, par exemple), car le balayage des
+  MCB (voir les fichiers correspondants) commence par la fin de la chaine
+  (m‚moire haute).
+  Elle consiste en la recherche du premier bloc de m‚moire haute satisfaisant
+  le demandeur (taille).
+
+

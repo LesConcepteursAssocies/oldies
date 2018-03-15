@@ -1,0 +1,89 @@
+\ ------------------------------------------------------------------------------
+\                  Evaluation R‚entrante de chaines de caractŠre.
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement de l'interpr‚teur de chaines de caractŠres )
+
+0. 2CONSTANT STR$    \ Stocke l'adresse et la longueur de la chaine.
+VARIABLE #STRING     \ Contient le nombre de chaines imbriqu‚es.
+
+( Redirection du flux d'entr‚e sur la chaine )
+: SOURCE$ ( --- adr len )
+  HANDLE @ 0<
+  IF
+    STR$
+  ELSE
+    (SOURCE)
+  THEN
+;
+
+( Redirection de la gestion des erreurs )
+: ?ERROR$ ( adr len flg --- )
+  DUP
+  IF
+    ['] (SOURCE) IS SOURCE
+    ['] (?ERROR) IS ?ERROR
+    HANDLE @ 0<
+    IF
+      HANDLE OFF
+      CR ." Chaine '" STR$ TYPE ." ' : "
+    THEN
+    #STRING OFF
+  THEN
+  (?ERROR)
+;
+
+: $EXECUTE ( adr len --- )
+  2DUP
+  #STRING 1+!
+  ['] SOURCE$ IS SOURCE
+  ['] ?ERROR$ IS ?ERROR
+  STR$ >R >R
+  SWAP ['] STR$ >BODY 2!
+  >IN @ >R 
+  >IN OFF   
+  HANDLE @ >R
+  #STRING @ NEGATE HANDLE !         \ Le Handler principal devient n‚gatif
+  DSEGMENT -ROT >R                  \ Transfert de la chaine et de sa
+  DSEGMENT BUFFERS                  \ longueur dans flux d'entr‚e
+  DUP 1+ SWAP R@ SWAP C! R> LCMOVE  
+  RUN
+  #STRING 1-!
+  #STRING @ 0=                      \ Est-ce la derniŠre chaine ?
+  IF
+    ['] (?ERROR) IS ?ERROR          \ Oui, restitution du flux d'entr‚e original
+    ['] (SOURCE) IS SOURCE
+  THEN
+  R> HANDLE !
+  R> >IN !
+  R> R> SWAP ['] STR$ >BODY 2!
+;
+
+EOF
+-------------------------------------------------------------------------------
+Exemples d'utilisations :
+
+5 STRING CHAINE1 
+" WORDS" CHAINE1 $!
+30 STRING CHAINE2 
+" CHAINE1 $EXECUTE 2 2 + ." CHAINE2 $!
+50 STRING CHAINE3
+" CR 4 4 * CHAINE2 $EXECUTE INCLUDE LABY.FTH" CHAINE3 $!
+
+CHAINE3 $EXECUTE
+
+Ou encore :
+
+5 STRING CHAINE1 
+" HELLO" CHAINE1 $!
+40 STRING CHAINE2 
+" : HELLO HERALD ; CHAINE1 $EXECUTE" CHAINE2 $!
+25 STRING CHAINE3 
+" CHAINE2 $EXECUTE" CHAINE3 $!
+
+CHAINE3 $EXECUTE
+
+L'imbrication des chaines n'est limit‚e que par la profondeur de la
+pile de retour...
+
+

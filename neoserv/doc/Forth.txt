@@ -1,0 +1,769 @@
+                    MANUEL DU LANGAGE FORTH DE NEOSERV
+                    ----------------------------------
+
+
+INTRODUCTION ET GENERALITES
+---------------------------
+
+FORTH est l'oeuvre d'un seul homme: Charles H. MOORE.
+Sa premiŠre implantation complŠte a ‚t‚ effectu‚e
+sur un IBM 1130 … l'‚poque des ordinateurs de 3Šme g‚n‚ration
+(fin des ann‚es 60).
+
+Il fut si satisfait de son travail qu'il n'h‚sita pas …
+appeler son langage FOURTH, langage de 4Šme g‚n‚ration.
+Mais l'IBM 1130 n'acceptait que des noms de programmes de
+5 lettres, ce qui a d‚cid‚ du nom d‚finitif du langage: FORTH.
+
+
+Le langage FORTH a ses adeptes et ses d‚tracteurs.
+R‚put‚ difficile par ceux qui n'ont fait que le
+survoler, il est un des langages informatiques les plus
+performants. Les concepts qu'il manipule, allient la
+simplicit‚, l'efficacit‚ et la compacit‚.
+
+
+PREMIERE COMPILATION
+--------------------
+
+Une action de compilation d‚bute par le mot : (deux-points)
+et s'achŠve par le mot ; (point-virgule). Le mot : est suivi
+par le nom de la nouvelle commande … d‚finir. Pour
+exemple, soit … d‚finir le mot EFFACE qui aura pour
+action d'effacer l'‚cran, editez le fichier 1ERPROG.NPG avec votre
+‚diteur pr‚f‚r‚, et tapez:
+
+// Premier programme
+#NAME = TEST
+
+: EFFACE  CLS ;
+
+: MAIN EFFACE WAIT ;
+
+Sauvegardez le fichier, puis lancez N‚oServ, en tapant:
+n load 1ERPROG.NPG
+Ensuite tapez TEST puis appuyez sur SHIF+CONNEXION/FIN
+et vous verrez l'‚cran du minitel s'effacer.
+
+C'est bien pratique, un langage que l'on peut
+franciser aussi facilement!
+
+Autre exemple:
+
+: SOIT ;
+: A-ADDITIONNER + ;
+: ET ;
+: A-AFFICHER PRINT ;
+
+: MAIN
+  SOIT 3 ET 5 A-ADDITIONNER ET A-AFFICHER
+;
+
+Presque du langage naturel! Dans cet exemple, les
+mots SOIT et ET sont cens‚s ne rien faire, ce qu'ils font
+trŠs bien...
+
+Lors de la frappe d'une ligne, les mots FORTH et leurs paramŠtres sont
+s‚par‚s par au moins un espace. Rappelez-vous bien
+de cette simple et seule rŠgle lexicale FORTH:
+
+               les mots sont s‚par‚s par des espaces.
+
+S'il y a plus d'un caractŠre espace entre deux mots, seul le premier
+caractŠre espace sera pris en compte par le compilateur.
+
+Tous les mots ainsi compil‚s font maintenant partie du langage
+FORTH au mˆme titre que n'importe quelle primitive
+d‚j… d‚finie.
+
+Les nombres, bien que n'‚tant pas d‚finis,
+sont correctement compil‚s. Tout
+nombre trouv‚ dans le flot d'entr‚e est stock‚ dans une
+zone m‚moire appel‚e PILE DE DONNEES ou pile
+param‚trique. Exemple:
+
+: LettreA
+  65 EMIT    affiche la lettre A majuscule.
+;
+
+A l'ex‚cution du mot LettreA, La valeur num‚rique 65
+est d‚pos‚e sur la pile de donn‚es et correspond
+au code ASCII d'un caractŠre affichable ou de contr“le.
+Cette valeur est trait‚e ensuite par le mot
+qui suit ce nombre, EMIT dans notre exemple.
+
+De nombreux mots FORTH admettent en entr‚e un ou
+plusieurs paramŠtres et empilent souvent le r‚sultat
+sur la pile de donn‚e.
+
+En ce sens, un mot FORTH est assimilable … une
+proc‚dure ou une fonction. FORTH ne fait pas de
+distinction entre un mot d‚fini au sein de son noyau
+et un mot d‚fini sous une forme plus ‚volu‚e.
+
+Pour bien vous impr‚gner de cette
+notion, abordez chaque nouveau mot comme une boŒte
+noire en tenant compte pour le moment exclusivement
+des paramŠtres qui sont ‚ventuellement trait‚s et
+rendus:
+
+  CLS           aucun paramŠtre en entr‚e et en sortie
+  EMIT          un paramŠtre en entr‚e
+  +             deux paramŠtres en entr‚e, un paramŠtre en sortie
+
+ESPACEMENT ET INDENTATION
+-------------------------
+
+Si la pr‚sentation des d‚finitions et le libell‚ des mots
+d‚finis par le programmeur FORTH sont laiss‚s … son
+entiŠre appr‚ciation, il est quand mˆme recommand‚
+de suivre quelques rŠgles. Une bonne pr‚sentation
+facilite la maintenance des programmes.
+
+L'espacement et l'indentation ont pour but d'a‚rer une
+d‚finition et mettre en valeur les structures et les
+composants de la d‚finition:
+
+      -1 espace entre le mot de d‚finition et le nom.
+      -2 espaces entre le nom et le commentaire.
+      -2 espaces ou un retour … la ligne aprŠs un
+         commentaire et avant la d‚finition.
+      -3 espaces entre le nom et la d‚finition s'il n'y a
+         pas de commentaire aprŠs le nom.
+      -3 espaces d'indentation, ou multiples de trois,
+         pour marquer les structures de contr“le.
+      -1 espace entre le mot et le nombre dans une
+         phrase, 2 … 3 espaces entre phrases.
+      -1 espace entre le dernier mot de la d‚finition et
+         le "point-virgule".
+
+La nature des donn‚es trait‚es par le mot peut ˆtre
+indiqu‚e de maniŠre symbolique … l'aide des
+abr‚viations suivantes:
+
+      n       nombre sign‚
+      u       nombre non sign‚
+      c       valeur ASCII sur 7 bits, 0 <= c <= 127
+      b       octet sur 8 bits, 0 <= b <= 255
+      ?       drapeau bool‚en, s'‚crit aussi sous la forme:
+         fl   valeur quelconque (0 ou -1)
+         t=   valeur vraie
+         f=   valeur fausse
+     s        symbole de type quelconque, num‚rique ou caractŠre
+     str      chaine de caractŠres
+
+
+PRONONCIATION DES SYMBOLES
+--------------------------
+
+Dans les articles des revues anglaises et am‚ricaines
+traitant du FORTH, les auteurs citent certaines
+fonctions par leur prononciation afin d'‚viter les
+problŠmes de compr‚hension li‚s … la typographie de
+celles-ci. En fran‡ais, quand nous ‚crivons point-
+virgule, nous faisons bien entendu r‚f‚rence au mot
+; . 
+
+Symbole        prononciation: anglais                fran‡ais
+   !                   store                         store
+   @                   fetch                         fetch
+   #                   sharp (or "number")           diŠse (ou "nombre")
+   $                   dollar                        dollar
+   %                   percent                       pour cent
+   ^                   caret                         carr‚ (exposant)
+   &                   ampersand                     ampersand
+   *                   star                          star
+   (                   left paren                    parenthŠse ouvrante
+   )                   right paren                   parenthŠse fermante
+   -                   dash, not                     moins
+   +                   plus                          plus
+   =                   equals                        ‚gal
+  { }                  faces (or "curly brackets")   accolades
+  [ ]                  square brackets               crochets, crochets carr‚s
+   "                   quote                         quote, guillemet
+   '                   tick (prefix); prime (suffix) prime, tick
+   ~                   tilde                         tilde
+   |                   bar                           barre
+   \                   backslash                     barre de fraction inverse, sous
+   /                   slash                         slash, barre de fraction, sur
+   <                   less-than                     inf‚rieur …
+   >                   greater-than                  sup‚rieur …
+   ?                   question (or "query")         point d'interrogation
+   ,                   comma                         virgule
+   .                   dot                           point
+
+
+EMPILAGE ET DEPILAGE DES SYMBOLES
+---------------------------------
+
+Le langage FORTH stocke les symboles litt‚raux (nombres, chaines)
+sur une pile nomm‚e "pile de donn‚es" ou "pile param‚trique".
+L'empilage d'un symbole est trŠs simple:
+
+  55
+
+empile le nombre 55. Pour d‚piler ce nombre, il y a
+plusieurs m‚thodes. La plus simple consiste … afficher
+le contenu du dernier ‚l‚ment empil‚:
+
+  PRINT    affiche 55
+
+Si vous empilez plusieurs symboles, voici ce qui se
+passe:
+
+   11 " COUCOU" 6543
+
+Empilage du premier symbole
+          ÚÄÄÄÄÄÄÄÄÄÄ¿
+          ³       11 ³
+          ÀÄÄÄÄÄÄÄÄÄÄÙ
+Empilage du second symbole
+          ÚÄÄÄÄÄÄÄÄÄÄ¿
+          ³ " COUCOU"³ Ä¿
+          ÃÄÄÄÄÄÄÄÄÄÄ´  ³ le nombre 11 passe en dessous
+          ³       11 ³<ÄÙ
+          ÀÄÄÄÄÄÄÄÄÄÄÙ
+Empilage du troisiŠme symbole
+          ÚÄÄÄÄÄÄÄÄÄÄ¿
+          ³     6543 ³ Ä¿
+          ÃÄÄÄÄÄÄÄÄÄÄ´  ³ la chaine " coucou" passe en dessous
+          ³ " COUCOU"³<ÄÙ 
+          ÃÄÄÄÄÄÄÄÄÄÄ´  ³ 11 passe en 3e position 
+          ³       11 ³<ÄÙ
+          ÀÄÄÄÄÄÄÄÄÄÄÙ
+
+Le d‚pilage successif des symboles affiche ceux-ci dans
+l'ordre inverse de leur empilage:
+
+  PRINT       affiche 6543
+  PRINT       affiche COUCOU
+  PRINT       affiche 11
+
+Pour mieux visualiser le m‚canisme d'empilage et de
+d‚pilage des symboles, pensez … une pile d'assiettes:
+la derniŠre assiette d‚pos‚e sur la pile sera la
+premiŠre reprise.
+
+Ce principe de rangement est appel‚ ‚galement pile
+LIFO (Last In, First Out) dans certains ouvrages
+‚crits en anglais pour d‚signer une pile dont le
+m‚canisme est: "dernier entr‚, premier sorti".
+
+Avec N‚oServ, la quantit‚ de symboles empilables
+n'est limit‚e que par la m‚moire disponible sur
+votre machine (la pile de donn‚es de chaque connect‚
+est g‚r‚e de fa‡on dynamique, en fonction des besoins).
+En outre, toute tentative pour d‚piler un symbole
+alors que la pile de donn‚es est vide, affichera
+un message d'erreur … l'ex‚cution du programme.
+
+Si vous ˆtes totalement d‚butant en FORTH, prenez le
+temps n‚cessaire … bien comprendre ce qu'est la pile
+de donn‚es, son m‚canisme et son ‚volution: la notion
+de pile est certainement la plus importante du langage
+FORTH.
+
+
+OPERATIONS ARITHMETIQUES ELEMENTAIRES
+-------------------------------------
+
+Les op‚rateurs arithm‚tiques + - * et / agissent sur les
+deux valeurs situ‚es au sommet de la pile de donn‚es.
+
+Somme de deux nombres entiers.
+------------------------------
+
+Pour additionner deux nombres, il faut d'abord les
+d‚poser sur la pile de donn‚es:
+
+  22 44 + PRINT      affiche  66
+
+Une fois empil‚s 22 et 44, le mot + opŠre l'addition de
+ces deux valeurs et le mot PRINT affiche le
+r‚sultat.
+
+  55 1 + 3 + PRINT   affiche  59    et peut aussi s'‚crire
+  55 1 3 + + PRINT
+
+L'addition est commutative: les valeurs peuvent ˆtre
+d‚pos‚es sur la pile de donn‚es dans n'importe quel
+ordre:
+
+  55 22 +   est ‚quivalent …   22 55 +
+
+Ce principe de calcul est appel‚ NOTATION
+POLONAISE INVERSE (RPN dans la litt‚rature
+anglaise, pour Reverse Polish Notation).
+
+Il est ‚galement possible de faire la somme de deux
+nombres de signe diff‚rent:
+
+  10 -5 + PRINT     affiche 5
+  -5 10 + PRINT     affiche aussi 5
+
+Soustraction de deux nombres entiers.
+-------------------------------------
+
+Soit deux nombres a et b. La diff‚rence de deux
+nombres sera ‚crite en FORTH sous la forme:
+
+  a b -   pour a-b
+
+La soustraction n'est pas commutative.
+
+  10 3 - PRINT    affiche 7
+  3 10 - PRINT    affiche -7
+
+Produit de deux nombres entiers.
+--------------------------------
+
+Soit deux nombres a et b. Le produit de deux nombres
+sera ‚crit en FORTH sous la forme:
+
+  a b *   pour a*b
+
+La multiplication est commutative:
+
+   7 5 * PRINT   ou     5 7 * PRINT   affiche 35
+
+Quotient de deux nombres entiers.
+---------------------------------
+
+  22 7 / PRINT  affiche 3.142857
+
+La division n'est pas commutative:
+
+  15 5 / PRINT     affiche 3
+  5 15 / PRINT     affiche 0
+
+Le reste de la division peut ˆtre obtenu en appliquant
+la fonction modulo:
+
+  22 7 % PRINT  affiche 1
+
+La fonction modulo peut servir … d‚terminer la
+divisibilit‚ d'un nombre par un autre:
+
+  : DIV?  // n1 n2 ---
+    OVER OVER % CR
+    IF
+       SWAP PRINT  " n'est pas " PRINT
+    ELSE
+       SWAP PRINT " est " PRINT
+    ENDIF
+    " divisible par " PRINT
+  ;
+
+  22 7 DIV?    affiche   22 n'est pas divisible par 7
+  22 11 DIV?   affiche   22 est divisible par 11
+
+
+TRAITEMENT DES EXPRESSIONS ALGEBRIQUES
+--------------------------------------
+
+Les op‚rations peuvent ˆtre chaŒn‚es, mais une op‚ration en notation
+alg‚brique comportant des parenthŠses doit ˆtre convertie en notation RPN
+en tenant compte de l'ordre de priorit‚ des op‚rations. FORTH n'utilise pas
+les parenthŠses dans les op‚rations arithm‚tiques:
+
+  soit l'expression alg‚brique      ( 2 + 5 ) * ( 7 - 2 )
+  elle s'‚crit en FORTH             2 5 + 7 2 - *
+
+Lors d'une op‚ration de conversion de notation
+alg‚brique infix‚e en notation polonaise inverse,
+commencez toujours par le niveau de parenthŠse le
+plus imbriqu‚ et par la gauche. Ecrivez la
+transcription en notation polonaise inverse de chaque
+op‚ration sur des lignes s‚par‚es, successivement de
+haut en bas, en les mettant dans le prolongement de
+l'expression alg‚brique exprim‚e dans la formule
+initiale:
+
+       ( ( 2 + 5 ) * ( 7 - 2 ) ) / ( ( 5 + 2 ) * 3 )
+      ÄÄÄÄÄ       ÄÄÂÄÄ           ÄÄÂÄÄ   ÄÂÄ
+      2 5 +       ÄÄÁÄÄ             ³      ³
+      ÄÄÂÄÄ       7 2 -             ³      ³
+        ³         ÄÄÂÄÄ             ³      ³
+        ÀÄÄÄÄ * ÄÄÄÄÙ             ÄÄÁÄÄ    ³
+              ³                   5 2 +    ³
+              ³                   ÄÄÂÄÄ   ÄÁÄ
+              ³                     ÀÄÄÄÄ 3 *
+              ³                           ÄÂÄ
+              ÀÄÄÄÄÄÄÄÄÄÄÄÄ / ÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+En reprenant chaque niveau dans l'ordre, on r‚‚crit
+la formule:
+
+   2 5 + 7 2 - * 5 2 + 3 * /
+
+C'est choquant? Mais tous les
+interpr‚teurs/compilateurs travaillent ainsi lorsqu'ils
+ont … ‚valuer une formule alg‚brique. En notation
+alg‚brique, les parenthŠses ne servent qu'… isoler une
+expression sous forme de sous-expression qui devient
+membre d'une expression plus g‚n‚rale.
+
+En informatique comme en arithm‚tique, un op‚rateur
+travaille toujours sur deux op‚randes et seulement
+deux op‚randes simultan‚ment. Le r‚sultat d'une
+op‚ration portant sur deux op‚randes d‚livre une
+valeur qui peut devenir … son tour op‚rande d'un
+autre op‚rateur. L'ordre d'ex‚cution des op‚randes et
+des op‚rateurs est fondamental:
+
+     notation alg‚brique   ³   polonaise inverse
+   ÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ
+      (2+3)*5              ³        2 3 + 5 *
+      2+(3*5)              ³ 2 3 5 * +  ou  3 5 * 2 +
+
+Tous les problŠmes arithm‚tiques peuvent ˆtre r‚solus
+de cette maniŠre; ce n'est qu'une question d'habitude.
+L'exemple donn‚ pr‚c‚demment illustre parfaitement
+la rigueur dont doit faire preuve le programmeur
+FORTH. Cette rigueur garantit un fonctionnement
+sans ambigu‹t‚ des programmes, quel que soit leur
+niveau de complexit‚.
+
+
+MANIPULATION DES DONNEES SUR LA PILE
+------------------------------------
+
+La pile de donn‚es est l'‚l‚ment fondamental du
+langage FORTH pour le traitement de donn‚es. Son
+fonctionnement est identique … celui de la pile g‚r‚e
+par le micro-processeur. Dans certaines situations, les
+donn‚es trait‚es par les diff‚rentes d‚finitions doivent
+ˆtre r‚ordonn‚es ou dupliqu‚es.
+
+Le mot DUP duplique le contenu du sommet de la pile de
+donn‚es:
+
+  10 DUP PRINT PRINT    affiche  10 10
+  5 DUP * PRINT         affiche  25
+
+Le mot OVER duplique le second ‚l‚ment de la pile de
+donn‚es:
+
+  5 15 OVER PRINT PRINT PRINT  affiche 5 15 5
+
+Le mot SWAP inverse les deux ‚l‚ments du sommet de la
+pile de donn‚es:
+
+  1 3 SWAP PRINT PRINT   affiche 1 3
+
+Le mot PICK d‚pose au sommet de la pile de donn‚es le
+niŠme ‚l‚ment de la pile de donn‚es, n non compris.
+La base de d‚part pour le comptage des ‚l‚ments …
+traiter est 1, l'‚l‚ment num‚ro un ‚tant
+situ‚ imm‚diatement aprŠs le paramŠtre trait‚ par PICK.
+La s‚quence 1 PICK est similaire … DUP, 2 PICK … OVER. Il n'y
+a pas de traitement d'erreur si n est sup‚rieur au
+nombre d'‚l‚ments d‚pos‚s sur la pile de donn‚es.
+Exemple:
+
+  1 2 3 4 5 6  4 PICK   empile  3
+   car 6 est l'‚l‚ment nø1, 5 l'‚l‚ment nø2, etc...
+
+Voici quelques exemples d'utilisation de ces
+manipulateurs de pile de donn‚es:
+
+  : AU-CARRE ( n --- n2)
+    DUP * ;
+
+Le mot AU-CARRE ‚lŠve un nombre entier quelconque au
+carr‚:
+
+  2 AU-CARRE PRINT       affiche 4
+  3 AU-CARRE PRINT       affiche 9
+  4 AU-CARRE PRINT       affiche 16
+
+  : AU-CUBE ( n --- n3)
+    DUP DUP * * ;
+
+Le mot AU-CUBE ‚lŠve un nombre entier quelconque au
+cube:
+
+  2 AU-CUBE PRINT        affiche 8
+  3 AU-CUBE PRINT        affiche 27
+
+La philosophie du langage FORTH tend … la simplicit‚.
+Il faudra toujours privil‚gier l'aspect sobre et un peu
+rustique des d‚finitions. Un mot traitant une donn‚e
+pass‚e par la pile de donn‚es n'est pas moins efficace
+qu'un programme alambiqu‚ ‚crit en N'IMPORTE-
+QUOI-D'AUTRE (C, PASCAL, FORTRAN, COBOL,
+etc... et bien s–r B-A-S-I-C).
+
+
+DEFINITION D'UNE CHAINE DE CARACTERE
+------------------------------------
+
+Les caractŠres contenus dans une chaŒne de caractŠres
+sont des valeurs cod‚es sur 7 ou 8 bits selon le
+systŠme utilis‚:
+
+   -sur 7 bits, les codes des caractŠres sont
+    compris entre 0 et 127. La norme la plus utilis‚e
+    est celle d‚finie dans le standard ASCII.
+
+   -sur 8 bits, les codes des caractŠres sont
+    compris entre 0 et 255. Sur les systŠmes IBM
+    PC/XT/AT et compatibles, les codes compris
+    entre 128 et 255 correspondent aux caractŠres
+    accentu‚s de divers pays, symboles mon‚taires
+    et math‚matiques, caractŠres semi-graphiques.
+
+
+Le mot EMIT affiche un caractŠre … partir de son code ASCII.
+Exemple:
+
+  65 EMIT   affiche  A
+
+Certains codes n'affichent pas directement un
+caractŠre … l'‚cran, mais d‚clenchent une action:
+
+   7 EMIT  provoque l'‚mission d'un bip sonore
+
+Le premier mot permettant de d‚finir une chaŒne de
+caractŠres est le mot " (quote ou guillemet). Le texte
+compris dans la chaŒne est d‚limit‚ par un guillemet.
+
+  : TITRE  // --- str
+    " MENU GENERAL " ;
+
+L'ex‚cution de titre d‚pose sur la pile de donn‚es le
+paramŠtre symbolis‚ par str correspondant … l'adresse
+de la chaine.
+Le premier mot " et le texte de la chaŒne doivent ˆtre s‚par‚s
+par au moins un caractŠre espace:
+
+  "MENU GENERAL"
+
+provoque une erreur … la compilation, FORTH ne reconnaissant
+pas le mot "MENU … moins que vous ne l'ayez pr‚alablement d‚fini.
+
+Le contenu de la chaŒne est affich‚ en ex‚cutant le mot PRINT :
+  TITRE PRINT affiche  MENU GENERAL
+
+Les chaŒnes de caractŠres peuvent ˆtre d‚finies de
+plusieurs fa‡ons:
+
+   -en tant que constantes alphanum‚riques, par
+    l'utilisation du mot ".
+
+   -traitement de variables alphanum‚riques d‚finies
+    par ex‚cution du mot de d‚finition CHAR ou CHAR[].
+
+   -par traitement de chaŒnes du type
+    concat‚nation, fractionnement, de constantes ou
+    variables alphanum‚riques, lecture de fichier, etc...
+
+Le mot CHAR d‚finit une variable de type chaŒne
+alphanum‚rique:
+
+  CHAR A$
+
+d‚finit une variable alphanum‚rique pouvant recevoir
+n caractŠres.
+Par d‚faut, les variables alphanum‚riques sont initialis‚e
+… vide et les variables num‚riques … z‚ro au moment de
+leur cr‚ation.
+
+L'affectation d'une chaŒne … une variable
+alphanum‚rique (ou d'un nombre … une variable num‚rique),
+est r‚alis‚ par le mot := pr‚c‚d‚ des
+paramŠtres de la chaŒne origine et la chaŒne de
+destination:
+
+  " TEST" A$ :=
+
+On peut aussi affecter depuis le clavier une chaŒne
+alphanum‚rique … une variable alphanum‚rique en
+utilisant le mot INPUT, ou INPUTVAR:
+
+  " ENTREZ VOTRE NOM" PRINT CR
+  INPUT A$ :=
+
+Ou encore:
+
+  " ENTREZ VOTRE NOM" PRINT CR
+  A$ INPUTVAR
+
+attend qu'une suite de caractŠres soit tap‚e depuis le
+clavier du minitel et la range dans la variable alphanum‚rique
+donn‚e.
+
+
+Dans certaines situations, on peut consid‚rer le
+contenu d'une variable comme un flag bool‚en
+et non comme une valeur litt‚rale. Dans ce cas, toute
+valeur non nulle sera consid‚r‚e comme vraie et toute
+valeur nulle comme fausse:
+
+  NUMBER VIVANT
+  : .HERITAGE  // ---
+    VIVANT
+    IF    " Attendez encore pour h‚riter" PRINT
+    ELSE  " Maintenant, courrez chez le notaire"  PRINT ENDIF
+  ;
+  ...
+
+  0 VIVANT
+  .HERITAGE   affiche  Maintenant, courrez chez le notaire
+
+Pour augmenter la lisibilit‚ des programmes,
+deux constantes pr‚-d‚finies, TRUE et FALSE
+existent:
+
+  TRUE VIVANT :=
+  .HERITAGE   affiche   Attendez encore pour h‚riter
+
+COMPILATION ET CHAINAGE DE FICHIERS SOURCE
+------------------------------------------
+
+
+Pour charger le contenu d'un fichier source, il faut
+utiliser le mot LOAD suivi du nom du fichier … traiter.
+L'extension du fichier est par d‚faut NPG et peut ˆtre
+omise. Dans le cas contraire, pr‚ciser l'extension. Le
+fichier peut provenir d'un lecteur disque ou d'un
+r‚pertoire diff‚rent du lecteur courant ou r‚pertoire
+courant:
+
+  LOAD TEST.TXT              compile TEST.TXT
+  LOAD b:BINAIRE             compile BINAIRE.NPG
+
+Si vous envisagez de d‚velopper une application de
+taille cons‚quente, il est souhaitable dans un premier
+temps, de la fractionner en plusieurs fichiers de petite
+taille. Eventuellement, une partie de programme peut
+ˆtre r‚utilis‚e par un autre programme et dans ce cas,
+le morcellement devient n‚cessaire (voir la directive 
+#USE du manuel de r‚f‚rence pour plus de d‚tails).
+
+Contrairement … d'autres compilateurs, FORTH
+n'autorise pas la compilation d'un mot dans une
+d‚finition avant qu'il ne soit d‚fini. C'est le principe
+de la pr‚c‚dence des d‚finitions:
+
+  : MOT1  // ---
+     ... MOT2 ... ;
+  : MOT2  // ---
+     ............ ;
+
+g‚nŠre une erreur … la compilation de MOT1, car MOT2
+n'est pas encore d‚fini.
+
+
+ORGANISATION DES PROGRAMMES
+---------------------------
+
+
+Un programme est constitu‚ de diverses PROCEDURES/FONCTIONS, DECLARATION DE
+VARIABLES, DIRECTIVES DIVERSES, organis‚es de la fa‡on suivante :
+
+<Directives de compilation (#USE...)>
+
+<D‚claration des variables>
+
+: <Proc1>
+   corps de la proc‚dure ...
+;
+
+: <Procn>
+   ...
+;
+
+: MAIN
+  Proc‚dure principale
+;
+
+Les sources peuvent ˆtre ‚crits avec n'importe quel ‚diteur de textes.
+
+A ce stade, on peut distinguer 2 types de programmes (cette distinction est
+purement abitraire, N‚oServ n'en fait aucune en fait) :
+
+- les MODULES, ou LIBRAIRIES, qui rassemblent diverses proc‚dures, utilisables
+  par plusieurs APPLICATIONS.
+
+- les APPLICATIONS, qui repr‚sentent les applications t‚l‚matiques proprement
+  dite.
+
+Dans toute APPLICATION, il doit exister une proc‚dure de nom "MAIN", qui
+repr‚sente le point d'entr‚e de celle-ci.
+C'est cette proc‚dure qui est appel‚e … chaque nouvelle connexion d'un
+minit‚liste.
+Les MODULES/LIBRAIRES, elles, n'ont pas a contenir de proc‚dure MAIN (c'est la
+la seule "diff‚rence" notable entre module et application), puisque l'on peut
+appeler n'importe quelle proc‚dure contenue dans n'importe quel ordre.
+
+Exemple : conception de l'application 3615 DEMO.
+          Source DEMO.NPG
+          // R‚f‚rencement des LIBRAIRES/MODULES que l'application
+          // DEMO va utiliser
+          #USE BAL QUIZZ
+          // D‚claration des variables locales au connect‚
+          LOCAL CHAR NOM PRENOM
+
+          // Proc‚dures
+          : SAINOM
+             " Entrez votre nom" print
+             INPUT
+             NOM :=
+          ;
+
+          : SAIPRENOM
+             " Entrez votre pr‚nom" print
+             INPUT
+             PRENOM :=
+          ;
+
+          // La proc‚dure principale.
+          : MAIN
+             CLS
+             " Bonjour" print
+             SAINOM
+             SAIPRENOM
+             ...
+             // Appel du menu g‚n‚ral des boites aux lettres
+             BAL::MENUGEN
+             ...
+          ;
+
+Pour ex‚cuter l'application DEMO, il suffit de la charger dans N‚oServ,
+de la fa‡on suivante :
+
+   LOAD DEMO
+
+Ensuite, pour se connecter en local … l'application DEMO, il suffit de
+taper "DEMO" sur le minitel local, puis d'appuyer sur SHIFT+CONNEXION/FIN.
+
+
+BIBLIOGRAPHIE ET INFORMATIONS COMPLEMENTAIRES
+---------------------------------------------
+
+Si vous ne devez poss‚der qu'un seul ouvrage sur FORTH, alors je vous
+conseille le livre suivant:
+
+Titre  : FORTH
+Auteurs: Walid P. SALMAN, Olivier TISSERAND et Bruno TOULOUT
+Edition: EYROLLES
+
+C'est le meilleur livre sur FORTH que j'ai pu lire … ce jour, vous y
+apprendrez tout ce que vous avez envie de savoir sur ce langage, tant
+au niveau de la programmation, qu'au niveau de la m‚canique de
+fonctionnement du compilateur.
+
+
+La communaut‚ FORTH fran‡aise n'est pas trŠs active, h‚las, mais il
+existe une soci‚t‚ qui se d‚marque:
+
+Soci‚t‚ MP7
+Mr Marc PETREMANN
+17 All‚e de la noiseraie
+93160 Noisy le Grand
+T‚l: 43 03 40 36
+
+Elle diffuse une version fran‡aise de FORTH, qui a pour nom TURBO-FORTH,
+ainsi que beaucoup d'autres choses relatives … FORTH.
+

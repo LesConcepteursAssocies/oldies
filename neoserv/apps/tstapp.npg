@@ -1,0 +1,12 @@
+// Test appel application
+
+: main
+   cls " test executeapp" print cr wait
+   " BENCH" searchapp
+   if
+      " Appel de BENCH" print cr wait
+      " BENCH" executeapp
+   endif
+   " BENCH non trouv‚e " print wait
+;
+

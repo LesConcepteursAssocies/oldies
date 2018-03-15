@@ -1,0 +1,64 @@
+                                  SYSTEME EXPERT
+
+Le programme suivant illustre un des plus ancien principe appliqu‚ dans les
+tous premiers systŠmes experts, celui des rŠgles de production.
+
+PRINCIPE GENERAL.
+-----------------
+
+Le programme travaille avec deux fichiers, l'un contenant ce qu'il est convenu
+d'appeler les REGLES de production du systŠme, dont la syntaxe g‚n‚rale est
+la suivante :
+
+   SI <Condition>
+   ALORS <Action>
+
+<Condition> peut repr‚senter n'importe quel pr‚misse logique, du genre de
+celui-ci : "Tout homme est mortel et socrate est un homme"
+
+<Action> est consid‚r‚ comme VRAI si la condition est r‚alis‚e (prouv‚e).
+
+Exemple : Si Tout homme est mortel et socrate est un homme
+          Alors socrate est mortel
+
+Evident n'est-ce pas !
+
+Le second fichier du systŠme contient ce qu'il est convenu d'appeler les FAITS
+‚tablis du systŠme, c'est … dire ceux dont on est sur.
+
+Exemple : Tout homme est mortel
+
+Un systŠme bas‚ sur ce principe est capable de "d‚duire" des faits nouveaux, par
+le proc‚d‚ du CHAINAGE AVANT, dont le principe est le suivant :
+
+- On balaye s‚quentiellement la base de rŠgles.
+- Sur chacune des rŠgles, on applique l'ensemble des faits de la base.
+- Si un fait est trouv‚ dans le texte de la condition, alors celle-ci est
+  consid‚r‚e comme vrai, et l'action de la rŠgle correspondante est ajout‚e
+  comme nouveau fait dans la base.
+
+Prenons comme exemple le systŠme suivant :
+
+  RŠgle : SI tout homme est mortel et socrate est un homme
+          ALORS socrate est mortel
+
+  Fait  : tout homme est mortel
+
+  Le systŠme va "d‚duire" le fait suivant :
+
+          socrate est mortel
+
+AMELIORAITON ENVISAGEABLES
+--------------------------
+
+Le programme fourni n'est en fait qu'un squelette de ce que l'on peut faire,
+il est possible d'ajouter un certain nombre de choses du genre :
+
+  - Am‚lioration du traitement des conditions (prise en compte de conditions
+    logiques du genre OU, ET), pour mixer plusieurs faits.
+
+  - Am‚lioration du balayage des rŠgles, dans le sens o— une fois qu'une
+    rŠgle est trait‚e, elle est "oubli‚e", ce qui peut ˆtre g‚nant dans le
+    cas o— les rŠgles ne sont pas entr‚s dans un ordre coh‚rent.
+
+

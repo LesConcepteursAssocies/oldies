@@ -1,0 +1,56 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+DECIMAL
+VARIABLE OLDMODE
+VARIABLE MAXX
+VARIABLE MAXY
+
+: FGDEMO62 ( --- )
+   FASTGRAPH?
+   IF
+      FGGETMODE OLDMODE !
+      FGAUTOMODE FGSETMODE
+      FGMOUSEINI
+      0<
+      IF
+         OLDMODE @ FGSETMODE
+         FGRESET
+         1 FGCURSOR
+         ABORT" Cette d‚monstration n‚c‚ssite une souris"
+      THEN
+      FGGETMAXX MAXX !
+      FGGETMAXY MAXY !
+      15 FGSETCOLOR
+      0 MAXX @ 0 MAXY @ FGRECT
+      1 FGMOUSEVIS
+      MAXX @ 4 / MAXX @ 3 * 4 / MAXY @ 4 / MAXY @ 3 * 4 / FGMOUSELIM
+      7 FGSETCOLOR
+      " Une Touche" FGTEXT
+      FGWAITKEY
+      0 0 FGMOUSEMOV
+      36 FGWAITFOR
+      0 MAXX @ FGMOUSEMOV
+      36 FGWAITFOR
+      MAXX @ MAXY @ FGMOUSEMOV
+      36 FGWAITFOR
+      0 MAXY @ FGMOUSEMOV
+      36 FGWAITFOR
+      MAXX @ 2/ MAXY @ 2/ FGMOUSEMOV
+      16 32 FGMOUSESPD
+      " Une Touche" FGTEXT
+      FGWAITKEY
+      OLDMODE @ FGSETMODE
+      FGRESET
+      1 FGCURSOR
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

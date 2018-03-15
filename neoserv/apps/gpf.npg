@@ -1,0 +1,29 @@
+//
+// tests plantages.
+local
+char nomtab tableau
+char[] 8 8 stab
+
+: main
+  cls
+  " test tableaux " print cr
+  " apps\serpent" dbopen
+  if
+     " TABLEAU" dbfield tableau :=
+     // On se plante dans l'ordre des paramätres de STRTOK
+     // Ordre normal: Chaine delim tableau STRTOK
+     " \13\10" stab tableau strtok
+     stab alen
+     0 do
+       dup 0 do
+          i j stab print
+       loop
+     loop
+     drop
+     dbcloseall
+  else
+     " erreur DBOPEN SERPENT.DBF" line0
+  endif
+  wait
+;
+

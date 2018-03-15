@@ -1,0 +1,105 @@
+\ ------------------------------------------------------------------------------
+\                       Gestion des vocabulaires de CONTEXT
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement du vocabulaire ROOT )
+
+CONTEXT DUP @ SWAP 2+ !
+VOCABULARY ROOT
+ROOT DEFINITIONS
+
+: ALSO
+  CONTEXT DUP 2+ #VOCS 2- 2* CMOVE>
+;
+
+: ONLY
+  ['] ROOT >BODY
+  CONTEXT #VOCS 1- 2*
+  2DUP ERASE
+  + !
+  ROOT
+;
+
+: SEAL
+  ' >BODY
+  CONTEXT #VOCS 2* ERASE
+  CONTEXT !
+;
+
+: PREVIOUS
+  CONTEXT DUP 2+ SWAP #VOCS 2- 2* CMOVE
+  CONTEXT #VOCS 2- 2* + OFF
+;
+
+: DEFINITIONS DEFINITIONS ;
+
+: FORTH FORTH ;
+
+: ORDER
+  CR ." CONTEXT : "
+  CONTEXT #VOCS 0
+  DO
+    DUP @ ?DUP
+    IF
+      BODY> >NAME .ID
+    THEN
+    2+
+  LOOP
+  DROP CR ." CURRENT : "
+  CURRENT @ BODY> >NAME .ID
+;
+
+: VOCS
+  ." : "
+  VOC-LINK @
+  BEGIN
+    DUP #THREADS 2* - BODY> >NAME .ID
+    @ DUP 0=
+  UNTIL
+  DROP
+;
+
+: TRIM
+  #THREADS 0
+  DO
+    2DUP @
+    BEGIN
+      2DUP U> NOT
+    WHILE
+      @
+    REPEAT
+    NIP OVER ! 2+
+  LOOP
+  2DROP
+;
+
+: (FORGET)
+  DUP FENCE @ U< ABORT" Zone prot‚g‚e par FENCE"
+  DUP VOC-LINK @
+  BEGIN
+    2DUP U<
+  WHILE
+    @
+  REPEAT
+  DUP VOC-LINK ! NIP
+  BEGIN
+    DUP
+  WHILE
+    2DUP #THREADS 2* - TRIM @
+  REPEAT
+  DROP 2+ DP !
+;
+
+: FORGET
+  BL WORD ?UPPERCASE
+  DUP CURRENT @
+  HASH @ (FIND) 0=
+  ?MISSING
+  >LINK 2- (FORGET)
+;
+
+ONLY FORTH ALSO DEFINITIONS
+
+EOF
+
+

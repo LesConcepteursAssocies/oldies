@@ -1,0 +1,19 @@
+//
+// Test 01 : reconnaissance des nombres.
+//
+//
+
+: main
+
+123E34 532E-125
+FFH
+010011101B               // Binaire
++56.23
+123e-34
+FEH                      // H‚xa.
+01237o                   // Octal
+125.364
+-2E4
+15E-3
+tutu
+;

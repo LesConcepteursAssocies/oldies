@@ -1,0 +1,21 @@
+//
+// test execute
+//
+#use apps\exec2
+
+local char nomproc := "EXEC2::APPEL"
+
+: appel
+   " vous etes dans APPEL" print cr
+   wait
+;
+
+: main
+   cls
+   " test execute" print cr
+   wait
+   nomproc execute
+   " retour" print cr
+   wait
+;
+

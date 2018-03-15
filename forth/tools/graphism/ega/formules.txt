@@ -1,0 +1,66 @@
+EGA 1
+-----
+
+HRES = 320 (X = 0..319)
+VRES = 200 (Y = 0..199)
+Nombre de couleurs maximum : 16 (0..15).
+
+EGA 2
+-----
+
+HRES = 640 (X = 0..639)
+VRES = 200 (Y = 0..199)
+Nombre de couleurs maximum : 16 (0..15).
+
+EGA 3
+-----
+
+HRES = 640 (X = 0..639)
+VRES = 350 (Y = 0..349)
+Nombre de couleurs maximum : 2 (0..1).
+
+EGA 4
+-----
+
+HRES = 640 (X = 0..639)
+VRES = 350 (Y = 0..349)
+Nombre de couleurs maximum : 16 (0..15).
+
+VGA 1
+-----
+
+HRES = 640 (X = 0..639)
+VRES = 480 (Y = 0..479)
+Nombre de couleurs maximum : 2 (0..1).
+
+VGA 2
+-----
+
+HRES = 640 (X = 0..639)
+VRES = 480 (Y = 0..479)
+Nombre de couleurs maximum : 16 (0..15).
+
+Formules communes:
+------------------
+
+Adresse de segment de l'‚cran : 0A000h
+
+4 plans de bits (rouge,vert,bleu,intensit‚).
+1 Bit par point.
+8 Points par octet.
+
+Octets par ligne : HRES / 8
+
+Offset du point X,Y:
+
+Y * Octets_par_ligne + X / 8
+
+Nø du bit :
+
+7 - (X mod 8 )
+
+Informations communes:
+---------------------
+
+Registre d'index
+

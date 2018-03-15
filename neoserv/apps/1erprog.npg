@@ -1,0 +1,11 @@
+#name = TEST
+
+: main
+   cls
+   " 22 / 7 = " print cr
+   22 7 / print cr
+   " 22 % 7  = " print cr
+   22 7 % print cr
+   wait
+;
+

@@ -1,0 +1,299 @@
+\ -----------------------------------------------------------------------------
+\                               D‚compilateur.
+\ -----------------------------------------------------------------------------
+
+CR .( Chargement des utilitaires de d‚compilation )
+
+ONLY FORTH
+
+: >IS  ( cfa --- )
+  >BODY
+;
+
+\ Mot de d‚finition avec ex‚cution param‚trable
+( Valeur initiale 0 )
+: CASE:   ( n --- )
+  CREATE
+    ,
+    [COMPILE] HIDE
+    ]
+  DOES>   ( #subscript --- ) ( execute le niŠme mot )
+    2DUP @ U<
+    IF
+      2+ SWAP 2* +
+    ELSE
+      CR  ." Le vecteur … choix multiple "
+      DUP BODY> >NAME .ID
+      ." admet pour indices [ 0 - " @ 1- . ." ]"
+      CR .
+      TRUE ABORT" est un indice hors limite"
+    THEN
+  PERFORM
+;
+
+: ;CASE
+  [COMPILE] [
+  [COMPILE] REVEAL
+; IMMEDIATE
+ 
+\ ASSOCIATIVE:   mot d‚finissant une table de recherche
+\                retourne n+1 si la valeur n'est pas dans la table
+: ASSOCIATIVE:  ( n --- ) \ table de n ‚l‚ments
+  CONSTANT   
+  DOES>                      ( valeur -- index )
+    DUP @  -ROT DUP @ 0 
+    DO
+      2+ 2DUP @ =            ( trouv‚ dans la table? )
+      IF
+        2DROP DROP 
+        I 0 0 LEAVE          ( retourne l'index de la valeur dans la table )
+      THEN
+    LOOP
+  2DROP
+;
+
+\ D‚compile chaque type de mot
+DEFER (SEE)
+
+VOCABULARY HIDDEN
+ALSO HIDDEN DEFINITIONS
+VARIABLE 'CFA
+
+: .POS        ( IP --- IP  )
+  DUP 'CFA @ - 2/
+  OVER @ ['] UNNEST <>
+  IF
+    #OUT @ 9 >
+    IF
+      CR ." nø" .
+      7 ?TAB
+    ELSE
+      DROP
+    THEN
+  ELSE
+    DROP
+  THEN
+;
+
+: .WORD       ( IP --- IP' )
+  DUP @ >NAME .ID
+  2+
+;
+
+: .INLINE     ( IP --- IP' )
+  .WORD
+  DUP @ .
+  2+
+;
+
+: .DINLINE     ( IP --- IP' )
+  .WORD
+  DUP 2@ D.
+  4 +
+;
+
+: .BRANCH     ( IP --- IP' )
+  .POS
+  ATTOFF
+  BOLD
+  .WORD
+  DUP @ 'CFA @ - 2/ ." nø" .
+  ATTOFF
+  2+
+  DUP @ ['] UNNEST <>
+  IF
+    .POS
+  THEN
+;
+
+: .QUOTE      ( IP --- IP' )
+  .WORD .WORD
+;
+
+: .STRING     ( IP --- IP' )
+  .WORD COUNT 2DUP TYPE SPACE
+  + EVEN
+  .POS
+;
+
+: .(;CODE)    ( IP --- IP' )
+  .WORD
+  DOES?
+  IF
+    1+
+  ELSE
+    5 -
+    DROP
+    FALSE
+  THEN
+;
+
+: .UNNEST     ( IP --- IP' )
+  CR ." nø"
+  'CFA @ - 2/ .
+  5 ?TAB ." ; "
+  0
+;
+
+: .FINISH     ( IP --- IP' )
+  CR 7 SPACES .WORD .WORD
+  DROP   0
+;
+
+ALSO ASSEMBLER
+ 
+\ Classification de chaque mot dans une d‚finition
+
+15 ASSOCIATIVE: EXECUTION-CLASS
+     (  0 ) ' (LIT) ,        (  1 ) ' ?BRANCH ,        (  2 ) ' BRANCH ,
+     (  3 ) ' (LOOP) ,       (  4 ) ' (+LOOP) ,        (  5 ) ' (DO) ,
+     (  6 ) ' COMPILE ,      (  7 ) ' (.") ,           (  8 ) ' (ABORT") ,
+     (  9 ) ' (;CODE) ,      ( 10 ) ' UNNEST ,         ( 11 ) ' (") ,
+     ( 12 ) ' (?DO) ,        ( 13 ) ' (;USES) ,        ( 14 ) ' (DLIT) ,
+ 
+16 CASE: .EXECUTION-CLASS
+     (  0 )  .INLINE          (  1 )  .BRANCH          (  2 ) .BRANCH
+     (  3 )  .BRANCH          (  4 )  .BRANCH          (  6 ) .BRANCH
+     (  6 )  .QUOTE           (  7 )  .STRING          (  8 ) .STRING
+     (  9 )  .(;CODE)         ( 10 )  .UNNEST          ( 11 ) .STRING
+     ( 12 )  .BRANCH          ( 13 )  .FINISH          ( 14 ) .DINLINE
+     ( 15 )  .WORD
+   ;CASE
+
+PREVIOUS
+ 
+\ D‚compile une d‚finition :
+: .PFA   ( CFA --- )
+  DUP 'CFA !
+  >BODY  .POS
+  BEGIN
+    DUP @ EXECUTION-CLASS 10 <>
+    IF
+      #OUT @ 50 >
+      IF
+        .POS
+      THEN
+    THEN
+    DUP @ EXECUTION-CLASS .EXECUTION-CLASS
+    DUP 0= STOP? OR
+  UNTIL
+  DROP
+;
+
+\ Affiche la cat‚gorie d'un mot
+: .CONSTANT    ( CFA --- )
+  DUP >BODY ?
+  ." CONSTANT "
+  >NAME .ID
+;
+
+: .2CONSTANT    ( cfa --- )
+  DUP >BODY 2@ SWAP D.
+  ." 2CONSTANT "
+  >NAME .ID
+;
+
+: .VARIABLE    ( CFA --- )
+  ." VARIABLE "
+  DUP >NAME .ID
+  ." Contenu = " >BODY ?
+;
+
+: .2VARIABLE   ( CFA --- )
+  ." 2VARIABLE "
+  DUP >NAME .ID
+  ." Contenu = " >BODY 2@ D.
+;
+
+: .:           ( CFA --- )
+  7 SPACES
+  ." : "
+  DUP >NAME .ID
+  .PFA
+;
+
+: .DOES>       ( CFA --- )
+  ." DOES> "
+  1+
+  BODY>
+  .PFA
+;
+
+: .DEFER   ( CFA --- )
+  DUP >NAME .ID
+  ." est vectoris‚ par "
+  >IS @ (SEE)
+;
+
+: .STRING$     ( cfa -- )
+  DUP >BODY DUP C@ .
+  ." STRING " SWAP >NAME .ID
+  ."   Contenu = "
+  BOLD ASCII " EMIT
+  ATTOFF 1+ COUNT TYPE
+  BOLD ASCII " EMIT
+  ATTOFF
+;
+
+: .OTHER   ( CFA -- )
+  DUP >NAME .ID
+  DUP @ OVER >BODY = ( cfa points to the pfa in code words )
+  IF
+    DROP ."  est en Code Machine"
+    EXIT
+  THEN
+  DUP @ DOES?
+  IF
+    .DOES>
+    DROP EXIT
+  THEN
+  SWAP DUP @ ['] (VOC) >BODY =
+  IF
+    ."  est un Vocabulaire"
+    2DROP EXIT
+  THEN
+  ."  est d'un type inconnu "
+  NIP @
+  ." ( son CFA contient " BODY> >NAME .ID ." )"
+;
+
+
+\ Classement d'un mot en fonction de son CFA
+8 ASSOCIATIVE: DEFINITION-CLASS
+     ( 0 )  ' QUIT @ ,          ( 1 )  ' FILES @ ,
+     ( 2 )  ' LAST @ ,          ( 3 )  ' (2VARIABLE) @ ,   ( 4 )  ' KEY @ ,
+     ( 5 )  ' EMIT @ ,          ( 6 )  ' STR$ @ ,          ( 7 )  ' STARTUP-FILE @ ,
+
+9 CASE:   .DEFINITION-CLASS
+     ( 0 )     .:               ( 1 )     .CONSTANT
+     ( 2 )     .VARIABLE        ( 3 )     .2VARIABLE
+     ( 4 )     .DEFER           ( 5 )     .DEFER
+     ( 6 )     .2CONSTANT       ( 7 )     .STRING$
+     ( 8 )     .OTHER
+  ;CASE
+ 
+\ Niveau haut du d‚compilateur, le mot SEE
+: ((SEE))   ( Cfa --- )
+  CR DUP DUP @ 
+  DEFINITION-CLASS .DEFINITION-CLASS
+  >NAME C@ 64 AND
+  IF
+    ." IMMEDIATE"
+  THEN
+  CR
+;
+
+' ((SEE)) IS (SEE)
+
+FORTH DEFINITIONS
+
+: SEE   ( <mot> --- )
+  ATTRIBUTS @
+  ATTRIBUTS ON
+  '
+  (SEE)
+  ATTRIBUTS !
+;
+
+
+

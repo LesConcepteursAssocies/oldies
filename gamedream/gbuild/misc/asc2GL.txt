@@ -1,0 +1,312 @@
+/*
+3d studio ASC -> open gl code
+written by lee jong whan
+date: 1998.4.25
+compiler: turbo c 2.0
+usage: if you want to convert "aa.asc".
+       1) copy aa.asc data.asc [enter]
+       2) a [enter]
+       then this program will generate opengl code in the screen
+       3) a > a. gl [enter]
+       open gl code will be stored to a.gl
+       open workspace of windows frame.
+       open CWalkDoc::Drawscene()
+       copy this code to above function.
+
+        then you can see 3d object.
+        and you can rotate it.
+
+        if the object is too big, you have to adjust it by
+        glTranslated( x, y, z)..
+email: leejw51@hitel.net
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <string.h>
+#include <math.h>
+
+void check(char*a) {
+        /*puts(a);*/
+        }
+        class Vector {
+        public:
+        float x,y,z;
+        Vector(float x,float y,float z);
+        Vector(void);
+        Vector cross(Vector A);
+        Vector operator/(float A);
+        Vector operator-(Vector A);
+        void print(void);
+        float dot(Vector A);
+float size(void);
+};
+Vector Vector::operator / (float A)
+{
+        Vector t;
+        t.x = x/A, t.y= y/A, t.z= z/A;
+        return t;
+
+}
+Vector Vector::operator - (Vector A)
+{
+        Vector t;
+        t.x=  x-A.x, t.y= y-A.y, t.z= z-A.z;
+        return t;
+}
+Vector::Vector(void)
+{
+        x=y=z=0.0;
+}
+Vector::Vector(float x,float y,float z)
+{
+        Vector::x=x;
+        Vector::y=y;
+        Vector::z=z;
+}
+Vector Vector::cross(Vector A)
+{
+        // i   j-    k
+        // x   y    z
+        //A.x  A.y  A.z
+        Vector B;
+        B.x= y*A.z-z*A.y;
+        B.y-= x*A.z-z*A.x;
+        B.z= x*A.y-y*A.x;
+
+        return B;
+}
+float Vector::dot(Vector A)
+{
+        return x*A.x+ y*A.y+ z*A.z;
+}
+float Vector::size(void)
+{
+        return sqrt(x*x+y*y+z*z);
+}
+void Vector::print(void)
+{
+        printf(" %7.3f i   +    %7.3f   j +  %7.3f  k \n",x,y,z);
+}
+class Vertex {
+        public:
+        float x,y,z;
+        Vertex(float x,float y,float z);
+        Vertex(void);
+
+
+
+
+        //linked list..
+        Vertex* pre;
+        Vertex* nxt;
+};
+
+class Solid {
+        public:
+        FILE* src;
+        Vertex* VERTEX;
+
+        void PrintVertex(void);// vertex functions
+        void GoLast(void);
+        void GoFirst(void);
+        void GoPrevious(void);
+        void GoNext(void);
+        int GoHere(int a);
+        int CanGoPrevious(void); // does it can go previous node?
+        int CanGoNext(void);
+        void Add(float,float,float);
+
+        void Read(void);
+
+
+        Solid(char*);
+        virtual ~Solid(void);
+}
+
+Vertex::Vertex(void)
+{
+        x=y=z=0.0;
+        pre=nxt=NULL;
+}
+
+Vertex::Vertex(float x, float y, float z)
+{
+        Vertex::x=x,
+        Vertex::y=y,
+        Vertex::z=z;
+        pre=nxt=NULL;
+}
+
+void Solid::GoNext(void){
+        VERTEX=VERTEX->nxt;
+}
+void Solid::GoPrevious(void)
+{
+        VERTEX=VERTEX->pre;
+}
+int Solid::CanGoNext(void)
+{
+        if (VERTEX->nxt) return 1; else return 0;
+}
+int Solid::CanGoPrevious(void)
+{
+        if (VERTEX->pre) return 1; else return 0;
+}
+
+int Solid::GoHere(int a)
+{
+        GoFirst();
+        int i=0;
+        while(1) {
+        if (i==a) return 0;
+        i++;
+        if (CanGoNext()) GoNext(); else return -1;
+        }
+}
+void Solid::GoLast(void)
+{
+        while(1) {
+        if (VERTEX->nxt==NULL) break;
+        GoNext();
+        }
+}
+void Solid::GoFirst(void)
+{
+        while(1) {
+        if (VERTEX->pre==NULL) break;
+        GoPrevious();
+        }
+}
+
+Solid::Solid(char* fname)
+{
+        VERTEX=NULL;
+
+        src=fopen(fname,"rt");
+        if (src==NULL) {puts("cannot open file for reading");exit(1);}
+        Read();
+}
+
+Solid::~Solid(void)
+{
+        fclose(src);
+//        puts("closing okay");
+}
+void Solid::Add(float x,float y,float z)
+{
+        if (VERTEX==NULL) { //is it a first node ?
+        VERTEX = new Vertex(x,y,z);
+        check("created");
+        return;
+        }
+
+        GoLast();
+        Vertex* n = new Vertex(x,y,z);
+        VERTEX->nxt=n; //double linked list
+        n->pre=VERTEX;
+
+        VERTEX=n;
+        check("added");
+}
+
+void Solid::PrintVertex(void)
+{
+        GoFirst();
+        int index=0;
+        while(1) {
+        printf("index=%3d x=%7.3f y=%7.3f z=%7.3f \n", index++,VERTEX->x, VERT
+EX->y, VERTEX->z);
+        if (CanGoNext()) GoNext();
+        else break;
+        }
+}
+void Solid::Read(void)
+{
+        char buf[300];
+
+        //read header
+        int VertexNumber=0,i;
+        int FaceNumber=0;
+        do { fscanf(src,"%s",buf); } while( strcmp(buf,"Vertices:"));
+        fscanf(src,"%d",&VertexNumber);
+                do { fscanf(src,"%s",buf); } while( strcmp(buf,"Faces:"));
+        fscanf(src,"%d",&FaceNumber);
+        do { fscanf(src,"%s",buf); } while( strcmp(buf,"Vertex"));
+        do { fscanf(src,"%s",buf); } while( strcmp(buf,"list:"));
+
+         //vertex read begin
+         float x,y,z;
+         for (i=0;i<VertexNumber;i++) {
+
+         fscanf(src,"%s",buf);fscanf(src,"%s",buf);
+         fscanf(src,"%s",buf);fscanf(src,"%f",&x);
+         fscanf(src,"%s",buf);fscanf(src,"%f",&y);
+         fscanf(src,"%s",buf);fscanf(src,"%f",&z);
+         Add(x,y,z);
+         }
+         printf("/*vetex number %3d    face number %3d   */ \n",VertexNumber,
+         FaceNumber);
+
+
+        //face generation begin..
+         do { fscanf(src,"%s",buf); } while( strcmp(buf,"Face"));
+        do { fscanf(src,"%s",buf); } while( strcmp(buf,"list:"));
+
+        //one line begin...
+        int A, B, C;
+                Vector A2,B2,C2;
+                Vector N,U,V;
+        printf("glPushMatrix();\n");
+          printf("glBegin(GL_TRIANGLES);\n");
+        for (i=0;i<FaceNumber;i++) {
+        while(1) {fscanf(src,"%s",buf); if (!strcmp(buf,"Face")) break;
+                }
+        fscanf(src,"%s",buf);
+        while(fgetc(src)!=':') {}; fscanf(src,"%d",&A);
+        while(fgetc(src)!=':') {}; fscanf(src,"%d",&B);
+        while(fgetc(src)!=':') {}; fscanf(src,"%d",&C);
+   //printf("A %d  B %d  c %d \n",A,B,C);
+        fscanf(src,"%s",buf);        fscanf(src,"%s",buf);        fscanf(src,"
+%s",buf);
+
+
+      
+        printf("/* group %d %d %d */\n",A,B,C);
+        GoHere(A);Vector A2=Vector(VERTEX->x, VERTEX->y, VERTEX->z);
+
+        GoHere(B);Vector B2=Vector(VERTEX->x, VERTEX->y, VERTEX->z);
+        GoHere(C);Vector C2=Vector(VERTEX->x, VERTEX->y, VERTEX->z);
+        U= Vector(B2-A2), V=Vector(C2-B2);
+        N= U.cross(V);
+        if (N.size()==0.0) {printf("normal vector %f %f %f \n error.\n",N.x, N
+.y, N.z);
+                printf("glVertex3f(%7.3ff, %7.3ff, %7.3ff); \n",A2.x, A2.y, A2
+.z);
+        printf("glVertex3f(%7.3ff, %7.3ff, %7.3ff); \n",B2.x, B2.y, B2.z);
+        printf("glVertex3f(%7.3ff, %7.3ff, %7.3ff); \n",C2.x, C2.y, C2.z);
+                return;}
+        else {N=N/N.size();}
+        printf("/* triangle */ \n");
+        printf("glNormal3f(%7.3ff, %7.3ff, %7.3ff); \n",N.x, N.y, N.z);
+        printf("glVertex3f(%7.3ff, %7.3ff, %7.3ff); \n",A2.x, A2.y, A2.z);
+        printf("glVertex3f(%7.3ff, %7.3ff, %7.3ff); \n",B2.x, B2.y, B2.z);
+        printf("glVertex3f(%7.3ff, %7.3ff, %7.3ff); \n",C2.x, C2.y, C2.z);
+        
+
+        }
+        printf("glEnd();\n");
+        printf("glPopMatrix();");
+
+
+
+        
+
+
+
+}
+void main(void)
+{
+        Solid a=Solid("data.asc");
+       // a.PrintVertex();
+}

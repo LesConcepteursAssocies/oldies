@@ -1,0 +1,163 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="Author" CONTENT="Philippe Guillaumaud">
+   <META NAME="Description" CONTENT="Gnu XML Engine">
+   <TITLE>GNU XML Engine</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff">
+
+<font color="#000000" face="Helvetica">
+
+<center><H1>GNU XML Engine</H1></center>
+<hr noshade size="1">
+
+<p>
+GXE est un interpréteur de commandes écrites en XML, basé sur le modèle client/serveur.<br>
+GXE est un Logiciel Libre distribué sous licence GPL.
+</p>
+
+<p>
+L'architecture générale de GXE est la suivante:
+</p>
+
+<center>
+<IMG SRC="specif-1.png" ALT="GXE" BORDER=1>
+</center>
+
+<H2><u>Principes généraux</u></H2>
+<p>
+GXE lit et interprète tout document écrit avec le méta-langage XML, et exécute les <strong>fonctions</strong> correspondants aux tags présents dans le document lu.
+</p>
+<p>
+Afin de différencier un document XML classique d'une <strong>requête</strong> GXE, GXE définit un méta-langage, <strong>FxML</strong> (<b>F</b>le<b>x</b>ible <b>M</b>arkup <b>L</b>anguage).
+</p>
+<p>
+Les fonctions FxML sont stockées dans des <strong>libraries dynamiques</strong> (libxx.so).<br>
+Le chargement des libraries se fait une première fois au lancement de gxe, et en cours de fonctionnement par l'intermédiaire d'un envoi de signal.
+</p>
+<p>
+Les fonctions FxML sont écrites en langage C dans la version actuelle, et s'intègre à gxe par le biais d'une <strong>API</strong> fournie.
+</p>
+
+<H2><u>Fonctionnalités de GXE</u></H2>
+<p>
+Les principales caractéristiques de GXE sont:
+<ul>
+  <li>Multi-thread
+  <li>Extensible dynamiquement. Pour ajouter une ou plusieurs fonctions FxML, il suffit de développer la librairie.
+  <li>L'ajout de librairies se fait <strong>sans arret</strong> du serveur.
+</ul>
+</p>
+
+<H2><u>Format général des document FxML</u></H2>
+<p>
+Un document FxML est structurée de la façon suivante:
+</p>
+
+<table border="0">
+<tr>
+<td bgcolor="#008080">
+<font size=+2 color="#FFFFFF">
+&lt;?xml version="1.0"?&gt;<br>
+&lt;FxML [version="1.0"]&gt;<br>
+&lt;NomCommande&gt;<br>
+&nbsp;&nbsp;&lt;Nomparamètre1&gt;valeur du paramètre 1&lt;/NomParamètre1&gt;<br>
+&nbsp;&nbsp;...autres paramètres éventuels...<br>
+&lt;/NomCommande&gt;<br>
+...autres commandes éventuelles...<br>
+&lt;/FxML&gt;
+</font>
+</td>
+</tr>
+</table>
+
+<p>
+<b>&lt;FxML ...&gt;</b> est la <b>balise racine</b>, présente dans toute requête FxML.<br>
+L'attribut optionnel <b>version</b> contiendra la version du langage utilisée par l'application cliente.<br>
+</p>
+
+<p>
+Un document FxML peut comporter un nombre arbitraire de commandes.
+</p>
+
+<p>
+La fin d'un document FxML est signifiée au serveur par l'envoi de 2 retours chariot successifs.
+</p>
+
+<H2><u>Description et principes de fonctionnement de GXE</u></H2>
+<p>
+GXE permet 2 modes de fonctionnement:
+<ul>
+  <li>Mode 1: un canal de communication par requète (fermeture du canal à l'initiative du client, ou au bout de n requètes).
+  <p><IMG SRC="specif-mode-1.png" ALT="GXE mode 1" BORDER=1></p>
+  <li>Mode 2: un canal de communication par <b>frontal</b> (un frontal pouvant lui-même gérer de 1 à n clients)
+  <p><IMG SRC="specif-mode-2.png" ALT="GXE mode 2" BORDER=1></p>
+</ul>
+</p>
+
+<p>
+GXE est composé des éléments suivants:
+</p>
+<center>
+<IMG SRC="specif-generale.png" ALT="gxe" BORDER=1>
+</center>
+
+<p>
+Le comportement général de GXE peut se résumer comme suit:
+</p>
+<center>
+<IMG SRC="orga-01.png" ALT="gxe" BORDER=1>
+</center>
+
+<H2><u>Conception des modules dynamiques (utilisation de l'API)</u></H2>
+<p>
+Développer un module gxe consiste à écrire une <strong>librairie partagée</strong>.<br>
+L'écriture en elle-même peut se faire à votre convenance, en evitant autant que possible les <strong>variables publiques (globales)</strong>, à cause de la <strong>réentrance du code</strong> induite par le caractère multi-thread de gxe.
+</p>
+
+<p>
+Le header <strong>s_global.h</strong> contient la définition des structures de données maintenues par gxe.<br>
+Ce fichier est à inclure dans chaque source de module.
+</p>
+
+<p>
+Le format général d'une commande est le suivant:
+<ul>
+  <li><strong>gint NomCommande(FxCommandPtr cmd)</strong>
+  <p>
+  <strong>cmd</strong>: pointe sur une structure <strong>FxCommand</strong> (voir le détail dans le fichier <strong>s_global.h</strong>)<br>
+  La commande doit renvoyer 0 si succès, toute autre valeur sinon.
+  </p>
+</ul>
+</p>
+
+<p>
+l'API met à la disposition du développeur quelques fonctions de base, permettant de s'interfacer avec GXE.<br>
+Le fichier <strong>s_api.c</strong> contient le détail des fonctions implémentées.
+</p>
+
+<p>
+Quand le parser xml de gxe récupère un tag correspondant à un nom de commande, il recherche celle-ci dans sa <strong>table des commandes</strong>.<br>
+Si il ne la trouve pas, il recherche une commande de ce nom dans sa <strong>table des modules</strong>.<br>
+Si il la trouve, il ajoute une entrée dans la table des commandes, afin d'optimiser la prochaine recherche.<br>
+En cas, d'echec, une erreur est renvoyée.
+</p>
+
+<p>
+Le projet gxe est organisé de la façon suivante:
+</p>
+<center>
+<IMG SRC="orga-projet.png" ALT="gxe" BORDER=1>
+</center>
+
+</font>
+<hr noshade size="1">
+<address>
+<font size=2><a href="mailto:pguillaumaud@april.org">Philippe GUILLAUMAUD</a>
+</font>
+</address>
+
+</BODY>
+</HTML>

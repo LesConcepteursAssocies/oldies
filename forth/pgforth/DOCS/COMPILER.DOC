@@ -1,0 +1,590 @@
+EXECUTE            cfa ---
+                   Ex‚cute le mot dont le CFA est sur la pile.
+
+                   D‚finition :
+                   CODE EXECUTE  ( cfa --- )
+                     W POP
+                     0 [W] JMP
+                   END-CODE
+
+DPUSH              ---
+                   Empile le contenu des registres EDX et EAX.
+
+                   D‚finition :
+                   LABEL DPUSH
+                     EAX PUSH
+                     EDX PUSH
+                     NEXT
+
+APUSH              ---
+                   Empile le contenu du registre EAX.
+
+                   D‚finition :
+                   LABEL APUSH
+                     EAX PUSH
+                     NEXT
+
+>NEXT              ---
+                   Point d'entr‚e de l'interpr‚teur FORTH.
+
+                   D‚finition :
+                   LABEL >NEXT
+                     CS: 0 [IP] W MOV
+                     4 # IP ADD
+                     0 [W] JMP
+
+CODE-REF           ---
+                   R‚f‚rence relogeable de FORTH.
+                   Est initialis‚ avec l'adresse du segment de code de FORTH
+                   au lancement de celui-ci.
+
+                   D‚finition :
+                   LABEL CODE-REF
+                     0 # EDX MOV
+                     RET
+
+PERFORM            adr_cfa ---
+                   Ex‚cution indirecte.
+                   Ex‚cute le mot dont le CFA est … l'adresse adr_cfa.
+
+                   D‚finition :
+                   CODE PERFORM  ( adr_cfa --- )
+                     W POP
+                     0 [W] W MOV
+                     0 [W] JMP
+                   END-CODE
+
+UNNEST             ---
+                   Retour … la d‚finition pr‚c‚dente.
+
+                   D‚finition :
+                   LABEL UNNEST
+                     0 [RP] IP MOV
+                     4 # RP ADD
+                     NEXT
+
+EXIT               ---
+                   Retourne … la d‚finition pr‚c‚dente.
+
+                   D‚finition :
+                   CODE EXIT
+                     UNNEST #) JMP
+                   END-CODE
+
+!CSP               ---
+                   Sauvegarde la profondeur actuelle de la pile de donn‚es,
+                   afin d'effectuer un contr“le en fin de compilation.
+
+                   D‚finition :
+                   : !CSP  ( --- )
+                     SP@ CSP !
+                   ;
+
+?CSP               ---
+                   Effectue un contr“le de la pile de donn‚es, en fin de
+                   compilation.
+
+                   D‚finition :
+                   : ?CSP  ( --- )
+                     SP@ CSP @
+                     <> ABORT" Structures mal imbriqu‚es"
+                   ;
+
+ALIGN              ( --- )
+                   Force l'alignement sur une frontiŠre de dmots.
+
+                   D‚finition :
+                   : ALIGN  ( --- )
+                     HERE 3 AND
+                     IF
+                       BL C, BL C,
+                       BL C,
+                     THEN
+                   ;
+
+HIDE               ---
+                   Rend non visible (pour WORDS ou FIND entre autre) la
+                   derniŠre d‚finition cr‚‚e.
+
+                   D‚finition :
+                   : HIDE  ( --- )
+                     LAST @ DUP
+                     N>LINK @
+                     SWAP CURRENT @
+                     HASH !
+                   ; IMMEDIATE
+
+REVEAL             Rend visible (pour WORDS ou FIND entre autre) la
+                   derniŠre d‚finition cr‚‚e, qui n'est pas forc‚ment
+                   valide.
+
+                   D‚finition :
+                   : REVEAL  ( --- )
+                     LAST @ DUP
+                     N>LINK SWAP
+                     CURRENT @
+                     HASH !
+                   ; IMMEDIATE
+
+(:)                ---
+                   Partie ex‚cution des d‚finitions cr‚‚es avec ":".
+
+                   D‚finition :
+                   CODE (:)
+                     4 # W ADD
+                     4 # RP SUB
+                     IP 0 [RP] MOV
+                     W IP MOV
+                     NEXT
+                   END-CODE
+
+:                  <nom> ---
+                   Cr‚‚ la d‚finition <nom> dans le vocabulaire COURANT.
+                   Les CFA des mots suivants sont compil‚s s'ils ne sont
+                   pas imm‚diats.
+
+                   D‚finition :
+                   : :  ( <nom> --- )
+                     !CSP
+                     CURRENT @ CONTEXT !
+                     CREATE
+                     [COMPILE] HIDE
+                     ]
+                   ;
+
+]                  ---
+                   Passage du systŠme FORTH en mode COMPILATION
+                   (COMPILE-TIME).
+                   Les mots qui suivent sont compil‚s.
+                   Les mots IMMEDIATS sont ‚x‚cut‚s.
+
+                   D‚finition :
+                   : ]  ( --- )
+                     STATE ON
+                     BEGIN
+                       ?STACK
+                       DEFINED DUP
+                       IF              \ Est-ce une d‚finition FORTH ?
+                         0<            \ Si Oui, est-ce un mot IMMEDIAT ?
+                         IF
+                           EXECUTE     \ Oui, on l'ex‚cute
+                         ELSE
+                           ,           \ Non, compilation de son CFA
+                         THEN
+                       ELSE
+                         DROP NUMBER   \ Non, c'est un nombre
+                         LITERAL
+                       THEN
+                       TRUE DONE?
+                     UNTIL
+                   ;
+
+[                  ---
+                   Passage du systŠme FORTH en mode INTERPRETATION
+                   (RUN-TIME).
+                   Les mots qui suivent sont ex‚cut‚s imm‚diatement.
+                   Les nombres entr‚s sont empil‚s sur la pile de donn‚es.
+
+                   D‚finition :
+                   : [  ( --- )
+                     STATE OFF
+                   ; IMMEDIATE
+
+ALLOT              n ---
+                   R‚serve n octets … la fin du dictionnaire.
+
+                   D‚finition :
+                   : ALLOT  ( n --- )
+                     DP +!
+                   ;
+
+,                  n ---
+                   Compile n … la fin du dictionnaire.
+
+                   D‚finition
+                   : ,  ( n --- )
+                     HERE !
+                     4 ALLOT
+                   ;
+
+C,                 o ---
+                   Compile l'octet o ([0..255]) … la fin du dictionnaire.
+
+                   D‚finition :
+                   : C,  ( o --- )
+                     HERE C!
+                     1 ALLOT
+                   ;
+
+COMPILE            <nom_def> ---
+                   Compile le CFA de <nom_def> … la fin du dictionnaire.
+
+                   D‚finition :
+                   : COMPILE  ( <nom_def> --- )
+                     R> DUP 4+ >R
+                     @ ,
+                   ;
+
+IMMEDIATE          ---
+                   Rend imm‚diate la derniŠre d‚finition cr‚‚e.
+
+                   D‚finition :
+                   : IMMEDIATE  ( --- )
+                     1073741824
+                     LAST @ CTOGGLE
+                   ;
+
+EVEN               n --- n'
+                   Rend un nombre pair, s'il ne l'est pas d‚j….
+
+                   D‚finition :
+                   : EVEN  ( n --- n' )
+                     DUP 1 AND +
+                   ;
+
+"CREATE            <nom> ---
+                   Cr‚‚ un entˆte FORTH de nom <nom>.
+
+                   D‚finition :
+                   : "CREATE  ( <nom> --- )
+                     COUNT
+                     HERE 12 + PLACE   \ Transfert du nom dans le dictionnaire.
+                     0 ,               \ R‚servation du VFA
+                     0 ,               \ R‚servation du LFA
+                     HERE LAST !       \ LAST pointe sur le nouveau NFA
+                     WARNING @
+                     IF
+                       HERE FIND       \ Le nouveau nom existe-t'il d‚j… ?
+                       IF
+                         BOLD HERE
+                         COUNT TYPE
+                         ."  existe d‚j…"
+                         ATTOFF CR
+                       THEN
+                       DROP
+                     THEN
+                     HERE CURENT @     \ Modification des liaisons
+                     HASH DUP @
+                     HERE 4- !         \ LFA cr‚‚.
+                     HERE 4- SWAP !    \ THREAD modifi‚.
+                     HERE DUP @
+                     WIDTH @ MIN
+                     1+ ALLOT          \ Compilation du NFA.
+                     2684354560 SWAP
+                     CSET              \ Masquage du NFA.
+                     128 HERE 1- CSET  \ Masquage dernier octet du nom.
+                     [COMPILE] ALIGN
+                     0 ,               \ R‚servation du CFA.
+                   ;USES (CREATE) ,    \ CFA=(CREATE) par d‚faut.
+
+(CREATE)           --- adr
+                   Partie ex‚cution des mots cr‚‚s avec CREATE.
+
+                   D‚finition :
+                   CODE (CREATE)  ( --- adr )
+                     4 # W ADD
+                     W PUSH
+                     NEXT
+                   END-CODE
+
+CREATE             <nom> ---
+                   Cr‚‚ un entˆte de d‚finition FORTH.
+
+                   D‚finition :
+                   : CREATE  ( <nom> --- )
+                     BL WORD
+                     ?UPPERCASE
+                     "CREATE
+                   ;
+
+(CONSTANT)         adr --- n
+                   Partie ex‚cution des mots cr‚‚s avec CONSTANT.
+
+                   D‚finition :
+                   CODE (CONSTANT)  ( adr --- n )
+                     4 # W ADD
+                     0 [W] EAX MOV
+                     1PUSH
+                   END-CODE
+
+CONSTANT           n <nom> ---
+                   Cr‚‚ la constante <nom>, initialis‚e avec la valeur n.
+
+                   D‚finition :
+                   : CONSTANT  ( n <nom> --- )
+                     CREATE
+                       ,
+                   ;USES (CONSTANT) ,
+
+(VARIABLE)         adr --- adr'
+                   Partie ex‚cution des mots cr‚‚s avec VARIABLE.
+
+                   D‚finition :
+                   CODE (VARIABLE)  ( adr --- adr' )
+                     4 # W ADD
+                     W PUSH
+                     NEXT
+                   END-CODE
+
+VARIABLE           <nom> ---
+                   Cr‚‚ une variable de nom <nom>, initialis‚e … 0.
+
+                   D‚finition :
+                   : VARIABLE  ( <nom> --- )
+                     CREATE
+                       0 ,
+                   ;USES (VARIABLE) ,
+
+(DEFER)            ---
+                   Partie ex‚cution des vecteurs cr‚‚s avec DEFER.
+
+                   D‚finition :
+                   CODE (DEFER)
+                     4 # W ADD
+                     0 [W] W MOV
+                     0 [W] JMP
+                   END-CODE
+
+(IS)               ---
+                   Utilis‚ par IS. Affectation d'un vecteur.
+
+                   D‚finition :
+                   : (IS)
+                     R@ @ >BODY !
+                     R> 4+ >R
+                   ;
+
+(LIT)              --- n
+                   Partie ex‚cution du mot LITERAL.
+
+                   D‚finition :
+                   CODE (LIT)  ( --- n )
+                     CS: 0 [IP] EAX MOV
+                     4 # IP ADD
+                     1PUSH
+                   END-CODE
+
+LITERAL            n ---
+                   Compile l'entier n dans une d‚finition.
+
+                   D‚finition :
+                   : LITERAL  ( n --- )
+                     COMPILE (LIT)
+                     ,
+                   ; IMMEDIATE
+
+(.")               ---
+                   Partie ex‚cution du mot .".
+
+                   D‚finition :
+                   : (.")
+                     R> COUNT 2DUP +
+                     EVEN >R TYPE
+                   ;
+
+,"                 <chaine> ---
+                   Compile une chaine … la fin du dictionnaire.
+
+                   D‚finition :
+                   : ,"  ( <chaine> --- )
+                     ASCII " PARSE
+                     TUCK HERE PLACE
+                     1+ ALLOT
+                     [COMPILE] ALIGN
+                   ;
+
+HERE               --- adr
+                   Renvoi l'adresse du prochaine octet libre dans le
+                   dictionnaire.
+
+                   D‚finition :
+                   : HERE  ( --- adr )
+                     DP @
+                   ;
+
+(;USES)            ---
+                   Partie ex‚cution du mot ;USES.
+
+                   D‚finition :
+                   : (;USES)
+                     R> @ @
+                     LAST @ NAME> !
+                   ;
+
+;USES              cfa ---
+                   Permet d'ajouter … la fin d'une d‚finition FORTH, l'appel
+                   … une d‚finition en code machine (cr‚‚e avec CODE ou LABEL).
+
+                   D‚finition :
+                   : ;USES  ( cfa --- )
+                     ?CSP
+                     ['] (:) @
+                     LAST @ NAME> !    \ La d‚finition cr‚‚e est une d‚f. ':'.
+                     COMPILE (;USES)
+                     '                 \ Compilation du CFA.
+                     [COMPILE] [       \ On repasse en mode interpr‚tation.
+                     [COMPILE] REVEAL  \ On montre le mot cr‚‚.
+                   ; IMMEDIATE
+
+(DOES>)            ---
+                   Utilis‚ par DOES.
+
+                   D‚finition :
+                   LABEL (DOES>)
+                     4 # RP SUB
+                     IP 0 [RP] MOV
+                     IP POP
+                     IP EAX MOV
+                     3 # EAX AND
+                     EAX IP ADD
+                     4 # W ADD
+                     W PUSH
+                     NEXT
+
+(VOC)              ---
+                   Partie ex‚cution du mot VOCABULARY.
+
+                   D‚finition :
+                   CODE (VOC)
+                     4 # W ADD
+                     CONTEXT # EDI MOV
+                     W 0 [EDI] MOV
+                     NEXT
+                   END-CODE
+
+BRANCH             ---
+                   Branchement inconditionnel.
+
+                   D‚finition :
+                   CODE BRANCH
+                   LABEL BRAN
+                     0 [IP] IP MOV
+                     NEXT
+                   END-CODE
+
+?BRANCH            flg ---
+                   Branchement conditionnel.
+
+                   D‚finition :
+                   CODE ?BRANCH  ( flg --- )
+                     EAX POP
+                     EAX EAX OR
+                     BRAN JE
+                     4 # IP ADD
+                     NEXT
+                   END-CODE
+
+(DO)               fin d‚but ---
+                   Partie ex‚cution du mot DO.
+
+                   D‚finition :
+                   IBASE HEX
+                   CODE (DO)  ( fin d‚but --- )
+                     EAX POP
+                     EBX POP
+                   LABEL PD0
+                     4 # RP SUB
+                     0 [IP] EDX MOV
+                     EDX 0 [RP] MOV
+                     4 # IP ADD
+                     80000000 # EBX ADD
+                     4 # RP SUB
+                     EBX 0 [RP] MOV
+                     EBX EAX SUB
+                     4 # RP SUB
+                     EAX 0 [RP] MOV
+                     NEXT
+                   END-CODE
+
+(?DO)              fin d‚but ---
+                   Partie ex‚cution du mot ?DO.
+
+                   D‚finition :
+                   CODE (?DO)  ( fin d‚but --- )
+                     EAX POP
+                     EBX POP
+                     EAX EBX CMP
+                     PD0 JNE
+                     0 [IP] IP MOV
+                     NEXT
+                   END-CODE
+
+(LOOP)             ---
+                   Partie ex‚cution du mot LOOP.
+
+                   D‚finition :
+                   LABEL PLOOP1
+                     12 # RP ADD
+                     4 # IP ADD
+                     NEXT
+                   CODE (LOOP)
+                     1 # EAX MOV
+                   LABEL PLOOP0
+                     EAX 0 [RP] ADD
+                     PLOOP1 JO
+                     BRAN #) JMP
+                   END-CODE
+
+(+LOOP)            n ---
+                   Partie ex‚cution du mot +LOOP.
+
+                   D‚finition :
+                   CODE (+LOOP)  ( n --- )
+                     EAX POP
+                     PLOOP0 #) JMP
+                   END-CODE
+
+(LEAVE)            ---
+                   Utilis‚ par LEAVE.
+                   Sortie inconditionnelle de boucle.
+
+                   D‚finition :
+                   CODE (LEAVE)
+                   LABEL (LEAV)
+                     8 # RP ADD
+                     0 [RP] IP MOV
+                     4 # RP ADD
+                     NEXT
+                   END-CODE
+
+(?LEAVE)           flg ---
+                   Utilis‚ par ?LEAVE.
+                   Sortie conditionnelle de boucle.
+
+                   D‚finition :
+                   CODE (?LEAVE)  ( flg --- )
+                     EAX POP
+                     EAX EAX OR
+                     (LEAV) JNZ
+                     NEXT
+                   END-CODE
+
+?LEAVE             flg ---
+                   Sortie de boucle conditionnelle.
+
+                   D‚finition :
+                   : ?LEAVE  ( flg --- )
+                     COMPILE (?LEAVE)
+                   ; IMMEDIATE
+
+I                  --- n
+                   R‚cup‚ration de l'indice de boucle le plus interne.
+
+                   D‚finition :
+                   CODE I  ( --- n )
+                     0 [RP] EAX MOV
+                     4 [RP] EAX ADD
+                     1PUSH
+                   END-CODE
+
+[COMPILE]          <nom> ---
+                   Permet de compiler le CFA d'un mot imm‚diat … la fin
+                   du dictionnaire.
+
+                   D‚finition :
+                   : [COMPILE]  ( <nom> --- )
+                     '
+                     ,
+                   ; IMMEDIATE
+
+

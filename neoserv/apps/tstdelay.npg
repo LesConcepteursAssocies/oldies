@@ -1,0 +1,13 @@
+// test delay
+
+: main
+   cls
+   " test delay" print cr wait
+   " debut" print time print cr
+   1000 delay
+   " fin  " print time print cr
+   " test" print blinkon " clignotement" print blinkoff
+   "  ca ca clignote pas" print
+   wait
+;
+

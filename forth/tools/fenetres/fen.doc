@@ -1,0 +1,207 @@
+                  Gestionnaire de fenˆtres dynamiques.
+                  ------------------------------------
+
+Ce programme permet de construire des fenˆtres dynamiques (en mode texte)
+… l'‚cran.
+
+GENERALITES
+-----------
+
+Avec l'avŠnement des interfaces graphiques de tout type, le fenˆtrage est
+au gout du jour, que ce soit pour les applications graphiques, ou texte.
+
+Une fenˆtre dite "dynamique" est une zone de l'‚cran, se comportant comme
+un ‚cran … part entiŠre, dont le contenu pr‚c‚dent … ‚t‚ sauvegard‚ pour
+pouvoir ˆtre restitu‚ lorsque l'on fermera la fenˆtre.
+
+PRINCIPES DU PROGRAMME
+----------------------
+
+Chaque fenˆtre possŠde un certain nombre de propri‚t‚s, qui sont, pour la
+fenˆtre courante, stock‚es dans une zone paramŠtre appel‚e WPARAM 
+(volontairement plus grande en vue d'extensions ‚ventuelles). Ces propri‚t‚s
+sont les suivantes :
+
+  - Une adresse de segment de la zone recouverte (WSEGMENT).
+  - Une position dans l'‚cran principal (POSX, POSY de WPARAM).
+  - Une taille, en nombre de lignes et de colonnes (LARG, HAUT de WPARAM).
+  - Un type de bord (5 types propos‚s dans cette version) (BORD de WPARAM).
+  - Une couleur de fond et de caractŠre (FCOL de WPARAM).
+  - Une position du curseur (CURX, CURY de WPARAM).
+    ***********************************************
+    L'origine est situ‚e … la position 1,1.
+    ***********************************************
+  - Un num‚ro de fenˆtre (NUME de WPARAM).
+  - Une couleur de bord (BCOL de WPARAM).
+  - Un titre ‚ventuel (segment, offset et long. stock‚s dans $FTITRE de WPARAM).
+  - Une couleur de titre (TCOL de WPARAM).
+  - Une ombre ‚ventuelle (SHADOW de WPARAM).
+
+Un petit sch‚ma va r‚sumer tout ceci :
+
+          POSX
+          |                  $FTITRE,TCOL          BORD,BCOL
+                                                 
+  POSY - ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍTitreÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
+          ºTexte de la fenˆtre                      º±±
+          ºavec gestion du scrolling CURY     |   ---FCOL
+          º                                   |     º±±
+          º                         CURX       |     º±±
+          º                                    H     º±±
+          º                                    A     º±±
+          º                                    U     º±±
+          º                                    T     º±±
+          º                                    |     º±±
+          º                                         º±±
+          º---------------- LARG ------------------º±±
+          ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+            ±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±± SHADOW
+
+
+Ces propri‚t‚s, qui peuvent ˆtres diff‚rentes d'une fenˆtre … l'autre, sont
+stock‚es dans une zone pouvant ˆtre consid‚r‚e comme une "m‚ta variable", dont
+l'accŠs se fait par l'interm‚diaire d'un indice correspondant au num‚ro
+de la fenˆtre (cette zone est appel‚e WTABLE dans le programme).
+
+Cette zone de paramŠtre est stock‚e dans un segment externe, ceci pour
+‚conomiser le maximum de place dans le dictionnaire.
+
+La zone utile de la fenˆtre (celle o— est affich‚ le texte) est appel‚e
+Zone Client. Cette dans cette zone que s'effectuent les traitements inh‚rents
+… la fenˆtre. La fin de ligne et la fin de zone client est g‚r‚e automatiquement
+par le mot WEMIT.
+
+A tout moment, on a une fenˆtre courante, qui est celle qui possŠde le clavier
+et dans laquelle se font les traitements.
+Les paramŠtres de cette fenˆtre sont r‚cup‚r‚s et stock‚s dans la zone WPARAM.
+
+Fermer la fenˆtre courante restitue les paramŠtres de la fenˆtre pr‚c‚dente,
+et rend celle-ci fenˆtre courante … son tour (la m‚ta variable WTABLE dont on
+parlait pr‚c‚dement est g‚r‚e comme une pile).
+
+A partir du moment o— une fenˆtre est ouverte, elle devient l'‚cran principal
+de Turbo Forth, et se comporte comme telle (notez la redirection des vecteurs
+principaux de gestion d'‚cran (EMIT, CR, AT) et du mot DARK).
+
+FONCTIONS DISPONIBLES.
+----------------------
+
+D'une fa‡on g‚n‚rale, les fonctions de fenˆtre accessibles au programmeur sont
+pr‚fix‚es de la lettre W (comme Window !).
+Dans son application, le programmeur peut :
+
+  - Initialiser correctement les vecteurs redirig‚s par le programme, ainsi
+    que l'allocation du segment des fenˆtres, avec le mot WINIT.
+    **********************************************************************
+    ATTENTION : L'UTILISATTION DE CE MOT EST OBLIGATOIRE AVANT TOUTES
+                MANIPULATIONS DE FENETRES, CAR IL ALLOUE LA TABLE DE
+                PARAMETRES, AINSI QUE LA REDIRECTION CORRECTE DES VECTEURS
+                UTILISES.
+    **********************************************************************
+  - Ouvrir une fenˆtre (ce qui est la moindre des choses...), avec le mot
+    WOUVRE.
+  - Fermer la fenˆtre courante avec le mot WFERME.
+  - Fermer toutes les fenˆtres ouvertes avec le mot WALLCLOSE.
+    **************************************************************************
+    ATTENTION : CE MOT DESALLOUE PAR LA MEME OCCASION LA TABLE DES PARAMETRES,
+                AINSI QUE LES VECTEURS.
+                VOUS DEVREZ DONC LANCER WINIT AVANT TOUTE REUTILISATION.
+    **************************************************************************
+  - Effacer le contenu de la fenˆtre courante, avec le mot WDARK (ou DARK !).
+  - D‚placer la fenˆtre courante :
+    - d'une ligne vers le haut avec le mot WMOVUP.
+    - d'une ligne vers le bas avec le mot WMOVDN.
+    - d'une colonne vers la gauche avec le mot WMOVLFT.
+    - d'une colonne vers la droite avec le mot WMOVRGT.
+  - Remplacer la couleur de n lignes de la fenˆtre courante, avec le mot
+    WXCHGCOLS.
+  - Remplacer la couleur d'un bloc d'une ligne dans la fenˆtre courante, avec
+    le mot WXCHGCOL.
+  - Positionner le curseur dans la fenˆtre courante, avec le mot AT
+    (ou WLOCATE).
+  - D‚placer la zone client de la fenˆtre courante d'une ligne vers le haut
+    o— vers le bas, avec le mot WSCROLL.
+  - Sauvegarder le contenu de la zone client de la fenˆtre courante, avec le
+    mot WCLIENTBCK.
+  - Restaurer le contenu pr‚c‚dement sauvegard‚ de la zone client de la fenˆtre
+    courante, avec le mot WCLIENTRST.
+  - Redimensionner la fenˆtre courante :
+    - en lui ajoutant une ligne avec le mot WHAUT+.
+    - en lui enlevant une ligne avec le mot WHAUT-.
+    - en lui ajoutant une colonne avec le mot WLARG+.
+    - en lui enlevant une colonne avec le mot WLARG-.
+
+Bien sur, il peut saisir et afficher de l'information avec les mots usuels
+de FORTH (TYPE, EXPECT, QUERY, ...).
+
+A tout moment, une aide est disponible sur l'ensemble des mots pr‚sents dans
+vocabulaire FEN, dans le fichier FEN.VOC.
+
+Quelques chiffres...
+--------------------
+
+Dans sa version actuelle, le gestionnaire permet d'ouvrir jusqu'… 50 fenˆtres
+simultan‚ment.
+
+- Taille de la zone paramŠtres : 50 * 100 = 5000 octets
+  (stock‚s dans un segment externe … FORTH).
+
+- Taille d'une fenˆtre         :   nombre de lignes   + 1 si ombre
+                                 * nombre de colonnes + 2 si ombre
+                                 * 2 (caractŠres + attributs)
+  (stock‚s dans un segment externe … FORTH).
+
+espace occup‚ dans le pire des cas (50 fenˆtres de 23 lignes et 78 colonnes
+avec ombre) :
+
+(25 * 80) * 2 = 4000 * 50 = 200.000 octets
+                           +  5.000 octets (zone paramŠtres)
+                           --------
+                          = 205.000 octets
+
+ce qui reste raisonnable (!), sur une machine possŠdant 640 Ko
+(il reste : 655.350 - (205.000 + 65535 (FORTH)) = 384.815 octets de libre).
+
+Rappel sur l'organisation de l'octet de couleur d'un caractŠre.
+---------------------------------------------------------------
+
+La couleur d'un caractŠre … l'‚cran (en mode texte) est form‚ de la couleur
+du fond et de la couleur du caractŠre proprement dit, dans un octet dont
+le format est le suivant (pour le mode texte uniquement) :
+
+                      Bit
+         7   6   5   4   3   2   1   0
+       +---+---+---+---+---+---+---+---+
+       | C |    Fond   |   caractŠre   |
+       +---+---+---+---+---+---+---+---+
+
+1 Bit de clignotement (C).
+3 Bits pour la couleur du Fond.
+4 Bits pour la couleur du caractŠre (Le bit 3 est un bit d'intensit‚).
+
+Codage des couleurs :
+       Bits
+  3   2   1   0
++---+---+---+---+
+| 0 | 0 | 0 | 0 |  Noir
+| 0 | 0 | 0 | 1 |  Bleu
+| 0 | 0 | 1 | 0 |  Vert
+| 0 | 0 | 1 | 1 |  Cyan
+| 0 | 1 | 0 | 0 |  Rouge
+| 0 | 1 | 0 | 1 |  Magenta
+| 0 | 1 | 1 | 0 |  Brun
+| 0 | 1 | 1 | 1 |  Gris clair
+| 1 | 0 | 0 | 0 |  Gris fonc‚
+| 1 | 0 | 0 | 1 |  Bleu clair
+| 1 | 0 | 1 | 0 |  Vert clair
+| 1 | 0 | 1 | 1 |  Cyan clair
+| 1 | 1 | 0 | 0 |  Rouge clair
+| 1 | 1 | 0 | 1 |  Magenta clair
+| 1 | 1 | 1 | 0 |  Jaune
+| 1 | 1 | 1 | 1 |  Blanc
++---+---+---+---+
+
+Le mot F/C permet de fabriquer un octet de couleur, … l'aide des deux mots
+empil‚s, repr‚sentants respectivement la couleur de fond et de caractŠre.
+
+

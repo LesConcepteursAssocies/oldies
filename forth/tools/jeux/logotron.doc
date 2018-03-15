@@ -1,0 +1,44 @@
+                                LE LOGOTRON
+                                -----------
+
+Ce programme permet la g‚n‚ration al‚atoire de mots, par concat‚nation
+d'un pr‚fixe et d'un suffixe, ainsi que l'affichage d'une signification
+"lisible".
+
+PRINCIPES.
+----------
+
+La logotronique, ou lexico-synthŠse, est la science qui ‚tudie et cr‚‚e les mots
+nouveaux, et leur trouve une signification.
+
+Pourquoi FORTH ne pourrait-t'il pas, lui aussi, acc‚der … la lexico-synthŠse ?
+
+C'est ce que permet le programme suivant.
+
+Fonctionnement
+--------------
+
+Le programme travaille avec deux fichiers, l'un contenant les pr‚fixes, l'autre
+contenant les suffixes, les deux fichiers ‚tants acc‚d‚s directement (par
+l'interm‚diaire des outils contenus dans DFILES.FTH, adaptat‚s de UFILES.FTH
+de M. ZUPPAN).
+
+Il vous est possible d'‚tendre le champ de connaissances du programme, en
+ajoutant des pr‚fixes et des suffixes (par les mots AJOUTE-PREF, et AJOUTE-SUFF).
+
+le fonctionnement du programme est relativement simple :
+
+  - G‚n‚ration al‚atoire d'un pr‚fixe et r‚cup‚ration de celui-ci, avec
+    sa signification.
+
+  - G‚n‚ration al‚atoire d'un suffixe et r‚cup‚ration de celui-ci, avec
+    sa signification.
+
+  - Concat‚nation des deux, avec ‚limination ‚ventuelle des voyelles
+    redondantes.
+
+  - Fabrication d'une signification "lisible".
+
+En tapant PRINTING ON, vous pouvez imprimer les mots ainsi cr‚‚s..
+
+

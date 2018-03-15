@@ -1,0 +1,16 @@
+//
+// test appels inter modules
+//
+// MOD1.TFH
+public number pmod := 0
+local char toto := " toto de mod1.tfh"
+
+: proc
+   " vous etes dans proc de mod1.tfh" print cr
+   wait
+   toto print cr
+   wait
+   " pmod = " print pmod print cr
+   wait
+;
+

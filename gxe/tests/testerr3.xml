@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<FxML>
+<cmd name="TestLib">
+  <cv value="1435"/>
+</cmd>
+<TestLib>
+	<cv>1345</cv>
+</TestLib>
+</FxML>
+
+

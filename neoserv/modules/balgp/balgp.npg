@@ -1,0 +1,1512 @@
+// ีอออออออออออออัอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออธ
+// ณBALGP.NPG    ณ                                                           ณ
+// รฤฤฤฤฤฤฤฤฤฤฤฤฤู                                                           ณ
+// ณDernire modification : 24/05/1995                                       ณ
+// ณ                                                                         ณ
+// ณModule Boites Aux Lettres Grand Public Multi-Services.                   ณ
+// ิอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออพ
+//
+// Dclaration des variables.
+local
+number nchoix npos := 1 maxpos npage := 1 nlig nbal bSaiCoord
+number bCreaBal nbmessrec nbmessenv bFini privilege bOpened := 0
+char   csaisie clebal cline0 dateecr heureecr datelec heurelec clu
+char   pseudo pseudodest pswd datecre heurecre dateacc heureacc cdept
+char   repl1 repl2 repl3 repl4 repl5
+char   nom prenom adrl1 adrl2 adrl3 cpost villel1 villel2
+char   msgl1 msgl2 msgl3 msgl4 msgl5 msgl6 msgl7 msgl8 msgl9 msgl10 msgl11
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Ouverture des fichiers
+// Renvoi VRAI si tout c'est bien pass, FAUX sinon.
+//
+: OpenBase  // --- b
+   bopened !
+   if
+      " MODULES\BALGP\MESSAGES" dbopen
+      " MODULES\BALGP\BALGP" dbopen
+      &&
+      if
+         true bopened :=
+         true
+      else
+         false bopened :=
+         false
+      endif
+   else
+      true
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation des variables.
+//
+: InitVar
+   0 nbmessrec :=
+   0 nbmessenv :=
+   0 privilege :=
+   "  " alltrim pseudo   :=
+   "  " alltrim pswd     :=
+   "  " alltrim datecre  :=
+   "  " alltrim heurecre :=
+   "  " alltrim dateacc  :=
+   "  " alltrim heureacc :=
+   "  " alltrim cdept    :=
+   "  " alltrim repl1    :=
+   "  " alltrim repl2    :=
+   "  " alltrim repl3    :=
+   "  " alltrim repl4    :=
+   "  " alltrim repl5    :=
+   "  " alltrim nom      :=
+   "  " alltrim prenom   :=
+   "  " alltrim adrl1    :=
+   "  " alltrim adrl2    :=
+   "  " alltrim adrl3    :=
+   "  " alltrim cpost    :=
+   "  " alltrim villel1  :=
+   "  " alltrim villel2  :=
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage du nom de la B.A.L courante.
+//
+: AffNomBal
+   pseudo empty? !
+   if
+      cursoroff
+      " MODULES\BALGP\NOMBAL.VTX" sendpage
+      pseudo alltrim "  " 20 padc 1 11 locate print
+      cursoron
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Renvoie VRAI si le pseudo empil
+// existe dans la base.
+: ExistePseudo?   // pseudo --- b
+   dbselected swap
+   " BALGP" dbselect
+   " PSEUDO" dbsetindex
+   app "  " 10 padr clebal :=
+   alltrim clebal strcat
+   clebal dbseek
+   swap
+   dbselect
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Rcupration des infos des variables du masque 1
+//
+: RecupBal01
+   " PSWD"  dbfield pswd :=
+   " DEPT"  dbfield cdept :=
+   " REPL1" dbfield repl1 :=
+   " REPL2" dbfield repl2 :=
+   " REPL3" dbfield repl3 :=
+   " REPL4" dbfield repl4 :=
+   " REPL5" dbfield repl5 :=
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Rcupration des infos des variables du masque 2
+//
+: RecupBal02
+   " NOM"       dbfield nom       :=
+   " PRENOM"    dbfield prenom    :=
+   " ADRL1"     dbfield adrl1     :=
+   " ADRL2"     dbfield adrl2     :=
+   " ADRL3"     dbfield adrl3     :=
+   " CPOST"     dbfield cpost     :=
+   " VILLEL1"   dbfield villel1   :=
+   " VILLEL2"   dbfield villel2   :=
+   " PRIVILEGE" dbfield privilege :=
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Accs … une B.A.L
+//
+: AccesBal
+   " %0.f" using
+   dbselected
+   OpenBase
+   if
+      " BALGP" dbselect
+      cursoroff
+      " MODULES\BALGP\ACCESBAL.VTX" sendpage
+      cursoron
+      "  " alltrim pseudo :=
+      "  " alltrim pswd   :=
+      1 npos :=
+      begin
+         npos
+         case
+            1 of
+                 // Saisie du pseudo
+                 11 15 pseudo alltrim strlen + locate
+                 fdheight setfont
+                 pseudo InputVar
+                 fkey fksommaire !=
+                 if
+                    pseudo empty?
+                    if
+                       " Saisie obligatoire" line0
+                       false
+                    else
+                       pseudo ExistePseudo? !
+                       if
+                          " Pseudo inexistant" line0
+                          false
+                       else
+                          // On passe … la saisie du mot de passe
+                          npos ++
+                          false
+                       endif
+                    endif
+                 else
+                    // Sortie
+                    true
+                 endif
+              endof
+            2 of
+                 // Saisie du mot de passe
+                 19 26 pswd alltrim strlen + locate
+                 fdheight setfont
+   //              blue dup setcolor setbackground
+                 blue setcolor
+                 pswd InputVar
+                 fkey fksommaire !=
+                 if
+                    // Vrification du mot de passe
+                    " PSWD" dbfield alltrim pswd !=
+                    if
+                       " Mot de passe incorrect !!" line0
+                       false
+                    else
+                       // Identification valide
+                       " dernier accs " cline0 :=
+                       " DATEACC" dbfield stod
+                       cline0 strcat
+                       "  … " cline0 strcat
+                       " HEUREACC" dbfield cline0 strcat
+                       cline0 line0
+                       // On met … jour la date et l'heure d'accs
+                       date dtos " DATEACC"  dbreplace
+                       time  " HEUREACC" dbreplace
+                       dbcommit
+                       // On rcupre les infos de la B.A.L
+                       RecupBal01
+                       RecupBal02
+                       // A-t'on reu des messages?
+                       " NBMESSREC" dbfield 0 >
+                       if
+                          " Vous avez reu " cline0 :=
+                          " NBMESSREC" dbfield str cline0 strcat
+                          "  message(s)" cline0 strcat
+                          cline0 line0
+                       endif
+                       AffNomBal
+                       // on sort
+                       true
+                    endif
+                 else
+                    // Sortie
+                    "  " alltrim pseudo :=
+                    true
+                 endif
+              endof
+            drop
+         endcase
+      until
+   endif
+   // On reslectionne l'ancienne base
+   dup empty? !
+   if
+      dbselect
+   else
+      drop
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage du masque 1 de l'enregistrement courant
+//
+: AfficheBal01
+   " PSEUDO" dbfield 4 17 locate print
+   " PSWD"   dbfield 6 17 locate print
+   " DEPT"   dbfield 8 17 locate print
+   " REPL1"  dbfield 11 1 locate print
+   " REPL2"  dbfield 12 1 locate print
+   " REPL3"  dbfield 13 1 locate print
+   " REPL4"  dbfield 14 1 locate print
+   " REPL5"  dbfield 15 1 locate print
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage du masque 2 de l'enregistrement courant
+//
+: AfficheBal02
+   " NOM"     dbfield 11 11 locate print
+   " PRENOM"  dbfield 12 11 locate print
+   " ADRL1"   dbfield 14 11 locate print
+   " ADRL2"   dbfield 15 11 locate print
+   " ADRL3"   dbfield 16 11 locate print
+   " CPOST"   dbfield 17 11 locate print
+   " VILLEL1" dbfield 18 11 locate print
+   " VILLEL2" dbfield 19 11 locate print
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Enregistrement de la BAL
+//
+: ValiderBal
+   " Enregistrement en cours..." line0
+   bCreaBal
+   if
+      // On est en cration
+      dbappendblank
+      app       " SERVICE"   dbreplace
+      date dtos " DATECRE"   dbreplace
+      time      " HEURECRE"  dbreplace
+      0         " NBMESSREC" dbreplace
+      0         " NBMESSENV" dbreplace
+   endif
+   pseudo alltrim " PSEUDO"   dbreplace
+   pswd   alltrim " PSWD"     dbreplace
+   cdept  alltrim " DEPT"     dbreplace
+   date dtos      " DATEACC"  dbreplace
+   time           " HEUREACC" dbreplace
+   repl1 alltrim  " REPL1"    dbreplace
+   repl2 alltrim  " REPL2"    dbreplace
+   repl3 alltrim  " REPL3"    dbreplace
+   repl4 alltrim  " REPL4"    dbreplace
+   repl5 alltrim  " REPL5"    dbreplace
+   // On regarde si les coordonnes sont autorises sur le
+   // service
+   bSaiCoord
+   if
+      // On met … jour les coordonnes
+      nom     alltrim " NOM"     dbreplace
+      prenom  alltrim " PRENOM"  dbreplace
+      adrl1   alltrim " ADRL1"   dbreplace
+      adrl2   alltrim " ADRL2"   dbreplace
+      adrl3   alltrim " ADRL3"   dbreplace
+      cpost   alltrim " CPOST"   dbreplace
+      villel1 alltrim " VILLEL1" dbreplace
+      villel2 alltrim " VILLEL2" dbreplace
+   endif
+   privilege " PRIVILEGE" dbreplace
+   // Fin de la validation
+   bCreaBal if
+      " Votre Boite Aux Lettres est cre" line0
+   else
+      " Votre Boite Aux Lettres est modifie" line0
+   endif
+   dbcommit
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Traitement des touches en saisie.
+// Empile VRAI si on sort de la saisie.
+//
+: TraiteFKSaisie  // --- b
+   fkey dup fkenvoi ==
+   if
+      // Validation ?
+      // On vrifie qu'il y ai au moins le pseudo,le mot de passe et
+      // le dpartement.
+      pseudo empty?
+      pswd empty?
+      cdept empty?
+      && &&
+      if
+         " B.A.L incomplte !" line0
+         drop false
+      else
+         drop true
+      endif
+   else
+      dup fksuite ==
+      if
+         // Zone suivante.
+         npos ++
+         npos maxpos >
+         if
+            // Dernire zone, on reboucle sur la premire
+            bCreaBal
+            if
+               1 npos :=
+            else
+               // Pseudo non modifiable
+               2 npos :=
+            endif
+         endif
+         drop false
+      else
+         fkretour ==
+         if
+            // Zone prcdente.
+            npos --
+            npos 0 <=
+            if
+               // premire zone, on reboucle sur la dernire
+               maxpos npos :=
+            endif
+            false
+         else
+            // Les autres touches provoquent
+            // la fin de la saisie
+            true
+         endif
+      endif
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Saisie du premier masque de B.A.L
+//
+: SaisieBal01
+   4 maxpos :=
+   begin
+      npos
+      case
+         1 of
+              // Saisie du pseudo
+              4 17 pseudo alltrim strlen + locate
+              pseudo InputVar
+              TraiteFKSaisie
+              dup !
+              if
+                 // On vrifie si le pseudo n'existe pas dj…
+                 pseudo ExistePseudo?
+                 if
+                    " Pseudo dj… prsent !!" line0
+                    false
+                 endif
+              endif
+           endof
+         2 of
+              // Saisie du mot de Passe
+              6 17 pswd alltrim strlen + locate
+              pswd InputVar
+              TraiteFKSaisie
+           endof
+         3 of
+              // Saisie du dpartement
+              cdept empty?
+              if
+                 Dept str cdept :=
+                 8 17 locate cdept print
+              endif
+              8 17 cdept alltrim strlen + locate
+              cdept InputVar
+              TraiteFKSaisie
+           endof
+         4 of
+              // Saisie du rpondeur
+              11 1 repl1 alltrim strlen + locate
+              5 40 mlinput
+              fkey fkenvoi ==
+              if
+                 repl5 :=
+                 repl4 :=
+                 repl3 :=
+                 repl2 :=
+                 repl1 :=
+              else
+                 5 0 do drop loop
+              endif
+              TraiteFKSaisie
+           endof
+      endcase
+   until
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Saisie du deuxime masque de B.A.L
+//
+: SaisieBal02
+   8 maxpos :=
+   begin
+      npos
+      case
+         1 of
+              // Saisie du nom
+              11 11 nom alltrim strlen + locate
+              nom InputVar
+              TraiteFKSaisie
+           endof
+         2 of
+              // Saisie du prnom
+              12 11 prenom alltrim strlen + locate
+              prenom InputVar
+              TraiteFKSaisie
+           endof
+         3 of
+              // Saisie de l'adresse ligne 1
+              14 11 adrl1 alltrim strlen + locate
+              adrl1 InputVar
+              TraiteFKSaisie
+           endof
+         4 of
+              // Saisie de l'adresse ligne 2
+              15 11 adrl2 alltrim strlen + locate
+              adrl2 InputVar
+              TraiteFKSaisie
+           endof
+         5 of
+              // Saisie de l'adresse ligne 3
+              16 11 adrl3 alltrim strlen + locate
+              adrl3 InputVar
+              TraiteFKSaisie
+           endof
+         6 of
+              // Saisie du code postal
+              17 11 cpost alltrim strlen + locate
+              cpost InputVar
+              TraiteFKSaisie
+           endof
+         7 of
+              // Saisie de la ville ligne 1
+              18 11 villel1 alltrim strlen + locate
+              villel1 InputVar
+              TraiteFKSaisie
+           endof
+         8 of
+              // Saisie de la ville ligne 2
+              19 11 villel2 alltrim strlen + locate
+              villel2 InputVar
+              TraiteFKSaisie
+           endof
+      endcase
+   until
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation de la saisie du masque 1
+//
+: InitSaisie01
+   cursoroff
+   " MODULES\BALGP\SAISIE01.VTX" sendpage
+   " MODULES\BALGP\BDXSAISI.VTX" sendpage
+   cursoron
+   bCreaBal
+   if
+      1 npos :=
+   else
+      // Pseudo non modifiable
+      2 npos :=
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation de la saisie du masque 2
+//
+: InitSaisie02
+   cursoroff
+   " MODULES\BALGP\SAISIE02.VTX" sendpage
+   " MODULES\BALGP\BDXSAISI.VTX" sendpage
+   cursoron
+   1 npos :=
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation de la cration
+//
+: InitCreaBal
+   true bCreaBal :=
+   cursoroff
+   " MODULES\BALGP\BDXCREA.VTX" sendpage
+   cursoron
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation de la modification
+//
+: InitModiBal
+   false bCreaBal :=
+   cursoroff
+   " MODULES\BALGP\BDXMODI.VTX" sendpage
+   cursoron
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Visualisation du rpondeur du pseudo empil
+//
+: VisuRep   // pseudo ---
+   cursoroff
+   dbselected swap
+   " BALGP" dbselect
+   " PSEUDO" dbsetindex
+   app "  " 10 padr clebal :=
+   alltrim clebal strcat
+   clebal dbseek
+   if
+      // On n'affiche que si le rpondeur
+      // contient quelque chose
+      " REPL1" dbfield empty? !
+      " REPL2" dbfield empty? !
+      " REPL3" dbfield empty? !
+      " REPL4" dbfield empty? !
+      " REPL5" dbfield empty? !
+      || || || ||
+      if
+         " MODULES\BALGP\VISUREP.VTX" sendpage
+         " REPL1" dbfield alltrim 11 1 locate print
+         " REPL2" dbfield alltrim 12 1 locate print
+         " REPL3" dbfield alltrim 13 1 locate print
+         " REPL4" dbfield alltrim 14 1 locate print
+         " REPL5" dbfield alltrim 15 1 locate print
+         wait
+      endif
+   endif
+   dbselect
+   cursoron
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation des variables d'un message
+//
+: InitVarMsg
+   "  " alltrim clu    :=
+   "  " alltrim msgl1  :=
+   "  " alltrim msgl2  :=
+   "  " alltrim msgl3  :=
+   "  " alltrim msgl4  :=
+   "  " alltrim msgl5  :=
+   "  " alltrim msgl6  :=
+   "  " alltrim msgl7  :=
+   "  " alltrim msgl8  :=
+   "  " alltrim msgl9  :=
+   "  " alltrim msgl10 :=
+   "  " alltrim msgl11 :=
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Traitement des touches en saisie d'un message.
+// Empile VRAI si on sort de la saisie.
+//
+: TraiteFKSaiMsg  // --- b
+   fkey dup fkenvoi ==
+   if
+      // Validation ?
+      // On vrifie qu'il y ai au moins une ligne
+      msgl1 empty?
+      msgl2 empty? &&
+      msgl3 empty? &&
+      msgl4 empty? &&
+      msgl5 empty? &&
+      msgl6 empty? &&
+      msgl7 empty? &&
+      msgl8 empty? &&
+      msgl9 empty? &&
+      msgl10 empty? &&
+      msgl11 empty? &&
+      if
+         " il faut au moins une ligne !" line0
+         drop false
+      else
+         drop true
+      endif
+   else
+      dup fksuite ==
+      if
+         // Zone suivante.
+         npos ++
+         npos maxpos >
+         if
+            // Dernire zone, on reboucle sur la premire
+            1 npos :=
+         endif
+         drop false
+      else
+         fkretour ==
+         if
+            // Zone prcdente.
+            npos --
+            npos 0 <=
+            if
+               // premire zone, on reboucle sur la dernire
+               maxpos npos :=
+            endif
+            false
+         else
+            // Les autres touches provoquent
+            // la fin de la saisie
+            true
+         endif
+      endif
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Validation du message.
+// En entre : VRAI si l'expditeur est connu, FAUX sinon.
+//
+: ValiderMsg   // b ---
+   " Enregistrement en cours..." line0
+   dbappendblank
+   app       " SERVICE"  dbreplace
+   date dtos " DATEECR"  dbreplace
+   time      " HEUREECR" dbreplace
+   pseudo     alltrim " EXPEDIT" dbreplace
+   pseudodest alltrim " DESTINA" dbreplace
+   msgl1      alltrim " MSGL1"   dbreplace
+   msgl2      alltrim " MSGL2"   dbreplace
+   msgl3      alltrim " MSGL3"   dbreplace
+   msgl4      alltrim " MSGL4"   dbreplace
+   msgl5      alltrim " MSGL5"   dbreplace
+   msgl6      alltrim " MSGL6"   dbreplace
+   msgl7      alltrim " MSGL7"   dbreplace
+   msgl8      alltrim " MSGL8"   dbreplace
+   msgl9      alltrim " MSGL9"   dbreplace
+   msgl10     alltrim " MSGL10"  dbreplace
+   msgl11     alltrim " MSGL11"  dbreplace
+   // On marque le message comme non lu
+   " +"  " LU" dbreplace
+   // On met … jour les infos des B.A.L
+   if
+      pseudo ExistePseudo? drop
+      " BALGP" dbselect
+      " NBMESSENV" dbfield 1 + " NBMESSENV" dbreplace
+   endif
+   pseudodest ExistePseudo? drop
+   " BALGP" dbselect
+   " NBMESSREC" dbfield 1 + " NBMESSREC" dbreplace
+   dbcommit
+   // Fin de la validation
+   " Message envoy" line0
+   " MESSAGES" dbselect
+   " DESTINA" dbsetindex
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Saisie du message … envoyer
+: SaisieMsg
+   cursoroff
+   " MODULES\BALGP\SAIMSG.VTX" sendpage
+   cursoron
+   1 npos :=
+   1 maxpos :=
+   begin
+      npos
+      case
+          1 of
+               // Saisie du message
+               11 1 msgl1 alltrim strlen + locate
+               11 40 mlinput
+               fkey fkenvoi ==
+               if
+                  msgl11 :=
+                  msgl10 :=
+                  msgl9  :=
+                  msgl8  :=
+                  msgl7  :=
+                  msgl6  :=
+                  msgl5  :=
+                  msgl4  :=
+                  msgl3  :=
+                  msgl2  :=
+                  msgl1  :=
+               else
+                  11 0 do drop loop
+               endif
+               TraiteFKSaiMsg
+            endof
+      endcase
+   until
+   fkey fkenvoi ==
+   if
+      true ValiderMsg
+   endif
+;
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Envoi d'un message
+// En entre : VRAI si on saisi le destinataire, FAUX sinon.
+//
+: EcrireMsg   // b ---
+   cursoroff
+   " MODULES\BALGP\ECRMSG.VTX" sendpage
+   date dateecr  :=
+   time heureecr :=
+   dateecr 5 6 locate print
+   heureecr 5 21 locate print
+   pseudo 7 16 locate print
+   cursoron
+   // Saisie du destinataire
+   9 16 locate pseudodest print
+   if
+      begin
+         9 16 pseudodest alltrim strlen + locate 
+         pseudodest InputVar
+         fkey fksommaire !=
+         if
+            pseudodest ExistePseudo?
+            if
+               pseudodest VisuRep
+               fkey fksommaire !=
+               if
+                  // Saisie du message
+                  InitVarMsg
+                  SaisieMsg
+               endif
+               true
+            else
+               " Pseudo inexistant !!" line0
+               false
+            endif
+         else
+            true
+         endif
+      until
+   else
+      pseudodest ExistePseudo?
+      if
+         pseudodest VisuRep
+         fkey fksommaire !=
+         if
+            // Saisie du message
+            InitVarMsg
+            SaisieMsg
+         endif
+      else
+         " Pseudo inexistant !!" line0
+      endif
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage de l'annuaire des B.A.L
+//
+: AfficheAnnuaire
+   cursoroff
+   " MODULES\BALGP\ANNLISTE.VTX" sendpage
+   " MODULES\BALGP\ANLSTBAS.VTX" sendpage
+   cursoron
+   1 nbal :=
+   5 nlig :=
+   begin
+      dbeof !
+      app " SERVICE" dbfield alltrim == &&
+      nlig 21 <= &&
+   while
+      nlig 2 locate black setcolor nbal str "  " 4 padl print
+      nlig 11 locate " PSEUDO" dbfield alltrim black setcolor print
+      nlig 37 locate " DEPT" dbfield black setcolor print
+      1 dbskip
+      nbal ++
+      nlig ++
+   repeat
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion des options de l'annuaire
+//
+: MenuAnnuaire
+   cursoron
+   begin
+      23 27 locate
+      input csaisie :=
+      fkey fksommaire !=
+   while
+      csaisie val nchoix :=
+      nchoix dup 0 > swap nbal < &&
+      if
+         fkey fkenvoi ==
+         if
+            // On a saisi un numro+ENVOI
+            // SKIP -(nbal-nchoix)
+            nbal nchoix - negate
+            dbskip
+            // On rcupre le destinataire
+            " PSEUDO" dbfield alltrim pseudodest :=
+            cursoroff
+            " MODULES\BALGP\BDXECMSG.VTX" sendpage
+            cursoron
+            pseudo empty?
+            if
+               AccesBal
+            endif
+            fkey fksommaire !=
+            if
+               pseudo pseudodest !=
+               if
+                  " MESSAGES" dbselect
+                  " DESTINA" dbsetindex
+                  false EcrireMsg
+               else
+                  " Impossible de s'crire !" line0
+               endif
+            endif
+            // On raffiche la liste
+            // (on se repositionne au dbut)
+            " BALGP" dbselect
+            " PSEUDO" dbsetindex
+            app dbseek drop
+            cursoroff
+            " MODULES\BALGP\BDXANNU.VTX" sendpage
+            cursoron
+            AfficheAnnuaire
+            cursoron
+         endif
+      else
+         // Gestion des touches/mot-clefs
+         csaisie " *A" ==
+         if
+            // Liste alphabtique
+            " PSEUDO" dbsetindex
+            // On raffiche la liste
+            // (on se repositionne au dbut)
+            app dbseek drop
+            AfficheAnnuaire
+            cursoron
+         else
+            csaisie " *D" ==
+            if
+               // Liste par dpartement
+               " DEPT" dbsetindex
+               // On raffiche la liste
+               // (on se repositionne au dbut)
+               app dbseek drop
+               AfficheAnnuaire
+               cursoron
+            else
+               // Gestion des touches
+               fkey
+               case
+                  fksuite  of
+                              // Page suivante
+                              dbeof !
+                              app " SERVICE" dbfield alltrim == &&
+                              if
+                                 AfficheAnnuaire
+                                 cursoron
+                                 npage ++
+                              else
+                                 " Dernire page" line0
+                              endif
+                           endof
+                  fkretour of
+                              // Page prcdente
+                              npage 1 >
+                              if
+                                 // SKIP -((nbal-1)+17)
+                                 nbal 1 - 17 + negate
+                                 dbskip
+                                 AfficheAnnuaire
+                                 cursoron
+                                 npage --
+                              else
+                                 " Premire page" line0
+                              endif
+                           endof
+                  drop
+               endcase
+            endif
+         endif
+      endif
+   repeat
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage du dtail du message courant
+//
+: AffDetMsg
+   cursoroff
+   " MODULES\BALGP\LIREMSG.VTX" sendpage
+   5 13 locate " DATEECR" dbfield stod print
+   5 28 locate " HEUREECR" dbfield print
+   7 16 locate " EXPEDIT" dbfield print
+   11 1 locate " MSGL1"  dbfield alltrim print
+   12 1 locate " MSGL2"  dbfield alltrim print
+   13 1 locate " MSGL3"  dbfield alltrim print
+   14 1 locate " MSGL4"  dbfield alltrim print
+   15 1 locate " MSGL5"  dbfield alltrim print
+   16 1 locate " MSGL6"  dbfield alltrim print
+   17 1 locate " MSGL7"  dbfield alltrim print
+   18 1 locate " MSGL8"  dbfield alltrim print
+   19 1 locate " MSGL9"  dbfield alltrim print
+   20 1 locate " MSGL10" dbfield alltrim print
+   21 1 locate " MSGL11" dbfield alltrim print
+   " LU" dbfield alltrim " +" ==
+   if
+      // Message non lu, on met … jour les infos
+      date dtos " DATELEC" dbreplace
+      time  " HEURELEC" dbreplace
+      " -" " LU" dbreplace
+      dbcommit
+      // On met … jour les infos de la B.A.L
+      " BALGP" dbselect
+      " PSEUDO" dbsetindex
+      pseudo ExistePseudo? drop
+      " NBMESSREC" dbfield 1 - " NBMESSREC" dbreplace
+      dbcommit
+      " MESSAGES" dbselect
+      " DESTINA" dbsetindex
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Menu des option de la lecture des messages
+//
+: MenuDetMsg
+   false bFini :=
+   begin
+      bFini !
+      if
+         wait
+         fkey fksommaire !=
+         bFini ! &&
+      else
+         false
+      endif
+   while
+      // Gestion des touches
+      fkey
+      case
+         fkannulation of
+                         // Supprimer le message courant.
+                         dbdelete
+                         " Message supprim" line0
+                         // On regarde si on a encore des messages
+                         app "  " 10 padr clebal :=
+                         pseudo alltrim clebal strcat
+                         clebal dbseek
+                         if
+                            cursoroff
+                            " MODULES\BALGP\BDXMSGLS.VTX" sendpage
+                            cursoron
+                            AffDetMsg
+                         else
+                            // Plus de messages
+                            true bFini :=
+                            " Vous n'avez plus de messages" line0
+                         endif
+                      endof
+         fkenvoi      of
+                         // Rpondre
+                         " EXPEDIT" dbfield pseudodest :=
+                         pseudodest ExistePseudo?
+                         if
+                            dbrecno
+                            cursoroff
+                            " MODULES\BALGP\BDXECMSG.VTX" sendpage
+                            cursoron
+                            false EcrireMsg
+                            // On se replace sur le message
+                            dbgo
+                            cursoroff
+                            " MODULES\BALGP\BDXMSGLS.VTX" sendpage
+                            cursoron
+                            AffDetMsg
+                         else
+                            " Ce pseudo n'existe plus !!" line0
+                         endif
+                      endof
+         fksuite      of
+                         // Message suivant
+                         dbeof !
+                         if
+                            1 dbskip
+                            app " SERVICE" dbfield alltrim ==
+                            pseudo " DESTINA" dbfield alltrim == &&
+                            if
+                               AffDetMsg
+                            else
+                               -1 dbskip
+                               " Dernier message" line0
+                            endif
+                         else
+                            " Dernier message" line0
+                         endif
+                      endof
+         fkretour     of
+                         // Message prcdent
+                         dbbof !
+                         if
+                            -1 dbskip
+                            app " SERVICE" dbfield alltrim ==
+                            pseudo " DESTINA" dbfield alltrim == &&
+                            if
+                               AffDetMsg
+                            else
+                               1 dbskip
+                               " Premier message" line0
+                            endif
+                         else
+                            " Premier message" line0
+                         endif
+                      endof
+         drop
+      endcase
+   repeat
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage de la liste des messages d'une B.A.L
+//
+: AfficheListeMsg
+   cursoroff
+   " MODULES\BALGP\MSGLISTE.VTX" sendpage
+   " MODULES\BALGP\MSGLSTBA.VTX" sendpage
+   cursoron
+   1 nbal :=
+   5 nlig :=
+   begin
+      dbeof !
+      app " SERVICE" dbfield alltrim == &&
+      pseudo " DESTINA" dbfield alltrim == &&
+      nlig 21 <= &&
+   while
+      nlig 2 locate black setcolor nbal str "  " 4 padl print
+      nlig 7 locate " EXPEDIT" dbfield alltrim black setcolor print
+      nlig 28 locate " DATEECR" dbfield stod black setcolor print
+      nlig 39 locate " LU" dbfield black setcolor
+      case
+         " +" of
+                 " N" print
+              endof
+         " -" of
+                 " O" print
+              endof
+      endcase
+      1 dbskip
+      nbal ++
+      nlig ++
+   repeat
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion des options de la liste des messages
+//
+: MenuListeMsg
+   false bFini :=
+   cursoron
+   begin
+      bFini !
+      if
+         23 27 locate
+         input csaisie :=
+         fkey fksommaire !=
+         bFini ! &&
+      else
+         false
+      endif
+   while
+      csaisie val nchoix :=
+      nchoix dup 0 > swap nbal < &&
+      if
+         // On a saisi un numro
+         // SKIP -(nbal-nchoix)
+         nbal nchoix - negate
+         dbskip
+         AffDetMsg
+         MenuDetMsg
+         // On raffiche la liste
+         app "  " 10 padr clebal :=
+         pseudo alltrim clebal strcat
+         clebal dbseek
+         if
+            AfficheListeMsg
+            cursoron
+         else
+            // Plus de messages
+            true bFini :=
+         endif
+      else
+         // Gestion des touches
+         fkey
+         case
+            fksuite  of
+                        // Page suivante
+                        dbeof !
+                        app " SERVICE" dbfield alltrim == &&
+                        pseudo " DESTINA" dbfield alltrim == &&
+                        if
+                           AfficheListeMsg
+                           cursoron
+                           npage ++
+                        else
+                           " Dernire page" line0
+                        endif
+                     endof
+            fkretour of
+                        // Page prcdente
+                        npage 1 >
+                        if
+                           // SKIP -((nbal-1)+17)
+                           nbal 1 - 17 + negate
+                           dbskip
+                           AfficheListeMsg
+                           cursoron
+                           npage --
+                        else
+                           " Premire page" line0
+                        endif
+                     endof
+            drop
+         endcase
+      endif
+   repeat
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Modification d'une B.A.L
+// L'enregistrement courant est sur la B.A.L … modifier.
+//
+: ModifierBal
+   InitSaisie01
+   AfficheBal01
+   SaisieBal01
+   fkey fkenvoi ==
+   if
+      // On regarde si on a les coordonnes … saisir
+      bSaiCoord
+      if
+         InitSaisie02
+         AfficheBal02
+         SaisieBal02
+         fkey fkenvoi ==
+         if
+            ValiderBal
+         endif
+      else
+         ValiderBal
+      endif
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Cration d'une B.A.L
+//
+: CreationBal
+   InitVar
+   " BALGP" dbselect
+   " PSEUDO" dbsetindex
+   InitSaisie01
+   SaisieBal01
+   fkey fkenvoi ==
+   if
+      // On regarde si on a les coordonnes … saisir
+      bSaiCoord
+      if
+         InitSaisie02
+         SaisieBal02
+         fkey fkenvoi ==
+         if
+            ValiderBal
+         endif
+      else
+         ValiderBal
+      endif
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Envoi d'un message … une BAL donne.
+// L'expditeur n'est pas connu.
+// Le destinataire est connu … l'entre.
+//
+// Cette fonction s'appelle indpendament du module:
+// <NomDest> Balgp.pseudodest :=
+// Balgp::LaisserUnMsg
+//
+: LaisserUnMsg
+   // On sauvegarde la base courante.
+   dbselected
+   // Ouverture des fichiers du module
+   OpenBase
+   if
+      " MESSAGES" dbselect
+      " DESTINA" dbsetindex
+      cursoroff
+      " MODULES\BALGP\ECRMSG2.VTX" sendpage
+      " MODULES\BALGP\SAIMSG.VTX" sendpage
+      date dateecr  :=
+      time heureecr :=
+      dateecr 5 6 locate print
+      heureecr 5 21 locate print
+      9 16 locate pseudodest print
+      cursoron
+      InitVarMsg
+      // Si pseudo est vide, on met le nom de l'application
+      // comme expditeur.
+      pseudo empty?
+      if
+         app pseudo :=
+      endif
+      1 npos :=
+      1 maxpos :=
+      begin
+         npos
+         case
+             1 of
+                  // Saisie du message
+                  11 1 msgl1 alltrim strlen + locate
+                  11 40 mlinput
+                  fkey fkenvoi ==
+                  if
+                     msgl11 :=
+                     msgl10 :=
+                     msgl9  :=
+                     msgl8  :=
+                     msgl7  :=
+                     msgl6  :=
+                     msgl5  :=
+                     msgl4  :=
+                     msgl3  :=
+                     msgl2  :=
+                     msgl1  :=
+                  else
+                     11 0 do drop loop
+                  endif
+                  TraiteFKSaiMsg
+               endof
+         endcase
+      until
+      fkey fkenvoi ==
+      if
+         false ValiderMsg
+      endif
+      " BALGP" dbclose
+      " MESSAGES" dbclose
+      false bOpened :=
+   else
+      " ERREUR A L'OUVERTURE DES FICHIERS" line0
+   endif
+   // On reslectionne l'ancienne base
+   dup empty? !
+   if
+      dbselect
+   else
+      drop
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Menu gnral du Module.
+//
+: MenuGen
+   " %0.f" using
+   // On sauvegarde la base courante.
+   dbselected
+   // Ouverture des fichiers du module
+   OpenBase
+   if
+      cursoroff
+      " MODULES\BALGP\MENUGEN.VTX" sendpage
+      cursoron
+      AffNomBal
+      // A-t'on reu des messages?
+      pseudo empty? !
+      if
+         pseudo ExistePseudo?
+         if
+            " BALGP" dbselect
+            " NBMESSREC" dbfield 0 >
+            if
+               " Vous avez reu " cline0 :=
+               " NBMESSREC" dbfield str cline0 strcat
+               "  message(s)" cline0 strcat
+               cline0 line0
+            endif
+         endif
+      endif
+      begin
+         16 36 locate
+         input dup empty? !
+         if
+            csaisie :=
+         else
+            drop
+         endif
+         fkey fksommaire !=
+      while
+         csaisie val nchoix :=
+         nchoix
+         case
+            1 of
+                 // Crer sa B.A.L
+                 InitCreaBal
+                 CreationBal
+                 // On raffiche le menu
+                 cursoroff
+                 " MODULES\BALGP\MENUGEN.VTX" sendpage
+                 cursoron
+                 AffNomBal
+              endof
+            2 of
+                 // Modifier sa B.A.L
+                 pseudo empty?
+                 if
+                    AccesBal
+                 endif
+                 fkey fksommaire !=
+                 if
+                    " BALGP" dbselect
+                    " PSEUDO" dbsetindex
+                    pseudo ExistePseudo?
+                    if
+                       InitModiBal
+                       ModifierBal
+                    else
+                       " B.A.L " cline0 :=
+                       pseudo alltrim cline0 strcat
+                       "  inexistante !" cline0 strcat
+                       cline0 line0
+                    endif
+                 endif
+                 // On raffiche le menu
+                 cursoroff
+                 " MODULES\BALGP\MENUGEN.VTX" sendpage
+                 cursoron
+                 AffNomBal
+              endof
+            3 of
+                 // Lire son courrier
+                 pseudo empty?
+                 if
+                    AccesBal
+                 endif
+                 fkey fksommaire !=
+                 if
+                    // On regarde si on a des messages … lire
+                    " MESSAGES" dbselect
+                    " DESTINA" dbsetindex
+                    app "  " 10 padr clebal :=
+                    pseudo alltrim clebal strcat
+                    clebal dbseek
+                    if
+                       cursoroff
+                       " MODULES\BALGP\BDXMSGLS.VTX" sendpage
+                       cursoron
+                       AfficheListeMsg
+                       MenuListeMsg
+                    else
+                       " Vous n'avez pas de messages" line0
+                    endif
+                 endif
+                 // On raffiche le menu
+                 cursoroff
+                 " MODULES\BALGP\MENUGEN.VTX" sendpage
+                 cursoron
+                 AffNomBal
+              endof
+            4 of
+                 // Envoyer un message
+                 cursoroff
+                 " MODULES\BALGP\BDXECMSG.VTX" sendpage
+                 cursoron
+                 pseudo empty?
+                 if
+                    AccesBal
+                 endif
+                 fkey fksommaire !=
+                 if
+                    " MESSAGES" dbselect
+                    " DESTINA" dbsetindex
+                    "  " alltrim pseudodest :=
+                    true EcrireMsg
+                 endif
+                 // On raffiche le menu
+                 cursoroff
+                 " MODULES\BALGP\MENUGEN.VTX" sendpage
+                 cursoron
+                 AffNomBal
+              endof
+            5 of
+                 // Ecrire au service
+                 cursoroff
+                 " MODULES\BALGP\BDXECMSG.VTX" sendpage
+                 cursoron
+                 pseudo empty?
+                 if
+                    AccesBal
+                 endif
+                 fkey fksommaire !=
+                 if
+                    app pseudodest :=
+                    " MESSAGES" dbselect
+                    " DESTINA" dbsetindex
+                    false EcrireMsg
+                 endif
+                 // On raffiche le menu
+                 cursoroff
+                 " MODULES\BALGP\MENUGEN.VTX" sendpage
+                 cursoron
+                 AffNomBal
+              endof
+            6 of
+                 // Consulter l'annuaire
+                 cursoroff
+                 " MODULES\BALGP\BDXANNU.VTX" sendpage
+                 cursoron
+                 " BALGP" dbselect
+                 " PSEUDO" dbsetindex
+                 app dbseek
+                 if
+                    AfficheAnnuaire
+                    MenuAnnuaire
+                 else
+                    " L'annuaire est vide" line0
+                 endif
+                 // On raffiche le menu
+                 cursoroff
+                 " MODULES\BALGP\MENUGEN.VTX" sendpage
+                 cursoron
+                 AffNomBal
+              endof
+            drop
+            " Choix incorrect" line0
+         endcase
+      repeat
+      " BALGP" dbclose
+      " MESSAGES" dbclose
+      false bOpened :=
+   else
+      " ERREUR A L'OUVERTURE DES FICHIERS" line0
+   endif
+   // On reslectionne l'ancienne base
+   dup empty? !
+   if
+      dbselect
+   else
+      drop
+   endif
+   usingoff
+;
+
+

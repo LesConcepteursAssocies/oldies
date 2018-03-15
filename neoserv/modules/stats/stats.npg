@@ -1,0 +1,541 @@
+// ีอออออออออออออัอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออธ
+// ณSTATS.NPG    ณ                                                           ณ
+// รฤฤฤฤฤฤฤฤฤฤฤฤฤู                                                           ณ
+// ณDernire modification : 15/06/1995                                       ณ
+// ณ                                                                         ณ
+// ณModule de consultation des statistiques d'une application.               ณ
+// ิอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออพ
+//
+// Dclaration des variables.
+local
+char cPalier cNomApp cMois cAnnee cDate ClefStat cLine0 cSaisie
+number[] 15 1 tPalier
+number[] 15 1 tRevt
+number[] 15 1 tAppels
+number[] 15 1 tTpsCnx
+number TotalAppels TotalTpsCnx TotalGains npos nlig tLig nChoix
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation des donnes
+: InitVar
+   0 tPalier afill
+   0 tRevt   afill
+   // Initialisation des paliers de Tletel
+   // et des montants des reversements (TARIFS 93)
+   82  0 0 tPalier := 0.00  0 0 tRevt :=
+   83  1 0 tPalier := 0.61  1 0 tRevt :=
+   70  2 0 tPalier := 0.88  2 0 tRevt :=
+   86  3 0 tPalier := 1.71  3 0 tRevt :=
+   92  4 0 tPalier := 0.61  4 0 tRevt :=
+   84  5 0 tPalier := 0.88  5 0 tRevt :=
+   85  6 0 tPalier := 1.71  6 0 tRevt :=
+   87  7 0 tPalier := 2.80  7 0 tRevt :=
+   88  8 0 tPalier := 4.68  8 0 tRevt :=
+   90  9 0 tPalier := 4.68  9 0 tRevt :=
+   91 10 0 tPalier := 7.95 10 0 tRevt :=
+   11 tLig :=
+   0 tAppels afill
+   0 tTpsCnx afill
+   0 TotalAppels :=
+   0 TotalTpsCnx :=
+   0 TotalGains  :=
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Convertit un nombre de secondes en temps
+// Empile HH MM SS
+//
+: SecToTime  // nbs --- ss mm hh
+   dup 3600 / int
+   over over 3600 * -
+   60 / int
+   rot 3 pick 3600 * -
+   over 60 * - int
+   swap rot
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affiche le temps empil sous la forme "HHHHhMMmSSs"
+//
+: AffTime  // hh mm ss ---
+   str "  " 4 padl print " h" print
+   str " 0" 2 padl print " m" print
+   str " 0" 2 padl print " s" print
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affiche le temps empil sous la forme "HH:MM:SS"
+//
+: AffTMC  // hh mm ss ---
+   str "  " 2 padl print " :" print
+   str " 0" 2 padl print " :" print
+   str " 0" 2 padl print
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage du gain
+//
+: AffGAIN  // n ---
+   dup empty? !
+   if
+      getusing swap
+      " %.2f" using
+      str "  " 8 padl print
+      using
+   else
+      drop
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Recherche des diffrents paliers de l'application donne, et totalisation
+// des infos.
+//
+: TotalStats
+   " Totalisations en cours.." line0
+   begin
+      dbeof !
+      cNomApp " NOMAPP" dbfield alltrim == &&
+      " DATEJOUR" dbfield 0 6 substr cDate == &&
+      tLig 14 <= &&
+   while
+      " PALIER" dbfield val tPalier asearch
+      if
+          // Le palier existe dj…, on met … jour
+          over over " TPSCNX" dbfield rot rot tTpsCnx +=
+          " NBAPPELS" dbfield rot rot tAppels +=
+      else
+         // Nouveau palier … ajouter au tableau
+         drop drop
+         " PALIER" dbfield val tLig 0 tPalier :=
+         " TPSCNX" dbfield tLig 0 tTpsCnx +=
+         " NBAPPELS" dbfield tLig 0 tAppels +=
+         // Un palier de plus
+         tLig ++
+      endif
+      1 dbskip
+   repeat
+   clear0
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage des stats
+//
+: AffStats
+   cursoroff
+   " MODULES\STATS\VISUSTAT.VTX" sendpage
+   4 2  locate black setcolor cNomApp print
+   4 29 locate black setcolor cMois print
+   4 32 locate black setcolor cAnnee print
+   6 nlig :=
+   tLig 0
+   do
+      // On n'affiche que les paliers ayants eu des appels
+      i 0 tAppels @ empty? !
+      if
+         nlig 2 locate black setcolor i 0 tPalier print
+         nlig 5 locate black setcolor
+         i 0 tAppels @ dup str "  " 6 padl print
+         dup TotalAppels +=
+         nlig 12 locate black setcolor
+         i 0 tTpsCnx @ dup SecToTime AffTime
+         // Calcul du TMC
+         dup rot / SecToTime
+         nlig 24 locate black setcolor AffTMC
+         // Calcul du gain
+         dup 60 / i 0 tRevt @ swap * dup
+         nlig 33 locate black setcolor AffGAIN
+         TotalGains  +=
+         TotalTpsCnx +=
+         nlig ++
+      endif
+   loop
+   // Affichage des totaux
+   22 5  locate TotalAppels str "  " 6 padl print
+   22 12 locate TotalTpsCnx SecToTime AffTime
+   22 33 locate TotalGains AffGAIN
+   cursoron
+   24 39 locate
+   wait
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Visualisation des stats d'une application pour le mois et l'anne
+// courante.
+// Peut tre appel par mot clef (*STATS par exemples)
+// indpendement de StatMain.
+//
+: VisuAppStat
+   " %0.f" using
+   dbselected
+   " .\APPSTAT" dbopen
+   if
+      InitVar
+      app dup cNomApp := "  " 10 padr ClefStat :=
+      Date 3 2 substr cMois :=
+      Date 6 4 substr cAnnee :=
+      cAnnee cDate :=
+      cMois  cDate strcat
+      cDate ClefStat strcat
+      ClefStat dbseek
+      if
+         TotalStats
+         AffStats
+      else
+         " Pas de Statistiques au " cLine0 :=
+         cMois cLine0 strcat
+         " /" cLine0 strcat
+         cAnnee cLine0 strcat
+         cLine0 line0
+      endif
+   else
+      " ERREUR A L'OUVERTURE DES STATS" line0
+   endif
+   // On reslectionne l'ancienne base
+   dup empty? !
+   if
+      dbselect
+   else
+      drop
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Statistiques par applications.
+//
+: StatApp
+   InitVar
+   cursoroff
+   " MODULES\STATS\STATSAI.VTX" sendpage
+   " MODULES\STATS\BDXSAISI.VTX" sendpage
+   cursoron
+   "  " alltrim cNomApp  :=
+   "  " alltrim cDate    :=
+   "  " alltrim cMois    :=
+   "  " alltrim cAnnee   :=
+   "  " alltrim ClefStat :=
+   1 npos :=
+   begin
+      npos
+      case
+         1 of
+              // Saisie du nom de l'application.
+              10 16 cNomApp alltrim strlen + locate fdheight setfont
+              cNomApp InputVar
+              fkey fksommaire !=
+              if
+                 cNomApp empty?
+                 if
+                    " Saisie obligatoire" line0
+                    false
+                 else
+                    // On vrifie l'existence de l'application
+                    cNomApp "  " 10 padr dup
+                    dbseek
+                    if
+                       ClefStat :=
+                       // On passe … la saisie du mois
+                       npos ++
+                       false
+                    else
+                       drop
+                       " Application inexistante" line0
+                       false
+                    endif
+                 endif
+              else
+                 // Sortie
+                 true
+              endif
+           endof
+         2 of
+              // Saisie du mois
+              cMois empty?
+              if
+                 // On met le mois courant par dfaut
+                 Date 3 2 substr cMois :=
+                 14 16 locate fdheight setfont cMois print
+              endif
+              14 16 cMois alltrim strlen + locate fdheight setfont
+              cMois InputVar
+              fkey fksommaire !=
+              if
+                 cMois empty?
+                 if
+                    " Saisie obligatoire" line0
+                    false
+                 else
+                    // On passe … la saisie de l'anne
+                    npos ++
+                    false
+                 endif
+              else
+                 // Sortie
+                 true
+              endif
+           endof
+         3 of
+              // Saisie de l'anne
+              cAnnee empty?
+              if
+                 // On met l'anne courante par dfaut
+                 Date 6 4 substr cAnnee :=
+                 18 16 locate fdheight setfont cAnnee print
+              endif
+              18 16 cAnnee alltrim strlen + locate fdheight setfont
+              cAnnee InputVar
+              fkey fksommaire !=
+              if
+                 cAnnee empty?
+                 if
+                    " Saisie obligatoire" line0
+                    false
+                 else
+                    // On vrifie l'existence de la date saisie
+                    cAnnee cDate :=
+                    cMois  cDate strcat
+                    cDate ClefStat strcat
+                    ClefStat dbseek
+                    if
+                       TotalStats
+                       AffStats
+                       // Sortie
+                       true
+                    else
+                       " Pas de Statistiques … cette date" line0
+                       2 npos :=
+                       cNomApp "  " 10 padr ClefStat :=
+                       false
+                    endif
+                 endif
+              else
+                 // Sortie
+                 true
+              endif
+           endof
+      endcase
+   until
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Totalisation des stats d'un palier
+//
+: TotalStatsPal
+   " Totalisations en cours.." line0
+   begin
+      dbeof !
+      cPalier " PALIER" dbfield alltrim == &&
+      " DATEJOUR" dbfield 0 6 substr cDate == &&
+   while
+      " NBAPPELS" dbfield TotalAppels +=
+      " TPSCNX" dbfield TotalTpsCnx +=
+      1 dbskip
+   repeat
+   clear0
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage des stats d'un palier
+//
+: AffStatsPal
+   cursoroff
+   " MODULES\STATS\VSTATPAL.VTX" sendpage
+   cursoron
+   22 8  locate TotalAppels str "  " 6 padl print
+   22 15 locate TotalTpsCnx SecToTime AffTime
+   // Calcul du gain
+   cPalier val tPalier asearch
+   if
+      tRevt TotalTpsCnx 60 / *
+      TotalGains :=
+   else
+      drop drop
+   endif
+   22 27 locate TotalGains AffGAIN
+   cursoron
+   24 39 locate
+   wait
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Statistiques par palier.
+//
+: StatPalier
+   InitVar
+   cursoroff
+   " MODULES\STATS\STATSAIP.VTX" sendpage
+   " MODULES\STATS\BDXSAISI.VTX" sendpage
+   cursoron
+   "  " alltrim cPalier  :=
+   "  " alltrim cDate    :=
+   "  " alltrim cMois    :=
+   "  " alltrim cAnnee   :=
+   "  " alltrim ClefStat :=
+   1 npos :=
+   begin
+      npos
+      case
+         1 of
+              // Saisie du palier.
+              10 11 cPalier alltrim strlen + locate fdheight setfont
+              cPalier InputVar
+              fkey fksommaire !=
+              if
+                 cPalier empty?
+                 if
+                    " Saisie obligatoire" line0
+                    false
+                 else
+                    // On vrifie l'existence du palier.
+                    cPalier dbseek
+                    if
+                       cPalier ClefStat :=
+                       // On passe … la saisie du mois
+                       npos ++
+                       false
+                    else
+                       " Palier non trouv" line0
+                       false
+                    endif
+                 endif
+              else
+                 // Sortie
+                 true
+              endif
+           endof
+         2 of
+              // Saisie du mois
+              cMois empty?
+              if
+                 // On met le mois courant par dfaut
+                 Date 3 2 substr cMois :=
+                 14 11 locate fdheight setfont cMois print
+              endif
+              14 11 cMois alltrim strlen + locate fdheight setfont
+              cMois InputVar
+              fkey fksommaire !=
+              if
+                 cMois empty?
+                 if
+                    " Saisie obligatoire" line0
+                    false
+                 else
+                    // On passe … la saisie de l'anne
+                    npos ++
+                    false
+                 endif
+              else
+                 // Sortie
+                 true
+              endif
+           endof
+         3 of
+              // Saisie de l'anne
+              cAnnee empty?
+              if
+                 // On met l'anne courante par dfaut
+                 Date 6 4 substr cAnnee :=
+                 18 11 locate fdheight setfont cAnnee print
+              endif
+              18 11 cAnnee alltrim strlen + locate fdheight setfont
+              cAnnee InputVar
+              fkey fksommaire !=
+              if
+                 cAnnee empty?
+                 if
+                    " Saisie obligatoire" line0
+                    false
+                 else
+                    // On vrifie l'existence de la date saisie
+                    cAnnee cDate :=
+                    cMois  cDate strcat
+                    cDate ClefStat strcat
+                    ClefStat dbseek
+                    if
+                       TotalStatsPal
+                       AffStatsPal
+                       // Sortie
+                       true
+                    else
+                       " Pas de Statistiques … cette date" line0
+                       2 npos :=
+                       cPalier ClefStat :=
+                       false
+                    endif
+                 endif
+              else
+                 // Sortie
+                 true
+              endif
+           endof
+      endcase
+   until
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Entre du programme:
+// Menu.
+//
+: StatMain
+   " %0.f" using
+   dbselected
+   " APPSTAT" dbopen
+   if
+      cursoroff
+      " MODULES\STATS\MENUGEN.VTX" sendpage
+      cursoron
+      begin
+         23 29 locate
+         input cSaisie :=
+         fkey fksommaire !=
+      while
+         cSaisie val nChoix :=
+         nChoix
+         case
+            1 of
+                 // Stat. par applications.
+                 " APPSTAT" dbsetindex
+                 StatApp
+                 cursoroff
+                 " MODULES\STATS\MENUGEN.VTX" sendpage
+                 cursoron
+              endof
+            2 of
+                 // Stat. par palier.
+                 " PALSTAT" dbsetindex
+                 StatPalier
+                 cursoroff
+                 " MODULES\STATS\MENUGEN.VTX" sendpage
+                 cursoron
+              endof
+            drop
+            " Choix incorrect" line0
+         endcase
+      repeat
+      " APPSTAT" dbclose
+   else
+      " ERREUR A L'OUVERTURE DES STATS" line0
+   endif
+   // On reslectionne l'ancienne base
+   dup empty? !
+   if
+      dbselect
+   else
+      drop
+   endif
+;
+

@@ -1,0 +1,13 @@
+Installing is easy: all you need to do is (aproximatly):
+	configure
+	make
+	su
+	make install
+
+Or something.
+
+Pour installer gbuild, tapez les commandes suivantes:
+	configure
+	make
+	su
+	make install

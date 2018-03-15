@@ -1,0 +1,48 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+DECIMAL
+CREATE PIXELRUN 20000 ALLOT
+
+VARIABLE OLDMODE
+VARIABLE NEWMODE
+
+: FGDEMO42 ( --- )
+   FASTGRAPH?
+   IF
+      320 200 1 FGBESTMODE NEWMODE !
+      NEWMODE @ DUP
+      0< SWAP 12 = OR
+      IF
+         ABORT" Cette d‚monstration n‚c‚ssite le mode 320x200"
+      THEN
+      FGGETMODE OLDMODE !
+      NEWMODE @ FGSETMODE
+      " OPEN CORAL.SPR" $EXECUTE >R
+      DSEGMENT PIXELRUN 18868 R@ (GET) ?DOS-ERR
+      DROP R> (CLOSE)
+      0 199 FGMOVE
+      PIXELRUN 18868 2/ 320 FGDISPLAY
+      " (Appuyez sur une touche)" FGTEXT
+      FGWAITKEY
+      " OPEN CORAL.PPR" $EXECUTE >R
+      DSEGMENT PIXELRUN 14151 R@ (GET) ?DOS-ERR
+      DROP R> (CLOSE)
+      FGERASE
+      PIXELRUN 14151 3 / 2* 320 FGDISPLAYP
+      " (Appuyez sur une touche)" FGTEXT
+      FGWAITKEY
+      OLDMODE @ FGSETMODE
+      FGRESET
+      1 FGCURSOR
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

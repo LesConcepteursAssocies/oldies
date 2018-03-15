@@ -1,0 +1,25 @@
+//
+// test padx
+//
+local
+char chaine := "TOTO"
+
+: main
+   cls " test padx" print cr wait
+   " chaine espace 10 padl = [" print
+   chaine "  " 10 padl print " ]" print cr
+   " chaine espace 3 padl = [" print
+   chaine "  " 3 padl print " ]" print cr
+   " chaine espace 10 padr = [" print
+   chaine "  " 10 padr print " ]" print cr
+   " chaine espace 3 padr = [" print
+   chaine "  " 3 padr print " ]" print cr
+   " chaine espace 11 padc = [" print
+   chaine "  " 11 padc print " ]" print cr
+   " chaine espace 3 padc = [" print
+   chaine "  " 3 padc print " ]" print cr
+   " chaine espace 4 padc = [" print
+   chaine "  " 4 padc print " ]" print cr
+   wait
+;
+

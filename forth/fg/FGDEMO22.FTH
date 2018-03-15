@@ -1,0 +1,57 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? RAND NOT ?\ INCLUDE ..\TFCLUB\RANDOM.FTH
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+DECIMAL
+
+200 CONSTANT RECTANGLES
+
+VARIABLE OLDMODE
+VARIABLE MINX
+VARIABLE MAXX
+VARIABLE MINY
+VARIABLE MAXY
+VARIABLE XRES
+VARIABLE YRES
+
+: FGDEMO22 ( --- )
+   FASTGRAPH?
+   IF
+      FGGETMODE OLDMODE !
+      FGAUTOMODE FGSETMODE
+      15 FGSETCOLOR
+      FGGETMAXX 1+ XRES !
+      FGGETMAXY 1+ YRES !
+      RECTANGLES 0
+      DO
+         RAND XRES @ MOD MINX !
+         RAND XRES @ MOD MAXX !
+         RAND YRES @ MOD MINY !
+         RAND YRES @ MOD MAXY !
+         RAND 16 MOD FGSETCOLOR
+         MINX @ MAXX @ 2DUP >
+         IF
+            SWAP
+         THEN
+         MINY @ MAXY @ 2DUP >
+         IF
+            SWAP
+         THEN
+         FGRECT
+      LOOP
+      " D‚monstration de FastGraph (Appuyez sur une touche)" FGTEXT
+      FGWAITKEY
+      OLDMODE @ FGSETMODE
+      FGRESET
+      1 FGCURSOR
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

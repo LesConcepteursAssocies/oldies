@@ -1,0 +1,16 @@
+//
+// Test bal
+//
+#use modules\balgp\balgp
+
+: main
+   cls
+   " test BAL SANS coordonn‚es" print cr
+   wait
+   false balgp.bSaiCoord :=
+   balgp::menugen
+   cr " retour" print cr
+   wait
+;
+
+

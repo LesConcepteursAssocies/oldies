@@ -1,0 +1,4 @@
+: main
+cls
+" coucou" print
+;

@@ -1,0 +1,39 @@
+                            Le Serpent bidulovore.
+                            ----------------------
+
+PRESENTATION.
+-------------
+
+Ce programme est une version en mode texte du träs classique SNAKE.
+
+FONCTIONNEMENT DU PROGRAMME.
+----------------------------
+
+Vous avez la charge des mouvements d'un serpent (avec les fläches), et vous
+devez Çvoluer dans un espace clos, sans espoir de sortie.
+
+En cours de jeu, le serpent se nourri avec des "bidules", qui ont un drìle
+d'effet sur le serpent : ils le font grandir.
+
+Le but de tout ceci est d'atteindre la plus grande longueur possible.
+
+Attention !
+-----------
+Tout les 10 bidules, des obstacles surgissent dans l'espace de jeu (le nombre
+de ces obstacles est contenu dans la variable NUMRS), et la vitesse du serpent
+augmente.
+
+Ceci pourrait parraitre simple si il n'y avait pas des rägles strictes
+rÇgissant l'espace de jeu :
+
+  Rägle 1 : Toute rencontre avec un obstacle (mur, corps du serpent) est
+            Çliminatoire !
+
+  Rägle 2 : Il est interdit de "se marcher dessus" ou de "se mordre la queue"
+            c'est aussi Çliminatoire.
+
+Le meilleur joueur est conservÇ (nom et score) dans le fichier SNAKE.TOP.
+
+Bonne chance...
+
+

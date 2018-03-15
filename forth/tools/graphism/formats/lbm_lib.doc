@@ -1,0 +1,44 @@
+                 MANIPULATION DU FORMAT GRAPHIQUE LBM.
+                 -------------------------------------
+
+Les routines fournies permettent de r‚cup‚rer les images cr‚‚es avec le
+logiciel CAMERA.COM, fourni dans le package du logiciel DELUXE PAINT II.
+
+GENERALITES
+-----------
+
+Le programme CAMERA.COM permet de capturer l'image pr‚sente … l'‚cran,
+dans un fichier de nom SCREENXX.LBM, ou XX repr‚sent un num‚ro d'ordre.
+Contrairement au programme DELUXE PAINT, CAMERA ne compresse pas les images
+captur‚es, ce qui permet de les d‚coder assez facilement.
+
+Principe de codage (pour le mode 320 x 200):
+--------------------------------------------
+
+Les n premiers octets de l'image (n ‚tant variable en fonction
+du mode graphique courant) sauv‚e contiennent des
+informations sur le format de l'image, ainsi que sur la
+palette utilis‚e (r‚cup‚r‚s, mais non exploit‚s par les
+routines fournies).
+
+CAMERA sauve alternativement une ligne paire et une ligne
+impaire.
+
+Les images sont d‚doubl‚es en portions de 40 octets de
+large.
+
+Les 320 points d'une ligne sont stock‚s par lignes
+de bits occupant 320 / 8 = 40 octets.
+Les bits d'un octet sont invers‚s (poid faible en premier).
+
+
+Principe de d‚codage (pour le mode 320 x 200):
+----------------------------------------------
+
+prendre les deux premiŠres lignes de bits (sur 8) de chaque
+s‚rie , puis reconstituer la ligne de pixels.
+
+Les routines r‚servent dynamiquement l'espace n‚c‚ssaire … l'image cod‚e,
+et la reconstitue dans l'‚cran virtuel.
+
+

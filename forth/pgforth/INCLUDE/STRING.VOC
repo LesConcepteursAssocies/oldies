@@ -1,0 +1,180 @@
+\ ------------------------------------------------------------------------------
+\                   Manipulation des chaines de caractŠres.
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement des utilitaires de manipulation de chaines )
+
+\ Compilation d'une chaine dans une d‚finition
+: (")
+  R> COUNT 2DUP +
+  EVEN >R
+;
+
+: "
+  STATE @
+  IF
+    COMPILE (")
+    ,"
+  ELSE
+    ASCII " PARSE
+  THEN
+;
+IMMEDIATE
+
+\ Affichage d'une chaine
+: ."  ( chaine --- )
+  STATE @
+  IF
+    COMPILE (.")
+    ,"
+  ELSE
+    ASCII " WORD
+    COUNT TYPE
+  THEN
+;
+IMMEDIATE
+
+\ Initialisation d'une variable chaine
+: $!  ( adr_src long adr_dest long --- )
+  DROP 2- DUP C@
+  ROT MIN SWAP 1+ PLACE
+;
+
+\ Cr‚ation d'une variable chaine
+: STRING  ( long_max nom_chaine --- )
+  CREATE
+    DUP C,
+    0 C,
+    ALLOT
+  DOES>
+    1+ DUP C@ 
+    SWAP 1+ 
+    SWAP   ( adr+2 long --- )
+;
+
+\ Renvoi la longueur maxi d'une variable chaine
+: LEN$ ( strvar len --- strvar len lenmax )
+  OVER 2- C@
+;
+
+\ Entr‚e au clavier et affectation d'une variable chaine
+: INPUT$ ( strvar len ---)
+  OVER >R LEN$ NIP EXPECT
+  SPAN @ R> 1- C!
+;
+
+\ Extraction de la sous-chaine droite d'une variable chaine
+: RIGHT$  ( str1 len --- str2 len )
+  0 MAX OVER MIN >R + R@ - R>
+;
+
+\ Extraction de la sous-chaine gauche d'une variable chaine
+: LEFT$  ( str1 len --- str2 len )
+  0 MAX MIN
+;
+
+\ Extraction de la sous-chaine donn‚e d'une variable chaine
+: MID$   ( str1 pos len --- str2 len )
+  >R OVER SWAP - RIGHT$ R> LEFT$
+;
+
+\ Renvoi l'adresse du n-iŠme mot (item) d'une variable chaine
+: ITEM  ( str1 len n --- str2 len )
+  1 MAX >R TUCK R> 0
+  DO
+    ROT DROP BL SKIP
+    OVER SWAP BL SCAN
+  LOOP
+  DROP OVER -
+;
+
+\ InsŠre str1 en d‚but de str2
+: INSERT  ( str1 len1 str2 len2 --- )
+  ROT OVER MIN >R R@ - OVER
+  DUP R@ + ROT CMOVE> R> CMOVE
+;
+
+\ InsŠre str1 dans str2 … la position pos
+: INSERT$  ( str len1 strvar len2 pos --- )
+  0 MAX OVER MIN -ROT LEN$
+  SWAP 4 PICK + OVER MIN
+  2 PICK 1- C!  2 PICK - >R + R> INSERT
+;
+
+\ ConcatŠne str1 … la fin de str2
+: APPEND$  ( str len1 strvar len2 --- )
+  DUP INSERT$
+;
+
+\ Efface la sous-chaine … partir de la position pos, sur une longueur long
+: ERASE$   ( strvar len pos long --- )
+  >R 0 MAX OVER MIN 2DUP - R>
+  MIN 0 MAX  2 PICK OVER - 4 PICK 1- C!
+  ROT OVER - 2 PICK -
+  >R -ROT + TUCK + SWAP R> CMOVE
+;
+
+VARIABLE FOUND
+
+\ Primitive de recherche.
+: SCAN-1ST  ( a n c --- a n )
+  CAPS @
+  IF
+    DROP
+  ELSE
+    SCAN
+  THEN
+;
+
+\ Recherche stradr dans badr. Renvoi la position et un flag
+: SEARCH   ( stradr strlen badr blen --- n f )
+  FOUND OFF
+  SWAP >R  2DUP U<=
+  IF
+    OVER - 1+ 2 PICK C@ R@ -ROT >R
+    BEGIN
+      R@ SCAN-1ST DUP
+      IF
+        >R 3DUP SWAP COMPARE 0=
+        IF
+          FOUND ON R> DROP 0 >R
+        THEN
+        R>
+      THEN
+      DUP
+    WHILE
+      1 /STRING
+    REPEAT
+    R>  2DROP  -ROT
+  THEN
+  2DROP R> - FOUND @
+;
+
+\ Recherche str dans strvar. Renvoi l'adresse et la longueur.
+: SEARCH$   ( str len1 strvar len2 --- pos len )
+  2 PICK >R SEARCH
+  IF
+    R>
+  ELSE
+    R> 2DROP 0 0
+  THEN
+;
+
+\ Cherche et efface (si trouv‚) str dans strvar
+: DELETE$   ( str len1 strvar len2 --- )
+  2DUP >R >R SEARCH$  R> R> 2SWAP ERASE$
+;
+
+\ Suppression des espaces en fin de chaine.
+: -TRAILING  ( adresse long --- adresse long2 )
+  DUP 0
+  DO
+    2DUP + 1- C@
+    BL <> ?LEAVE
+    1-
+  LOOP
+;
+
+EOF
+
+

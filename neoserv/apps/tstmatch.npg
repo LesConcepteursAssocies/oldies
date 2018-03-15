@@ -1,0 +1,31 @@
+//
+// Test strmatch
+//
+
+local
+char expr := "[0-9][a-z]"
+char chaine
+
+: main
+  cls
+  " test STRMATCH " print cr
+  " expression = " print expr print cr
+  begin
+     10 1 locate
+     " entrez une chaine" print cr
+     chaine inputvar
+     chaine empty? !
+     if
+        chaine expr strmatch
+        if
+           " TROUVE " print cr
+           print
+        else
+           drop " *** NON TROUVE" print
+        endif
+     endif
+     chaine empty?
+  until
+  wait
+;
+

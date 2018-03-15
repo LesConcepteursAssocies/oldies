@@ -1,0 +1,11 @@
+//
+// test execute externe
+//
+local number toto := 5.4
+
+: APPEL
+   " vous ˆtes dans APPEL de EXEC2" print cr
+   " toto = " print toto print cr
+   wait
+;
+

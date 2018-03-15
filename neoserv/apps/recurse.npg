@@ -1,0 +1,26 @@
+//
+//
+//
+use
+
+: fact
+  dup 1 >
+  if
+     dup 1 - fact *
+  else
+    1 *
+  endif
+;
+
+: main
+   cls
+   " test recursivit‚" print cr
+   wait
+   " factorielle de 5 = " print cr
+   5 fact
+   print
+   wait
+;
+
+
+

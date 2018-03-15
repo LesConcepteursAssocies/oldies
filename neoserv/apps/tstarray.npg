@@ -1,0 +1,148 @@
+//
+// Test tableaux
+//
+#NAME = tab
+
+local
+char[] 8 8 ctab1
+char[] 5 5 ctab2
+number[] 8 8 ntab
+char chaine := " un deux trois quatre cinq six"
+char delim  := " "
+
+: main
+   cls
+   " %.0f" using
+   " test tableaux" print cr wait
+   " len ntab = " print
+   ntab alen swap print " x" print print cr
+   " len ctab1 = " print
+   ctab1 alen swap print " x" print print cr
+   " test afill ntab" print cr wait
+   0 ntab afill
+   ntab alen swap
+   0 do
+      dup
+      0 do
+         j i ntab print         // " -" print
+      loop
+      cr
+   loop
+   drop
+   0 5 ntab
+   if
+      " 0 5 ntab <> 0" print
+   else
+      " 0 5 ntab == 0" print
+   endif
+   cr " test afill ctab1" print cr wait
+   " 1" ctab1 afill
+   ctab1 alen swap
+   0 do
+      dup
+      0 do
+         j i ctab1 print         // " -" print
+      loop
+      cr
+   loop
+   drop
+   cr " fin premier test" print wait
+   cls
+   cr " insertion d'une ligne … ntab" print
+   ntab ains
+   cr " len ntab = " print
+   ntab alen swap print " x" print print cr
+   " test afill ntab" print cr wait
+   3 ntab afill
+   " affichage" print cr
+   ntab alen swap
+   0 do
+      dup
+      0 do
+         j i ntab print         // " -" print
+      loop
+      cr
+   loop
+   drop
+   0 5 ntab
+   if
+      " 0 5 ntab <> 0" print
+   else
+      " 0 5 ntab == 0" print
+   endif
+   cr " fin deuxiŠme test" print wait
+   cls
+   cr " suppression d'une ligne … ntab" print
+   ntab adel
+   cr " len ntab = " print
+   ntab alen swap print " x" print print cr
+   " affichage" print cr
+   ntab alen swap
+   0 do
+      dup
+      0 do
+         j i ntab print         // " -" print
+      loop
+      cr
+   loop
+   drop
+   cr " fin troisiŠme test" print wait
+   cls
+   " len ctab2 = " print
+   ctab2 alen swap print " x" print print cr
+   " 2" ctab2 afill
+   ctab2 alen swap
+   0 do
+      dup
+      0 do
+         j i ctab2 print         // " -" print
+      loop
+      cr
+   loop
+   drop
+   cr " test acopy de ctab1 dans ctab2" print cr wait
+   ctab1 ctab2 acopy
+   ctab2 alen swap
+   0 do
+      dup
+      0 do
+         j i ctab2 print         // " -" print
+      loop
+      cr
+   loop
+   drop
+   cr " fin quatriŠme test" print wait
+   cls
+   cr " len ctab2 = " print
+   ctab2 alen swap print " x" print print cr
+   cr " test aclone de ctab1 dans ctab2" print cr wait
+   ctab1 ctab2 aclone
+   ctab2 alen swap
+   0 do
+      dup
+      0 do
+         j i ctab2 print         // " -" print
+      loop
+      cr
+   loop
+   drop
+   cr " fin cinquiŠme test" print wait
+   cls
+   cr " len ctab2 = " print
+   ctab2 alen swap print " x" print print cr
+   cr " test d‚coupage de chaine … partir de delim dans ctab2" print cr wait
+   chaine delim ctab2 strtok
+   cr " len ctab2 = " print
+   ctab2 alen swap print " x" print print cr
+   ctab2 alen swap
+   0 do
+      dup
+      0 do
+         j i " [" print ctab2 print " ]" print cr
+      loop
+      cr
+   loop
+   drop
+   cr " FIN DU TEST" print wait
+;
+

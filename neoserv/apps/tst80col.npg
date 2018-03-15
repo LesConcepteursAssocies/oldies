@@ -1,0 +1,42 @@
+// Test mode 80 col
+
+local
+char csai
+
+: main
+   cls
+   " test 80 colonnes" print cr
+   wait
+   " passage en mode mixte 80 colonnes" print cr wait
+   tmodemixte settmode
+   " mode mixte active (sommaire pour annuler)" print cr
+   " test cls" print wait
+   cls
+   " en haut de l'ecran" print cr
+   begin
+      wait
+      fkey fkenvoi ==
+      if
+         " test accents : ‚‚……‡‡ŠŠ" print
+      endif
+      fkey fksuite ==
+      if
+         " test saisie" print cr
+         input csai :=
+         cr " csai = " print csai print cr
+      endif
+      fkey fkretour ==
+      if
+         " test locate" print cr
+         10 10 locate " 10 10 locate" print cr
+         " test ligne 0" print cr
+         "  message en ligne 0" line0
+         5 5 locate " 5 5 locate" print cr
+      endif
+      fkey fksommaire ==
+   until
+   tmodevdt settmode
+   " retour au mode vid‚otex" print
+   wait
+;
+

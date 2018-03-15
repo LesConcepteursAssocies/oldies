@@ -1,0 +1,12 @@
+//
+//
+// test #stacksize
+
+: main
+   " test pile" print cr
+   wait
+   1 2 3
+   wait
+   4
+;
+

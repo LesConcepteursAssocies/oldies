@@ -1,0 +1,39 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+DECIMAL
+
+VARIABLE OLDMODE
+VARIABLE MAXCOL
+VARIABLE MAXROW
+
+: FGDEMO09 ( --- )
+   FASTGRAPH?
+   IF
+      FGGETMODE OLDMODE !
+      3 FGSETMODE
+      0 FGCURSOR
+      15 FGSETCOLOR
+      FGGETMAXX MAXCOL !
+      FGGETMAXY MAXROW !
+      " D‚monstration de FastGraph" FGTEXT
+      "  MAXCOL = " FGTEXT
+      MAXCOL @ (.) FGTEXT
+      "  MAXROW = " FGTEXT
+      MAXROW @ (.) FGTEXT
+      "  (Appuyez sur une touche)" FGTEXT
+      FGWAITKEY
+      OLDMODE @ FGSETMODE
+      FGRESET
+      1 FGCURSOR
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

@@ -1,0 +1,11 @@
+//
+//
+//
+
+#pathvtx = apps
+
+: main
+   " garde.pag" sendpage
+   wait
+;
+

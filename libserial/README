@@ -1,0 +1,19 @@
+libserial v 0.0.1beta
+2000-2001, Guillaumaud philippe <pguillaumaud@april.org>
+
+Français/French
+===============
+
+libserial est un ensemble d'outils permettant de manipuler les ports séries
+d'un PC.
+
+Vos commentaires et/ou modifications sont les bienvenues.
+
+Anglais/English
+===============
+
+libserial provide tools for manipulating serial ports.
+
+Comments and/or patches are welcome.
+
+Philippe GUILLAUMAUD <pguillaumaud@april.org>

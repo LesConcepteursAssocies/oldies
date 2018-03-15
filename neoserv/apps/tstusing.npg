@@ -1,0 +1,44 @@
+//
+// test formatages
+//
+local
+number nombre := 123456.7890 chiffre := 135
+
+: attend
+   " appuyez sur une touche" print cr
+   wait
+;
+
+: main
+   cls
+   " test formatages" print cr
+   attend
+   " %f par d‚faut = " print nombre print cr
+   "                 " print chiffre print cr
+   attend
+   " %1f" using
+   " format %1f    = " print nombre print cr
+   "                 " print chiffre print cr
+   attend
+   " %.0f" using
+   " format %.0f   = " print nombre print cr
+   "                 " print chiffre print cr
+   attend
+   " %1.0f" using
+   " format %1.0f  = " print nombre print cr
+   "                 " print chiffre print cr
+   attend
+   " %E" using
+   " format %E     = " print nombre print cr
+   "                 " print chiffre print cr
+   attend
+   " %X" using
+   " format %X     = " print nombre print cr
+   "                 " print chiffre print cr
+   attend
+   " %b" using
+   " format %b     = " print nombre print cr
+   "                 " print chiffre print cr
+   attend
+;
+

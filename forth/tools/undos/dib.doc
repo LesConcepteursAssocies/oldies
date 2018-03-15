@@ -1,0 +1,140 @@
+                         Le Dos Information Block
+                         ------------------------
+
+Le Dos Information Block, aussi appel List Of List est sans conteste la
+structure cache du D.O.S la plus importante.
+
+Cette structure contient toutes sortes d'informations vitales au fonctionnement
+de D.O.S.
+
+Elle a volue avec les diffrentes versions de D.O.S, et pour cela, connaitre
+la version du systme est trs important (voir le fichier MSDOS.FTH).
+
+L'obtention de l'adresse du D.I.B se fait par le biais de la fonction cache
+52h de l'interruption 21h, qui renvoie l'adresse de celui-ci dans ES:BX.
+Curieusement, cette adresse ne correspond pas au dbut du D.I.B., il faut
+pour cela retrancher 12 … l'offset.
+
+STRUCTURE DU D.I.B.
+-------------------
+
+Le D.I.B se compose des lments suivants (les offsets sont en hxa.):
+
+ษออออออออออออหอออออออออออออออออออออออออออออออออออออออออออออออออหออออออออออป
+บ  Adresse   บ                  Contenu                        บ Longueur บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off-0C บ Compteur de retry partag.                      บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off-0A บ Dlai de retry partag.                         บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off-08 บ Pointeur sur le buffer courant du disque.       บ 4 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off-04 บ Entre CON non lue.                             บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off-02 บ Adresse de segment du 1er MCB (Memory Control   บ          บ
+บ            บ Block).                                         บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off    บ Pointeur sur le premier Block de Paramtres de  บ          บ
+บ            บ l'unit de disque (DPB).                        บ 4 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+04 บ Pointeur sur la DFT (DOS File Tables).          บ 4 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+08 บ Pointeur sur le Driver d'horloge (CLOCK$).      บ 4 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+0C บ Pointeur sur le Driver de console (CON:).       บ 4 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+10 บ Longueur maximale d'un secteur (pour toutes les บ          บ
+บ            บ mmoires de masse connectes) en octets.        บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+12 บ Pointeur sur le premier buffer DOS.             บ 4 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+16 บ Pointeur sur la CDS (Current Directory          บ          บ
+บ            บ Structures).                                    บ 4 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+1A บ Pointeur sur la Table des FCB (File Control     บ          บ
+บ            บ Block).                                         บ 4 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+1E บ Nombre de FCB protgs.                         บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+20 บ Nombre de priphriques de type block.          บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+21 บ Code du dernier lecteur logique (LASTDRIVE).    บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+22 บ Entte du priphrique NUL actuel.              บ18 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+34 บ Nombre de lecteurs joints (avec la commande     บ          บ
+บ            บ JOIN).                                          บ 1 Octet  บ
+ศออออออออออออสอออออออออออออออออออออออออออออออออออออออออออออออออสออออออออออผ
+
+Nous auront l'occasion de revoir certaines des structures cites, en voici
+quelques unes … titre d'informations :
+
+Le Drive Parameters Block est une structure mise en place par DOS pour
+chaque mmoire de masse connecte au systme.
+( exemple : pour un systme avec 2 lecteurs et 1 disque dur, 3 DPB sont
+  mis en place. )
+  
+                              Structure du DPB : 
+ษออออออออออออหอออออออออออออออออออออออออออออออออออออออออออออออออหออออออออออป
+บ  Adresse   บ                  Contenu                        บ Longueur บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off    บ Numro ou nom de priphrique de l'unit de     บ          บ
+บ            บ disque correspondante (0 = A, 1 = B,...).       บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+01 บ Sous-unit du driver de priphrique de l'unit บ          บ
+บ            บ de disque.                                      บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+02 บ Octets par secteur.                             บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+04 บ Facteur interleave.                             บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+05 บ Secteurs par cluster.                           บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+06 บ Secteurs rservs ( pour le Boot ).             บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+08 บ Nombre de File Alocation Table ( FAT ).         บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+09 บ Nombre d'entres dans le rpertoire racine.     บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+11 บ Premier secteur occup.                         บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+13 บ Dernier cluster occup.                         บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+15 บ Secteurs par FAT.                               บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+16 บ Premier secteur de donnes.                     บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+18 บ Pointeur sur l'en-tte du driver de priphriqueบ          บ
+บ            บ correspondant.                                  บ 4 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+22 บ Media Descriptor.                               บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+23 บ Flag d'utilisation ( FFh = priphrique n'a pas บ          บ
+บ            บ encore t appel ).                            บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+24 บ Pointeur sur le prochain DPB ( xxxx:FFFFh =     บ          บ
+บ            บ plus de DPB ).                                  บ 4 Octets บ
+ศออออออออออออสอออออออออออออออออออออออออออออออออออออออออออออออออสออออออออออผ
+
+DOS alloue autant de buffers que spcifi dans le fichier CONFIG.SYS
+(commande FILES=nn).
+
+                         Structure d'un buffer DOS :
+ษออออออออออออหอออออออออออออออออออออออออออออออออออออออออออออออออหออออออออออป
+บ  Adresse   บ                  Contenu                        บ Longueur บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off    บ Pointeur sur le prochain buffer ( xxxx:FFFFh =  บ          บ
+บ            บ plus de buffer ).                               บ 4 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+04 บ Numro de l'unit de disque ( 0 = A, 1 = B,... )บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+05 บ Flags.                                          บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+06 บ Numro de secteur.                              บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+08 บ Rserv.                                        บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+10 บ Contenu du secteur dans le buffer.              บ 512 Oct. บ
+ศออออออออออออสอออออออออออออออออออออออออออออออออออออออออออออออออสออออออออออผ
+
+

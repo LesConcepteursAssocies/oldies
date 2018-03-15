@@ -1,0 +1,45 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+DECIMAL
+VARIABLE OLDMODE
+VARIABLE NEWMODE
+
+: FGDEMO56 ( --- )
+   FASTGRAPH?
+   IF
+      320 200 2 FGBESTMODE NEWMODE !
+      NEWMODE @
+      DUP 0< SWAP 12 = OR
+      IF
+         ABORT" Cette d‚monstration n‚c‚ssite le mode 320x200"
+      THEN
+      FGGETMODE OLDMODE !
+      NEWMODE @ FGSETMODE
+      1 FGALLOCATE DROP
+      1 FGSETHPAGE
+      2 FGSETCOLOR
+      0 319 0 199 FGRECT
+      1 FGSETPAGE
+      1 FGSETCOLOR
+      0 319 0 199 FGRECT
+      " Appuyez sur une touche" FGTEXT
+      FGWAITKEY
+      0 FGFADEIN
+      " Appuyez sur une touche" FGTEXT
+      FGWAITKEY
+      1 FGFREEPAGE DROP
+      OLDMODE @ FGSETMODE
+      FGRESET
+      1 FGCURSOR
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

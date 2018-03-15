@@ -1,0 +1,33 @@
+//
+// test mots clef et touches
+//
+: abandon
+  " proc‚dure ABANDON (touche)" print cr
+   wait
+;
+
+: aide
+   " proc‚dure AIDE (touche)" print cr
+   wait
+;
+
+: main
+   cls " test mot-clef/touches" print cr
+   setglobalkeyword *help aide noreturn
+//   setglobalfkey fkguide aide
+//   setglobalfkey fksommaire abandon
+   " *help pour de l'aide" print cr
+   wait
+   " retour" print cr
+   " suppression du mot-clef" print cr
+//   deleteglobalfkey fkguide
+   deleteglobalkeyword *help
+   " essai *help" print cr
+   wait
+   " suitre" print cr
+   wait
+//   " vidage table" print cr
+//   emptyglobalkeywordtable
+//   wait
+;
+

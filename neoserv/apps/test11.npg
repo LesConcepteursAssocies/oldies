@@ -1,0 +1,16 @@
+//
+// Test assignation touche et mot-clef
+//
+
+: AIDE
+   " AIDE sur GUIDE" print
+   wait
+;
+
+: main
+  SETGLOBALFKEY FKGUIDE AIDE
+  " main" print
+  wait
+  " re main" print
+;
+

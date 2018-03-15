@@ -1,0 +1,29 @@
+//
+// test appels inter modules
+//
+
+#use apps\mod1 apps\mod2
+
+local char toto := " toto de testmod.tfh"
+
+: main
+   cls
+   " tests appels inter modules" print cr
+   wait
+   toto print cr
+   wait
+   mod1::proc
+   " de retour dans testmod.tfh" print cr
+   wait
+   mod2.toto print cr
+   wait
+   " nouveau toto de mod2" mod2.toto :=
+   mod2::proc
+   wait
+   " … nouveau de retour dans testmod.tfh" print cr
+   wait
+   mod1.pmod ++
+   " mod1.pmod = " print mod1.pmod print cr
+   wait
+;
+

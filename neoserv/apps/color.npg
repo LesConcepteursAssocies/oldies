@@ -1,0 +1,17 @@
+//
+// test
+//
+
+: main
+  cls
+  7 0
+  do
+     7 0
+     do
+        i setbackground
+        j setcolor
+        " coucou" print cr
+     loop
+  loop
+;
+

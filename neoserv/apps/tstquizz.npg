@@ -1,0 +1,19 @@
+//
+// Test quizz
+//
+#use modules\balgp\balgp
+#use modules\quizz\quizz
+
+: main
+   cls
+   " test QUIZZ" print cr
+   wait
+   balgp::menugen
+   " APPEL DU QUIZZ" print cr
+   wait
+   quizz::menugen
+   cr " retour" print cr
+   wait
+;
+
+

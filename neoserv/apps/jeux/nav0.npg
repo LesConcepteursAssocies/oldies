@@ -1,0 +1,55 @@
+// ========================================================================== // 
+// Bataille Navalle Version 1.00
+//
+// Date de cr‚ation : 05/07/94
+// Date de mise … jour : 09/01/95
+//
+// D‚claration des variables et fonctions diverses
+//
+// ========================================================================== //
+
+PUBLIC
+
+	// Nombre de cases occup‚es par les bateaux
+	// PA = Porte-Avion CR = Croiseur DE = Destroyer SM = Sous-marin
+
+	NUMBER TAILLEPA := 4
+	NUMBER TAILLECR := 3
+	NUMBER TAILLEDE := 2      
+	NUMBER TAILLESM := 1  
+	
+	// Coordonn‚es de d‚part des 2 grilles
+
+	NUMBER XC1 := 5
+	NUMBER XC2 := 26
+	NUMBER YC1 := 5
+	NUMBER YC2 := 5
+
+LOCAL 
+	CHAR[] 11 11 Tab1  
+	CHAR[] 11 11 Tab2
+
+	// Flotille restante pour chaque joueur
+	
+	NUMBER NbReste1 := 20                             
+	NUMBER NbReste2 := 20                             
+
+	NUMBER ii jj xx yy cpt1 cpt2 Xrange Yrange
+	NUMBER Xplay := 0
+	NUMBER Yplay := 0
+	NUMBER Res
+
+//
+// Calcul de coordonn‚es au hasard
+//
+: Hasard
+
+	Xrange rnd
+	xx :=
+	xx ++
+	Yrange rnd
+	yy :=
+	yy ++
+	
+;
+

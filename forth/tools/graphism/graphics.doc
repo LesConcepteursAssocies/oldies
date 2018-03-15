@@ -1,0 +1,402 @@
+                               Introduction
+                               ------------
+
+Ce chapitre comprend un certain nombre de programmes permettants
+de manipuler les diff‚rentes cartes graphiques couleurs disponibles
+sur les P.C.
+
+Les primitives fournies permettent de piloter un mode graphique,
+parmis ceux disponibles sur chaque carte, mais l'adaptation aux autres
+modes ne pose pas de problŠmes particuliers, comme nous pourrons
+le voir plus loin.
+
+Pour chaque carte ‚tudi‚e, les primitives sont regroup‚es dans un
+source diff‚rent :
+
+              CGA_LIB.FTH  : Primitives de programmation du mode
+                             C.G.A 320 x 200 4 couleurs.
+
+              EGA_LIB.FTH  : Primitives de programmation du mode
+                             E.G.A 320 x 200 16 couleurs.
+
+              MCGA_LIB.FTH : Primitives de programmation du mode
+                             M.C.G.A 320 x 200 256 couleurs.
+
+              KERNGRPH.FTH : Primitives communes aux librairies
+                             graphiques.
+
+              GRAPHICS.FTH : D‚finitions des vecteurs principaux.
+                             Programme de d‚monstration.
+
+Ce dernier source fourni au programmeur un ensemble de vecteurs,
+qui vont lui permettre de d‚velopper une application graphique
+(en mode 320 x 200, dans un premier temps) qui pourra fonctionner
+sur les trois principales cartes couleurs pr‚sentes sur P.C.
+
+GENERALITES
+-----------
+
+Manipulation d'‚crans virtuels.
+-------------------------------
+
+Dans la plupart des routines fournies, on travaille dans un ou deux ‚crans
+virtuels, ce qui acc‚lŠre un peu les traitements, car on effectue les
+diff‚rentes manipulations dans l'‚cran virtuel, puis on transfŠre celui-ci
+d'un seul coup dans la R.A.M vid‚o.
+
+Les ‚crans virtuel sont cr‚‚s avec les routines de r‚servation m‚moire
+inclues dans le fichier KERNGRPH.FTH.
+
+Dans le cas d'un programme d'animation, on peut cr‚er autant d'‚crans virtuels
+que peut en contenir la m‚moire, stocker plusieurs images dans ces ‚crans
+et effectuer les transferts les uns aprŠs les autres.
+
+Portions d'images.
+------------------
+
+Capturer et restituer une partie de l'‚cran vid‚o peut s'av‚rer trŠs pratique,
+pour fabriquer toutes sortes d'objets graphiques, curseurs, icones,
+lutins (sprites).
+
+La portion d'image captur‚e est stock‚e pour l'instant en haut … gauche
+de l'‚cran destination, il est trŠs facile de la faire travailler
+dans une autre partie de la m‚moire, et pourquoi pas, dans un fichier.
+
+
+                     Programmation de la carte C.G.A.
+                     --------------------------------
+
+La carte C.G.A est la plus ancienne carte couleur des P.C,
+et ses possibilit‚s, en matiŠre de couleurs et de r‚solution
+entres autres, sont relativement limit‚es, mais elle est encore
+pr‚sente sur nombre de machines, ce qui fait que l'on ne peut
+pas l'‚viter ! (du moins pour l'instant).
+
+Cette carte possŠde plusieurs modes de fonctionnement,
+qui sont les suivants :
+
+              Mode 4 : 320 x 200, 4 couleurs.
+              Mode 5 : 320 x 200, 4 couleurs.
+              Mode 6 : 640 x 200, 2 couleurs.
+
+La diff‚rence entre les modes 4 et 5 se situe au niveau de
+l'intensit‚ de certaines couleurs.
+
+Les modes 4 et 5 proposent, en outre, le choix des 4 couleurs
+parmis deux palettes :
+
+              Palette 0 : couleur 0 (noir)
+                          couleur 1 (vert)
+                          couleur 2 (rouge)
+                          couleur 3 (jaune)
+
+              Palette 1 : couleur 0 (noir)
+                          couleur 1 (cyan)
+                          couleur 2 (magenta)
+                          couleur 3 (blanc)
+
+Organisation de la m‚moire vid‚o.
+---------------------------------
+
+La R.A.M vid‚o est organis‚e en deux zones de 8 Ko., une pour stocker
+les lignes paires, une pour stocker les lignes impaires, commencant …
+l'adresse de segment B800h (pour les lignes paires, BA00h pour les
+lignes impaires).
+
+Dans les modes 4 et 5, un point est cod‚ sur 2 bits (4 couleurs oblige),
+un octet contenant le codage de quatres points, chaque ligne de 320
+points est donc cod‚e sur 80 octets (320/4).
+
+Dans le mode 6, un point est cod‚ sur 1 bit (2 couleurs), un octet contenant
+le codage de huit points, chaque ligne de 640 points sera aussi cod‚e sur
+80 octets.
+
+On peut se repr‚senter la m‚moire vid‚o comme une matrice
+organis‚e de la fa‡on suivanteÿ(pour les modes 4 et 5) :
+
+                       ---------------- 80 octets (320 points) -----------
+                       1 octet
+                       4 points
+                      +---------------------------------------------------+
+              B800 -> | xxxxxxxx (ligne 0)                                |
+                      |          (ligne 2)                                |
+                      |          (ligne 4)                                |
+                      |             .                                     |
+                      |             .                                     |
+                      |             .                                     |
+                      |          (ligne 198)                              |
+                      +---------------------------------------------------+
+                      +---------------------------------------------------+
+              BA00 -> | xxxxxxxx (ligne 1)                                |
+                      |          (ligne 3)                                |
+                      |          (ligne 5)                                |
+                      |             .                                     |
+                      |             .                                     |
+                      |             .                                     |
+                      |          (ligne 199)                              |
+                      +---------------------------------------------------+
+
+Ecriture d'un point … l'‚cran.
+------------------------------
+
+La routine d'‚criture d'un point … l'‚cran est au coeur de tout traitement
+graphique (ligne, cercle, etc...) et sa rapidit‚ d'‚x‚cution est primordiale
+pour le reste de l'application.
+
+La complexit‚ r‚side dans le fait que l'on doit travailler sur 2 bits
+particuliers d'un octet, sans alt‚rer les autres.
+
+On peut la d‚finir en FORTH de deux fa‡ons :
+
+en utilisant les fonctions du BIOS, m‚thode la plus simple,
+ce qui peut se traduire par le code suivant :
+
+              HEX
+              CODE (CGA-PSET)  ( x y coul --- )
+                AX POP         \ AL = couleur du point.
+                DX POP         \ DX = coord. Y.
+                CX POP         \ CX = coord. X.
+                0C # AH MOV    \ AH = Nø de fonction.
+                10 INT
+                NEXT
+              END-CODE
+
+Hormis la compacit‚ du code r‚sultant, on n'a aucun avantage …
+utiliser cette technique, … cause de sa lenteur (que l'on pourrait
+qualifier de g‚ologique !).
+
+La deuxiŠme m‚thode consiste … aller ‚crire directement dans la R.A.M
+vid‚o (ou dans un ‚cran virtuel, comme c'est le cas pour la routine
+fournie) en utilisant la technique suivante :
+
+              soit … ‚crire le point de couleur coul aux coordonn‚es
+              X,Y :
+
+              on fabrique le d‚placement … appliquer … la couleur
+              pour obtenir un octet avec les deux bits correspondants
+              positionn‚s.
+
+              on fabrique ensuite un masque, que l'on appliquera
+              … l'octet actuel pour mettre … 0 les bits du point
+              … ‚crire.
+
+              on calcule ensuite l'offset du point … ‚crire.
+
+              puis on lit le point actuel, auquel on applique le
+              masque, et on positionne les deux bits de la couleur
+              choisie.
+
+              exemple :
+
+              soit … ‚crire le point de couleur 3 (00000011b) … la
+              position 0, 2, en supposant que l'octet actuel ait la
+              valeur 01000111b :
+
+              fabrication du d‚placement : 2*(3-X modulo 4)
+              2 * (3-0 modulo 4) = 6
+              application … la couleur : coul << 2*(3-X modulo 4)
+              3 << 6 = 192 (11000000)
+
+              fabrication du masque : (2*(3-X modulo 4)) << 3
+              (2 * (3-0 modulo 4)) << 3 = 192 (11000000)
+
+              calcul de l'offset de l'octet actuel : Y/2*80+X/4
+              2/2*80+0/4 = 80 (octet 0 de la 2Šme ligne)
+
+              puis lecture du point : valeur 01000111b
+
+              on inverse le masque (par un NOT) et on l'applique …
+              cet octet : o AND (NOT masque)
+              NOT masque = 00111111
+              01000111 AND (NOT masque) = 00000111
+
+              on applique la couleur (par un OR) … l'octet
+              r‚sultant : (octet AND (NOT masque)) OR couleur
+              00000111 OR 11000000 = 11000111
+
+              ensuite on r‚‚crit l'octet.
+
+Cette technique, plus longue … d‚tailler qu'… ‚x‚cuter, est quand mˆme
+plus rapide que la pr‚c‚dente (100 points ‚crits en 00,71 sec.),
+et le serait encore plus en r‚‚crivant la routine en code machine.
+
+Adaptation au mode 6 (640 x 200).
+---------------------------------
+
+Le mode 6 offre une meilleure r‚solution horizontale, mais ne possŠde
+en contrepartie que 2 couleurs, 0 et 1.
+
+Adapter les routines est en fait trŠs simple, car les images ont la mˆme
+taille en mode 4, 5, et 6 (80 octets par ligne, lignes paires et
+impaires), les diff‚rences ‚tant les suivantes:
+
+              - Le nombre de points par octet est de 8 au lieu de 4
+                (1 bit par point). Les routines de trac‚ d'un point,
+                de capture et restitution d'images seront donc …
+                modifier en cons‚quence.
+
+              - La largeur de l'‚cran passe … 640 points.
+
+
+                     Programmation de la carte E.G.A.
+                     --------------------------------
+
+La carte E.G.A est un peu plus r‚cente que la carte C.G.A, et offre de ce fait
+une r‚solution plus ‚lev‚e, ainsi qu'un nombre de couleurs plus important.
+
+N‚anmoins, la carte E.G.A est une des plus complexe … manipuler, du fait de son
+organisation m‚moire particuliŠre.
+
+Cette carte possŠde plusieurs modes de fonctionnement (en plus de l'‚mulation
+des modes de la carte C.G.A), qui sont les suivants :
+
+              Mode 13 : 320 x 200, 16 couleurs.
+              Mode 14 : 640 x 200, 16 couleurs.
+              Mode 16 : 640 x 350, 16 couleurs.
+
+Organisation de la m‚moire vid‚o.
+---------------------------------
+
+La R.A.M vid‚o de la carte E.G.A est organis‚e en 4 plans de n octets (n ‚tant
+fonction du mode E.G.A courant), chaque plan codant un bit de couleur (1 plan
+rouge, 1 plan vert, 1 plan bleu, 1 plan d'intensit‚) d'un point
+(4 bits/point = 16 couleurs).
+
+L'adresse de segment de la R.A.M vid‚o est A000h.
+
+On peut se repr‚senter la m‚moire vid‚o comme une matrice … deux dimensions,
+organis‚e de la fa‡on suivante :
+                                                   Plan 3 (intensit‚)
+                                                   +------------------------+
+                                     Plan 2 (bleu) |                        |
+                                     +-------------------------+            |
+                       Plan 1 (vert) |                         |            |
+                       +---------------------------+           |            |
+        Plan 0 (rouge) |                           |           |            |
+        +-----------------------------+            |           |            |
+A000 -> |                             |            |           |            |
+        |                             |            |           |------------+
+        |                             |            |           |
+        |                             |            |-----------+
+        |                             |            |
+        |                             |------------+
+        |                             |
+        +-----------------------------+
+
+L'accŠs aux diff‚rents plans se fait par l'interm‚diaire de registres pr‚sents
+sur la carte, et accessibles par le biais des ports de sorties du PC.
+
+Ecriture d'un point … l'‚cran.
+------------------------------
+
+La principale difficult‚ r‚side dans le fait qu'il faut manipuler 1 bit dans
+les 4 octets des 4 plans.
+
+Pour acc‚lerer les traitements, on utilise une table contenant les d‚finitions
+binaires des 16 couleurs de base (EGA-COULEURS).
+
+Travailler avec un ‚cran virtuel s'avŠre, dans le cas de la carte E.G.A, trŠs
+pratique, car chaque plan est dispos‚ de fa‡on lin‚aire, en m‚moire. La
+manipulation des registres ne s'effectue qu'au moment du transfert dans la
+m‚moire vid‚o.
+
+Scrolling
+---------
+
+Une possibilit‚ supl‚mentaire offerte par la carte E.G.A est le scrolling
+d'‚cran, qui consiste … faire d‚filer l'image horizontalement.
+
+Ce scrolling est r‚alis‚ de fa‡on "hard", par manipulation d'un registre de
+la carte, auquel on indique de combien de 1/80Šme d'‚cran on veut d‚caler
+le buffer vid‚o.
+
+Vous remarquerez que la routine fournie est temporis‚e, le d‚filement ‚tant
+trop rapide sans cela...
+
+Compression d'images
+--------------------
+
+La taille d'une image, en mode 320x200 16 couleurs entre autre, est de 32 Ko.
+Stocker plusieurs images sur le disque peut vite devenir un problŠme.
+
+L'algorithme propos‚ dans la routine fournie repose sur le trŠs classique
+R.L.E (Run Length Encoding), et fonctionne de la fa‡on suivante :
+
+  - On balaye l'image, en comptant le nombre de points contigus de couleur
+    identique.
+  - On stocke dans le fichier r‚sultant ce compteur, ainsi que le code de la
+    couleur.
+
+Les performances sont bien sur fonction de la complexit‚ du dessin. La routine
+fournie est capable de d‚terminer si la taille du fichier compact‚ est
+sup‚rieure … la taille de l'image initial, auquel cas elle renvoie 0 pour
+indiquer que rien n'a ‚t‚ compact‚.
+
+Beaucoup de formats graphiques travaillent avec ce principe, en utilisant
+diff‚rentes variantes (comptage en colonne au lieu des lignes, ...).
+
+Adaptation aux autres modes E.G.A
+---------------------------------
+
+Les dif‚rences entres les diff‚rents modes se situent surtout au niveau
+de la taille des images et des plans, et sont les suivantes :
+
+  - Mode 13 320x200 16 couleurs
+      4 Plans x 40 octets/ligne x 200 lignes = 32000 octets
+
+  - Mode 14 640x200 16 couleurs
+      4 Plans x 80 octets/ligne x 200 lignes = 64000 octets
+
+  - Mode 16 640x350 16 couleurs
+      4 Plans x 80 octets/ligne x 350 lignes = 112000 octets
+
+Ce dernier mode n'est bien sur disponible que sur les cartes E.G.A disposant
+d'au moins de 128 Ko. de R.A.M. (… l'heure actuelle, 256 Ko. est la valeur
+courante).
+
+                Programmation du mode M.C.G.A 320x200 256 couleurs
+                --------------------------------------------------
+
+Ce mode (nø 19) n'est disponible qu'avec une carte de type V.G.A, la plus
+r‚cente carte disponible sur PC.
+
+Ce mode est le plus facile … programmer, en ce sens que l'identit‚ est totale
+entre octet et pixel (1 octet = 1 point de l'‚cran), puisque 1 octet peut
+coder 256 couleurs !.
+
+La faible r‚solution est compens‚e par le nombre important de couleurs
+disponibles.
+
+Organisation de la m‚moire vid‚o.
+---------------------------------
+
+La m‚moire vid‚o est organis‚e de fa‡on lin‚aire, et commence … l'adresse
+de segment A000h.
+                         1 octet = 1 point
+                      +---------------------------------------------------+
+              A000 -> | xxxxxxxx (ligne 0)                                |
+                      |          (ligne 1)                                |
+                      |          (ligne 2)                                |
+                      |             .                                     |
+                      |             .                                     |
+                      |             .                                     |
+                      |          (ligne 199)                              |
+                      +---------------------------------------------------+
+
+Ecriture d'un point … l'‚cran.
+------------------------------
+
+La routine d'‚criture d'un point … l'‚cran se passe, … mon avis, de tout
+commentaire !.
+
+Composantes couleur
+-------------------
+
+Dans le mode M.C.G.A, chaque point est en fait le r‚sultat du m‚lange de 3
+composantes, la composante rouge, la composante verte, la composante bleu.
+
+Deux fonctions du B.I.O.S V.G.A permettent de modifier les composantes R.V.B
+d'une couleur, ce qui permet d'avoir, … un moment donn‚, une palette de 256
+couleurs parmis plus de 264000 !.
+
+

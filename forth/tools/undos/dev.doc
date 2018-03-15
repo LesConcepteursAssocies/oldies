@@ -1,0 +1,69 @@
+                  AFFICHAGE DE LA LISTE DES PERIPHERIQUES PRESENTS
+                  ------------------------------------------------
+
+Ce programme permet d'afficher la liste des p‚riph‚riques pr‚sents en m‚moire.
+
+GENERALITES
+-----------
+
+Pour pouvoir communiquer avec les diff‚rents organes ext‚rieurs (disque,
+clavier, ...), le D.O.S possŠde un certain nombre de programmes appel‚s
+des DRIVERS. Ces drivers peuvent ˆtres de deux types :
+
+  - Drivers de blocs      : correspondent aux drivers communiquants par blocs
+                            (disque, ...).
+
+  - Drivers de caractŠres : correspondent aux drivers communiquants caractŠre
+                            par carctŠre (clavier, ‚cran, ...).
+
+Depuis la version 2.0, l'utilisateur a la possibilit‚ de mettre en place
+ces drivers de fa‡on "dynamique" (lignes "DEVICE=..." du fichier CONFIG.SYS).
+
+STRUCTURE D'UN DRIVER
+---------------------
+
+Chaque driver possŠde un entˆte, dont la composition est la suivante :
+
+off+00 : 1 Pointeur (seg:off) sur le prochain entˆte de driver (off = FFFFh si
+         c'est le dernier).
+ 
+off+04 : 1 mot (16 Bits) d‚finissant les attributs du driver, dont la
+         signification est la suivante :
+         Pour les drivers de caractŠres :
+         - Bit 15 : mis … 1.
+         - Bit 14 : … 1 si les fonctions IOCTL sont support‚es (voir la
+                    fonction 44h de l'int‚ruption 21h).
+         - Bit  3 : … 1 si le p‚riph‚rique est CLOCK$.
+         - Bit  2 : … 1 si le p‚riph‚rique est NUL.
+         - Bit  1 : … 1 si le p‚riph‚rique est le p‚riph‚rique de sortie
+                    standard.
+         - Bit  0 : … 1 si le p‚riph‚rique est le p‚riph‚rique d'entr‚e
+                    standard.
+         Pour les drivers de blocs :
+         - Bit 15 : mis … 0.
+         - Bit 14 : … 1 si les fonctions IOCTL sont support‚es (voir la
+                    fonction 44h de l'int‚ruption 21h).
+         - Bit 13 : … 1 si le format est non-IBM.
+         - Bit  1 : … 1 si le p‚riph‚rique supporte l'adressage de secteurs sur
+                    32 bits.
+
+off+06 : 1 mot (16 bits) pointant sur le point d'entr‚e de la routine de
+         strat‚gie.
+
+off+08 : 1 mot (16 bits) pointant sur le point d'entr‚e de la routine
+         d'interruption.
+
+Pour les drivers de caractŠres :
+off+10 : Nom du driver, sur 8 octets (justifi‚s avec des espaces).
+
+Pour les drivers de blocs :
+off+10 : Nombre d'unit‚s support‚es par ce driver.
+off+11 : 7 Octets non utilis‚s.
+
+FONCTIONNEMENT DU PROGRAMME
+---------------------------
+
+Le premier entˆte est r‚cup‚r‚ dans le DIB (voir les fichier correspondants).
+Ensuite, il n'y a plus qu'… tracer jusqu'… l'offset FFFFh.
+
+

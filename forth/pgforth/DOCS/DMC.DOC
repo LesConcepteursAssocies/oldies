@@ -1,0 +1,49 @@
+                            M‚ta Compilation Dynamique
+
+
+Principe :
+
+On gŠre une table de r‚f‚rence, qui va contenir un certain nombre
+d'informations sur la d‚finition FORTH appel‚e.
+
+exemple de la structure d'une ligne de la table :
+
+   Mot (16 Bits)         Mot (16 Bits)               Double Mot (32 Bits)
++-----------------+----------------------------+-----------------------------+
+|  C.F.A          | Adr_LIB                    |  Position                   |
++-----------------+----------------------------+-----------------------------+
+
+
+Adr_LIB   : Adresse de la chaine d‚signant la librairie
+            (Exemple : "C:\LE_FORTH\LE_FORTH.LDL"
+
+Position  : Position de la d‚finition dans la librairie (pour le SEEK)
+
+C.F.A     : Ce CFA peut contenir 2 types d'informations :
+
+            1) Quand la d‚finition n'existe pas (par exemple au premier appel)
+               ce CFA pointe sur un LOADER, qui va :
+               - ouvrir la librairie d‚sign‚e par Adr_LIB
+               - d‚terminer la taille de la d‚finition
+                 (Position_de_la_d‚f_suivante - Position_de_la_def_actuelle)
+               - Allouer un bloc m‚moire correspondant
+               - modifier C.F.A (c'est … dire lui-mˆme), pour qu'il pointe
+                 sur le LANCEUR.
+
+            2) Quand la d‚finition existe, ce CFA pointe sur un LANCEUR,
+               qui va effectuer un JMP FAR dans la d‚finition.
+
+
+
+En pratique :
+
+les besoins sont :
+
+- un mot permettant de rendre DYNAMIQUE une d‚finition cr‚‚e par
+  l'utilisateur.
+
+- un ensemble d'outils permettants de g‚rer les librairies DYNAMIQUES.
+
+- le LOADER (genre BLOAD)
+
+- le LANCEUR

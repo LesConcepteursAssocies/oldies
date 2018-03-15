@@ -1,0 +1,599 @@
+// ีอออออออออออออัอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออธ
+// ณQREP.NPG     ณ                                                           ณ
+// รฤฤฤฤฤฤฤฤฤฤฤฤฤู                                                           ณ
+// ณDernire modification : 24/05/1995                                       ณ
+// ณ                                                                         ณ
+// ณModule Questions/Rponses Multi-Services.                                ณ
+// ิอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออพ
+//
+// Dclaration des variables.
+local
+number nchoix npos := 1 npage := 1 nquest nlig bGestion bFini
+char   csaisie cleqrep
+char   cresume ql1 ql2 ql3 ql4 ql5 ql6 ql7 rl1 rl2 rl3 rl4 rl5 rl6 rl7
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation des variable de la rponse.
+//
+: InitReponse
+   "  " alltrim rl1 :=
+   "  " alltrim rl2 :=
+   "  " alltrim rl3 :=
+   "  " alltrim rl4 :=
+   "  " alltrim rl5 :=
+   "  " alltrim rl6 :=
+   "  " alltrim rl7 :=
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation des variables.
+//
+: InitVar
+   "  " alltrim cresume :=
+   "  " alltrim ql1 :=
+   "  " alltrim ql2 :=
+   "  " alltrim ql3 :=
+   "  " alltrim ql4 :=
+   "  " alltrim ql5 :=
+   "  " alltrim ql6 :=
+   "  " alltrim ql7 :=
+   InitReponse
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Enregistrement de la question.
+//
+: ValiderQuestion
+   " Enregistrement en cours..." line0
+   dbappendblank
+   // On fabrique la clef.
+   // SERVICE+BREPONSE+DTOS(DATE)
+   app       " SERVICE" dbreplace
+   date dtos " DATE"    dbreplace
+   cresume alltrim " RESUME" dbreplace
+   ql1     alltrim " QL1"    dbreplace
+   ql2     alltrim " QL2"    dbreplace
+   ql3     alltrim " QL3"    dbreplace
+   ql4     alltrim " QL4"    dbreplace
+   ql5     alltrim " QL5"    dbreplace
+   ql6     alltrim " QL6"    dbreplace
+   ql7     alltrim " QL7"    dbreplace
+   // On marque la question comme
+   // Attendant une rponse (!)
+   // "-" : Question sans rponse.
+   // "+" : Question rpondue.
+   " -"    " BREPONSE" dbreplace
+   dbcommit
+   // Fin de la saisie
+   clear0
+   " MODULES\QREP\FINSTSAI.VTX" sendpage
+   wait
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Enregistrement de la rponse.
+//
+: ValiderReponse
+   " Enregistrement en cours..." line0
+   rl1     alltrim " RL1"    dbreplace
+   rl2     alltrim " RL2"    dbreplace
+   rl3     alltrim " RL3"    dbreplace
+   rl4     alltrim " RL4"    dbreplace
+   rl5     alltrim " RL5"    dbreplace
+   rl6     alltrim " RL6"    dbreplace
+   rl7     alltrim " RL7"    dbreplace
+   // On marque la question comme rpondue
+   // "-" : Question sans rponse.
+   // "+" : Question rpondue.
+   " +"    " BREPONSE" dbreplace
+   dbcommit
+   // Fin de la saisie
+   clear0
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Traitement des touches en saisie d'un rponse.
+// Empile VRAI si on sort de la saisie.
+//
+: TraiteFKReponse  // --- b
+   fkey dup fkenvoi ==
+   if
+      // Validation ?
+      // On vrifie qu'il y ai au moins une ligne.
+      rl1 empty?
+      rl2 empty?
+      rl3 empty?
+      rl4 empty?
+      rl5 empty?
+      rl6 empty?
+      rl7 empty?
+      && && && && && &&
+      if
+         " Il faut au moins une ligne !!" line0
+         drop false
+      else
+         drop true
+      endif
+   else
+      dup fksuite ==
+      if
+         // Zone suivante.
+         npos ++
+         npos 1 >
+         if
+            // Dernire zone, on reboucle sur la premire
+            1 npos :=
+         endif
+         drop false
+      else
+         fkretour ==
+         if
+            // Zone prcdente.
+            npos --
+            npos 0 <=
+            if
+               // premire zone, on reboucle sur la dernire
+               1 npos :=
+            endif
+            false
+         else
+            // Les autres touches provoquent
+            // la fin de la saisie
+            true
+         endif
+      endif
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Saisie d'une rponse
+//
+: SaisieReponse
+   InitReponse
+   begin
+      npos
+      case
+         1 of
+              // Saisie de la rponse.
+              15 1 rl1 alltrim strlen + locate
+              7 40 mlinput
+              fkey fkenvoi ==
+              if
+                 rl7 :=
+                 rl6 :=
+                 rl5 :=
+                 rl4 :=
+                 rl3 :=
+                 rl2 :=
+                 rl1 :=
+              else
+                 7 0 do drop loop
+              endif
+              TraiteFKReponse
+           endof
+      endcase
+   until
+   fkey fkenvoi ==
+   if
+      ValiderReponse
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Traitement des touches en saisie.
+// Empile VRAI si on sort de la saisie.
+//
+: TraiteFKSaisie  // --- b
+   fkey dup fkenvoi ==
+   if
+      // Validation ?
+      // On vrifie qu'il y ai au moins une ligne.
+      ql1 empty?
+      ql2 empty?
+      ql3 empty?
+      ql4 empty?
+      ql5 empty?
+      ql6 empty?
+      ql7 empty?
+      && && && && && &&
+      if
+         " Il faut au moins une ligne !!" line0
+         drop false
+      else
+         drop true
+      endif
+   else
+      dup fksuite ==
+      if
+         // Zone suivante.
+         npos ++
+         npos 2 >
+         if
+            // Dernire zone, on reboucle sur la premire
+            1 npos :=
+         endif
+         drop false
+      else
+         fkretour ==
+         if
+            // Zone prcdente.
+            npos --
+            npos 0 <=
+            if
+               // premire zone, on reboucle sur la dernire
+               1 npos :=
+            endif
+            false
+         else
+            // Les autres touches provoquent
+            // la fin de la saisie
+            true
+         endif
+      endif
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Saisie d'une question
+//
+: SaisieQuestion
+   begin
+      npos
+      case
+         1 of
+              // Saisie du rsum
+              5 3 cresume alltrim strlen + locate
+              cresume InputVar
+              // La saisie du rsum est obligatoire
+              cresume empty?
+              if
+                 " Saisie obligatoire" line0
+                 false
+              else
+                 TraiteFKSaisie
+              endif
+           endof
+         2 of
+              // Saisie de la question.
+              7 1 ql1 alltrim strlen + locate
+              7 40 mlinput
+              fkey fkenvoi ==
+              if
+                 ql7 :=
+                 ql6 :=
+                 ql5 :=
+                 ql4 :=
+                 ql3 :=
+                 ql2 :=
+                 ql1 :=
+              else
+                 7 0 do drop loop
+              endif
+              TraiteFKSaisie
+           endof
+      endcase
+   until
+   fkey fkenvoi ==
+   if
+      ValiderQuestion
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation de la saisie d'une question
+//
+: InitSaisie
+   InitVar
+   cursoroff
+   " MODULES\QREP\STSAISIE.VTX" sendpage
+   " MODULES\QREP\BDXSAISI.VTX" sendpage
+   cursoron
+   1 npos :=
+   SaisieQuestion
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage du dtail de la question
+//
+: AfficheDetQuest
+   cursoroff
+   " MODULES\QREP\STDETREP.VTX" sendpage
+   " MODULES\QREP\BDXBAS.VTX" sendpage
+    5 3 locate " RESUME" dbfield alltrim print
+    7 1 locate " QL1" dbfield alltrim print
+    8 1 locate " QL2" dbfield alltrim print
+    9 1 locate " QL3" dbfield alltrim print
+   10 1 locate " QL4" dbfield alltrim print
+   11 1 locate " QL5" dbfield alltrim print
+   12 1 locate " QL6" dbfield alltrim print
+   13 1 locate " QL7" dbfield alltrim print
+   15 1 locate " RL1" dbfield alltrim print
+   16 1 locate " RL2" dbfield alltrim print
+   17 1 locate " RL3" dbfield alltrim print
+   18 1 locate " RL4" dbfield alltrim print
+   19 1 locate " RL5" dbfield alltrim print
+   20 1 locate " RL6" dbfield alltrim print
+   21 1 locate " RL7" dbfield alltrim print
+   cursoron
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Menu des options en dtail question
+//
+: MenuDetQuest
+   begin
+      cursoroff
+      23 20 locate
+      wait
+      fkey fksommaire !=
+   while
+      fkey
+      case
+         fksuite  of
+                     // Question suivante
+                     dbeof !
+                     if
+                        1 dbskip
+                        app " SERVICE" dbfield alltrim ==
+                        " BREPONSE" dbfield " +" == &&
+                        if
+                           AfficheDetQuest
+                        else
+                           -1 dbskip
+                           " Dernire question" line0
+                        endif
+                     else
+                        " Dernire question" line0
+                     endif
+                  endof
+         fkretour of
+                     // Question prcdente
+                     -1 dbskip
+                     dbbof !
+                     app " SERVICE" dbfield alltrim == &&
+                     " BREPONSE" dbfield " +" == &&
+                     if
+                        AfficheDetQuest
+                     else
+                        " Premire question" line0
+                     endif
+                  endof
+         drop
+      endcase
+   repeat
+   cursoron
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage de la liste des questions
+//
+: AfficheListe
+   cursoroff
+   " MODULES\QREP\STLISTE.VTX" sendpage
+   " MODULES\QREP\STLSTBAS.VTX" sendpage
+   1 nquest :=
+   5 nlig :=
+   begin
+      // On n'affiche que les questions du service
+      // auquel on a rpondu (!)
+      // ou pas (si on est en gestion)
+      dbeof !
+      app " SERVICE" dbfield alltrim == &&
+      bGestion
+      if
+         " BREPONSE" dbfield " -" == &&
+      else
+         " BREPONSE" dbfield " +" == &&
+      endif
+      nlig 21 <= &&
+   while
+      nlig 2 locate black setcolor nquest str "  " 2 padl print
+      nlig 6 locate " RESUME" dbfield alltrim 0 35 substr black setcolor print
+      1 dbskip
+      nquest ++
+      nlig ++
+   repeat
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion de options de la liste des questions
+//
+: MenuListe
+   cursoron
+   false bFini :=
+   // Menu de la liste
+   begin
+      bFini !
+      if
+         23 28 locate
+         input csaisie :=
+         fkey fksommaire !=
+      else
+         false
+      endif
+   while
+      csaisie val nchoix :=
+      nchoix dup 0 > swap nquest < &&
+      if
+         // On a saisi un numro
+         // SKIP -(nquest-nchoix)
+         nquest nchoix - negate
+         dbskip
+         AfficheDetQuest
+         bGestion
+         if
+            cursoroff
+            " MODULES\QREP\BDXSAISI.VTX" sendpage
+            cursoron
+            SaisieReponse
+            // On raffiche la liste
+            // (on se repositionne au dbut)
+            cleqrep dbseek
+            if
+               AfficheListe
+               cursoron
+            else
+               " plus de questions en attente" line0
+               true bFini :=
+               false bGestion :=
+            endif
+         else
+            MenuDetQuest
+            // On raffiche la liste
+            // (on se repositionne au dbut)
+            app dbseek drop
+            AfficheListe
+            cursoron
+         endif
+      else
+         // Gestion des touches
+         fkey
+         case
+            fksuite  of
+                        // Page suivante
+                        // On regarde si on a encore
+                        // des questions … afficher
+                        dbeof !
+                        app " SERVICE" dbfield == &&
+                        bGestion
+                        if
+                           " BREPONSE" dbfield " -" == &&
+                        else
+                           " BREPONSE" dbfield " +" == &&
+                        endif
+                        if
+                           AfficheListe
+                           npage ++
+                        else
+                           " Dernire page" line0
+                        endif
+                     endof
+            fkretour of
+                        // Page prcdente
+                        npage 1 >
+                        if
+                           // SKIP -((nquest-1)+17)
+                           nquest 1 - 17 + negate
+                           dbskip
+                           AfficheListe
+                           npage --
+                        else
+                           " Premire page" line0
+                        endif
+                     endof
+            drop
+         endcase
+      endif
+   repeat
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Menu gnral du Module.
+//
+: MenuGen
+   " %0.f" using
+   // On sauvegarde la base courante.
+   dbselected
+   // Ouverture du fichier principal.
+   " MODULES\QREP\QREP" dbopen
+   if
+      FALSE bGestion :=
+      cursoroff
+      " MODULES\QREP\MENUGEN.VTX" sendpage
+      cursoron
+      begin
+         23 29 locate
+         input csaisie :=
+         fkey fksommaire !=
+      while
+         // On regarde si on a saisie le mot-clef de gestion
+         csaisie " **SYSOP" ==
+         if
+            TRUE bGestion :=
+            " MODE GESTIONNAIRE ACTIVE" line0
+            beep
+            // On regarde si il y a des questions en attente.
+            " AREPONDRE" dbsetindex
+            " -" cleqrep :=
+            app "  " 10 padr cleqrep strcat
+            cleqrep dbseek
+            if
+               " Il y a des questions" line0
+               AfficheListe
+               MenuListe
+               // On raffiche le menu.
+               cursoroff
+               " MODULES\QREP\MENUGEN.VTX" sendpage
+               cursoron
+            else
+               " Pas de questions en attente" line0
+            endif
+            " QREP" dbsetindex
+            app dbseek drop
+         else
+            csaisie val nchoix :=
+            nchoix
+            case
+               1 of
+                   " QREP" dbsetindex
+                    InitSaisie
+                    // On raffiche le menu.
+                    cursoroff
+                    " MODULES\QREP\MENUGEN.VTX" sendpage
+                    cursoron
+                 endof
+               2 of
+                    // On regarde si il y a au moins
+                    // une question … laquelle il a t rpondu.
+                    " QREP" dbsetindex
+                    app dbseek
+                    if
+                       " BREPONSE" dbfield " +" ==
+                       if
+                          AfficheListe
+                          MenuListe
+                          // On raffiche le menu.
+                          cursoroff
+                          " MODULES\QREP\MENUGEN.VTX" sendpage
+                          cursoron
+                       else
+                          " Pas de rponses pour l'instant" line0
+                       endif
+                    else
+                       " Pas de questions pour l'instant" line0
+                    endif
+                 endof
+               drop
+               " Choix incorrect" line0
+            endcase
+         endif
+      repeat
+      " QREP" dbclose
+   else
+      " ERREUR A L'OUVERTURE DU FICHIER QREP" line0
+   endif
+   // On reslecionne l'ancienne base
+   dup empty? !
+   if
+      dbselect
+   else
+      drop
+   endif
+   usingoff
+;
+

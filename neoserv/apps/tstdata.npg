@@ -1,0 +1,16 @@
+// test WAITCHAR
+
+: main
+   cls
+   " attente d'un CR (NORMALMODE)" print cr
+   13 CHR WAITCHAR
+   cr " CR RECU" print cr
+   wait
+   " attente d'un CR (BINARYMODE)" print cr
+   SETBINARYMODE
+   13 CHR WAITCHAR
+   cr " CR RECU" print cr
+   SETNORMALMODE
+   wait
+;
+

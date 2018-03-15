@@ -1,0 +1,24 @@
+FORTH est un langage dual, … la fois interpr‚teur et compilateur.
+
+Une variable systŠme reflŠte … tout instant son ‚tat courant, la variable
+STATE.
+
+MODE INTERPRETATION (STATE=0) :
+-------------------------------
+C'est l'‚tat dans lequel est plac‚ le systŠme FORTH, au lancement de celui-ci.
+
+Tout ce qui entre par le canal d'entr‚e courant (STDIN, la plupart du temps
+le clavier) est interpr‚t‚ et imm‚diatement ex‚cut‚ par le systŠme. Le mode
+interpr‚tation est reconnaissable par l'apparition d'un "prompt"
+d'interrogation ("Ok"), signifiant … l'utilisateur que FORTH est dans
+l'attente d'une commande.
+
+MODE COMPILATION (STATE=1) :
+----------------------------
+Tout ce qui entre par le canal d'entr‚e courant (STDIN, la plupart du temps
+le clavier) est compil‚ … la fin du dictionnaire courant, … l'exception des
+mots IMMEDIATS, qui eux sont ex‚cut‚s imm‚diatements (!). C'est l'‚tat qui
+permet d'ajouter de nouvelles d‚finitions au vocabulaire, et, partant de
+cr‚‚r une application.
+
+

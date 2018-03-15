@@ -1,0 +1,16 @@
+//
+// test path
+//
+#pathvtx = tlj\vtx
+
+: main
+ cls
+ " test path" print cr
+ wait
+ " APPS\TEST.PAG" sendpage
+ wait
+ " menugen.vtx" sendpage
+ wait
+;
+
+

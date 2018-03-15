@@ -1,0 +1,391 @@
+\ ------------------------------------------------------------------------------
+\                       Primitives et Structures de contrìle
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement des primitives et des structures de contrìle)
+
+\ Termine une dÇfinition FORTH, et repasse en mode INTERPRETATION.
+: ;  ( --- )
+  ?CSP
+  COMPILE UNNEST
+  [COMPILE] REVEAL  ( Fait apparaitre la nouvelle dÇfinition )
+  [COMPILE] [       ( Repasse en mode InterprÇtation )
+;USES (:) ,         ( La nouvelle dÇfinition est une dÇfinition ':' )
+IMMEDIATE
+
+\ Permet de dÇfinir la partie ÇxÇcution d'un mot de dÇfinition,
+\ crÇÇ avec CREATE.
+: (;CODE)
+  R> LAST @ NAME> !
+;
+
+: DOES>
+  COMPILE (;CODE)
+  232 C,
+  (DOES>) 
+  HERE 2+ - , 
+  [COMPILE] ALIGN
+;
+IMMEDIATE
+
+\ Structures de contrìle
+\ Primitives
+
+: ?CONDITION  ( flag --- )
+  NOT ABORT" Structures mal imbriquÇes"
+;
+
+\ Marquage d'un branchement avant inconditionnel
+: >MARK  ( --- adr )
+  HERE 0 ,
+;
+
+\ RÇsolution d'un branchement avant inconditionnel
+: >RESOLVE ( adr --- )
+  HERE SWAP !
+;
+
+\ Marquage d'un branchement arriäre inconditionnel
+: <MARK ( --- adr )
+  HERE
+;
+
+\ RÇsolution d'un branchement arriäre inconditionnel
+: <RESOLVE ( adr --- )
+  ,
+;
+
+\ Marquage d'un branchement avant conditionnel
+: ?>MARK ( --- flag adr )
+  TRUE >MARK
+;
+
+\ RÇsolution d'un branchement avant conditionnel
+: ?>RESOLVE ( flag adr --- )
+  SWAP ?CONDITION
+  >RESOLVE
+;
+
+\ Marquage d'un branchement arriäre conditionnel
+: ?<MARK ( --- flag adr )
+  TRUE <MARK
+;
+
+\ RÇsolution d'un branchement arriäre conditionnel
+: ?<RESOLVE ( flag adr --- )
+  SWAP ?CONDITION
+  <RESOLVE
+;
+
+\ IF ... [ELSE] ... THEN
+
+: IF
+  COMPILE ?BRANCH
+  ?>MARK
+;
+IMMEDIATE
+
+: ELSE
+  COMPILE BRANCH
+  ?>MARK
+  2SWAP
+  ?>RESOLVE
+;
+IMMEDIATE
+
+: THEN
+  ?>RESOLVE
+;
+IMMEDIATE
+
+\ BEGIN ... UNTIL
+\ BEGIN ... AGAIN
+\ BEGIN ... WHILE ... REPEAT
+
+: BEGIN
+  ?<MARK
+;
+IMMEDIATE
+
+: UNTIL
+  COMPILE ?BRANCH
+  ?<RESOLVE
+;
+IMMEDIATE
+
+: AGAIN
+  COMPILE BRANCH
+  ?<RESOLVE
+;
+IMMEDIATE
+
+: WHILE
+  [COMPILE] IF
+;
+IMMEDIATE
+
+: REPEAT
+  2SWAP [COMPILE] AGAIN
+  [COMPILE] THEN
+;
+IMMEDIATE
+
+\ DO ... LOOP
+\ DO ... +LOOP
+\ ?DO ... LOOP
+\ ?DO ... +LOOP
+
+: DO
+  COMPILE (DO)
+  ?>MARK
+;
+IMMEDIATE
+
+: ?DO
+  COMPILE (?DO)
+  ?>MARK
+;
+IMMEDIATE
+
+: LOOP
+  COMPILE (LOOP)
+  2DUP 2+
+  ?<RESOLVE
+  ?>RESOLVE
+;
+IMMEDIATE
+
+: +LOOP
+  COMPILE (+LOOP)
+  2DUP 2+
+  ?<RESOLVE
+  ?>RESOLVE
+;
+IMMEDIATE
+
+\ Sortie de boucle inconditionnelle
+: LEAVE
+  COMPILE (LEAVE)
+;
+IMMEDIATE
+
+\ CASE ... OF ... ENDOF ... ENDCASE
+
+: CASE
+  CSP @ !CSP
+;
+IMMEDIATE
+
+: OF
+  COMPILE OVER
+  COMPILE =
+  COMPILE ?BRANCH
+  >MARK
+  COMPILE DROP
+;
+IMMEDIATE
+
+: ENDOF
+  COMPILE BRANCH
+  >MARK SWAP
+  >RESOLVE
+;
+IMMEDIATE
+
+: ENDCASE
+  COMPILE DROP
+  BEGIN
+    SP@ CSP @ <>
+  WHILE
+    >RESOLVE
+  REPEAT
+  CSP !
+;
+IMMEDIATE
+
+\ Primitives diverses
+
+\ CrÇation d'un vocabulaire dans le vocabulaire CURRENT.
+: VOCABULARY  ( nom_vocabulaire --- )
+  CREATE
+  #THREADS 0
+  DO
+    0 ,              ( CrÇation des THREADS )
+  LOOP
+  HERE VOC-LINK @ ,  ( Mise Ö jour du chainage des vocabulaires )
+  VOC-LINK !
+;USES (VOC) ,
+
+\ Le premier vocabulaire de CONTEXT devient le vocabulaire CURRENT.
+: DEFINITIONS  ( --- )
+  CONTEXT @
+  CURRENT !
+;
+
+\ Compilation d'un CFA dans une dÇfinition
+: [']  ( nom_def --- )
+  '
+  [COMPILE] LITERAL
+;
+IMMEDIATE
+
+\ CrÇation de mots vectorisÇs.
+: DEFER  ( mot --- )
+  ['] NOOP
+  CONSTANT
+;USES (DEFER) ,
+
+\ Affectation d'un mot vectorisÇ.
+: IS  ( cfa_mot mot --- )
+  STATE @ 
+  IF
+    COMPILE (IS)
+  ELSE
+    ' >BODY !
+  THEN
+;
+IMMEDIATE    
+
+\ CrÇation d'une variable double.
+: 2VARIABLE  ( nom_variable --- )
+  CREATE
+  0 DUP , ,
+;USES (2VARIABLE) ,
+
+\ CrÇation d'une constante double.
+: 2CONSTANT  ( nom_constante --- )
+  CREATE
+  , ,
+;USES (2CONSTANT) ,
+
+\ Permet de compiler le code d'un caractäre dans une
+\ dÇfinition.
+: ASCII  ( car --- )
+  BL WORD 1+ C@
+  STATE @
+  IF
+    [COMPILE] LITERAL
+  THEN
+;
+IMMEDIATE
+
+\ Permet la compilation d'un caractäre de contrìle (code
+\ ASCII compris entre 0 et 32).
+: CONTROL  ( car --- )
+  BL WORD 1+ C@
+  ASCII @ -
+  STATE @
+  IF
+    [COMPILE] LITERAL
+  THEN
+;
+IMMEDIATE
+
+\ Empile le NFA du mot dont le CFA est sur la pile de donnÇes.
+: >NAME  ( cfa --- nfa )
+  -1 TRAVERSE
+  -1 TRAVERSE
+;
+
+\ Empile le LFA du mot dont le CFA est sur la pile de donnÇes.
+: >LINK  ( cfa --- lfa )
+  >NAME N>LINK
+;
+
+\ Empile le NFA du mot dont le LFA est sur la pile de donnÇes.
+: L>NAME  ( lfa --- nfa )
+  2+
+;
+
+\ Empile le CFA du mot dont le LFA est sur la pile de donnÇes.
+: LINK>  ( lfa --- cfa )
+  L>NAME NAME>
+;
+
+\ Empile le CFA du mot dont le PFA est sur la pile de donnÇes.
+: BODY>  ( pfa --- cfa )
+  2-
+;
+
+\ Changement de base
+: HEX  ( adr_base --- )
+  16 SWAP !
+;
+
+: OCTAL  ( adr_base --- )
+  8 SWAP !
+;
+
+: BINARY  ( adr_base --- )
+  2 SWAP !
+;
+
+\ Primitives diverses
+\ Utilisation du DRIVER ANSI.SYS
+\ Positionne le curseur en haut et Ö gauche.
+: HOME  ( --- )
+  27 (CONS) ASCII [ (CONS)
+  ASCII f (CONS)
+;
+
+\ Efface l'Çcran, et positionne le curseur en haut et Ö gauche.
+: DARK  ( --- )
+  27 (CONS) ASCII [ (CONS)
+  ASCII 2 (CONS) ASCII J (CONS)
+  #OUT OFF #LINE OFF
+;
+
+\ Passage en vidÇo inverse.
+: INVERS  ( --- )
+  7 (ATTRIB)
+;
+
+\ Passage en mode clignotant.
+: BLINK  ( --- )
+  5 (ATTRIB)
+;
+
+\ Passage en mode soulignÇ.
+: UNDERL  ( --- )
+  4 (ATTRIB)
+;
+
+\ Affichage d'une chaine. Equivalent Ö TYPE.
+: >TYPE  ( adresse long --- )
+  TUCK $PAD SWAP CMOVE
+  $PAD SWAP TYPE
+;
+
+\ Comparaisons d'entiers SIMPLES.
+: >=  ( n1 n2 --- flag )
+  < NOT
+; 
+
+: <=  ( n1 n2 --- flag )
+  > NOT
+; 
+
+: U>=  ( un1 un2 --- flag )
+  U< NOT
+; 
+
+: U<=  ( un1 un2 --- flag )
+  U> NOT
+; 
+
+: 0>=  ( n --- flag )
+  0< NOT
+; 
+
+: 0<=  ( n --- flag )
+  0> NOT
+; 
+
+\ Teste d'inclusion entre deux bornes.
+: WITHIN
+  1- BETWEEN
+;
+
+EOF
+
+

@@ -1,0 +1,24 @@
+//
+// Test 09 : test I J K
+//
+//
+
+: main
+   cls
+   " test I J K (touche)" print cr
+   wait
+   10 0 do " I=" print I print loop cr
+   wait
+   10 0
+   do
+      10 0
+      do
+         " I=" print i print
+         " J=" print j print
+      loop
+   loop cr
+   wait
+   " FIN DE MAIN" print wait
+;
+
+

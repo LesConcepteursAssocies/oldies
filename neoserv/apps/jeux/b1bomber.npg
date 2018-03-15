@@ -1,0 +1,672 @@
+// =========================================================================== //
+// B1 BOMBER Version 1.00
+//
+// Date de dernire mise … jour : 12/05/95
+//
+// Auteur: Sebastien Maitre
+// =========================================================================== //
+
+#PATHVTX jeux\VTX
+#PATHDBF jeux
+
+PUBLIC
+      CHAR   _CURSEUR := "\25\46"
+      CHAR   _PSWD    := "FORTH"
+      NUMBER _YPOS    := 9
+
+LOCAL
+     number clavier
+     number[] 1 16 tab
+     number go_on oldtime avtime btime maxtime
+     number x y xb yb reste tmp cpt score niv haut vies niveau
+
+     char chaine
+     Char Acces3614
+
+
+: actu_time
+
+   timer dup
+
+   oldtime !=
+   if
+     oldtime :=
+     avtime ++
+     btime ++
+
+   else
+       drop
+
+   endif
+
+;
+
+
+: f_so
+ 1 clavier :=
+;
+
+
+: f_an
+ 2 clavier :=
+;
+
+
+: f_re
+ 3 clavier :=
+;
+
+
+: f_rep
+ 4 clavier :=
+;
+
+
+: f_gu
+ 5 clavier :=
+;
+
+
+: f_co
+ 6 clavier :=
+;
+
+
+: f_su
+ 7 clavier :=
+;
+
+
+: f_en
+ 8 clavier :=
+;
+
+
+: coul_correspond
+
+   case
+
+       0 of 65 endof
+       1 of 68 endof
+       2 of 69 endof
+       3 of 66 endof
+
+   endcase
+
+;
+
+
+: init_game
+ 0 reste :=
+ " b1game.vtx" sendpage
+ 0 tab afill
+ 0 cpt :=
+ randomize
+ 15 0
+ do
+  begin
+   4 rnd coul_correspond tmp := // coul batiment
+   tmp cpt !=
+  until
+  haut rnd 4 +  0 i tab :=            // hauteur batiment ...
+  0 i tab 4 - niv <
+  if
+   niv 4 + 0 i tab :=
+  endif
+
+  0 i tab 2 %
+  1 ==
+  if
+   0 i tab 1 + reste +=
+  else
+   0 i tab reste +=
+  endif
+
+  24 cpt :=
+  0 i tab 1 - 0
+  do   // affichage ...
+   cpt j 2 * 1 + locate
+   " \14\27" print
+   tmp emit
+   " \27\80\91\91" print
+   cpt --
+  loop
+  //dessin du toit
+  cpt i 2 * 1 + locate
+  " \14\27" print
+  tmp emit
+  " \27\80\27\90\88\84" print
+  tmp cpt :=
+ loop
+ timer oldtime :=
+ 0 avtime :=
+ 0 btime :=
+ -2 x :=
+ 1 y :=
+ 0 xb :=
+
+ " Appuyez sur ENVOI pour commencer ..." line0
+
+ begin
+      clavier 7 ==
+      clavier 8 ==
+      ||
+
+ until
+
+ clear0
+ 0 clavier :=
+;
+
+
+: aff_score
+ 7 35 locate
+ score print
+;
+
+
+: aff_vies
+ 17 35 locate
+ vies print
+;
+
+
+: aff_niv
+ 12 35 locate
+ niveau print
+;
+
+
+: adapt_niv
+ niveau 5 <
+ if
+  18 haut :=
+  3 maxtime :=
+  niveau
+  case
+   1 of 0 niv := endof
+   2 of 2 niv := endof
+   3 of 4 niv := endof
+   4 of 6 niv := endof
+   drop
+  endcase
+ else
+  niveau 10 <
+  if
+   19 haut :=
+   2 maxtime :=
+   niveau
+   case
+	5 of 8 niv := endof
+	6 of 10  niv := endof
+	7 of 12 niv := endof
+	8 of 14 niv := endof
+	9 of 16 niv := endof
+	drop
+   endcase
+  else
+   20 haut :=
+   1 maxtime :=
+   niveau
+   case
+	10 of 17 niv := endof
+	11 of 18 niv := endof
+	12 of 19 niv := endof
+	13 of 19 niv := endof
+	14 of 19 niv := endof
+	drop
+	0 maxtime :=
+	19 niv :=
+   endcase
+  endif
+ endif
+;
+
+
+: game
+ 0 score :=
+ adapt_niv
+ 3 vies :=
+
+ init_game
+ aff_score
+ aff_niv
+ aff_vies
+ true go_on :=
+ begin
+  go_on true ==
+ while
+   actu_time
+   clavier
+   case
+	 1 of
+		0 clavier :=
+		false go_on :=
+	   endof
+	 8 of
+		0 clavier :=
+		xb 0 ==
+		if
+		 x -1 > x 31 < &&
+		 if
+		   x xb :=
+		   y 1 + yb :=
+		 endif
+		else
+		 beep
+		endif
+	   endof
+   drop
+   endcase
+   avtime maxtime >
+   if
+	// avion avance ...
+	x 0 >
+	if
+	 x 29 <
+	 if
+	   y x locate
+	   " \14\32\84\80" print
+	 else
+	  // on est … droite de l'cran
+	  y x locate
+	  x 29 ==
+	  if
+	   " \14\32\84" print
+	  else
+	   "  " print
+	  endif
+	 endif
+	else
+	 // on est … gauche de l'cran
+	 y 1 locate
+	 x 0 ==
+	 if
+	  " \14\84\80" print
+	 else
+	  x -1 ==
+	  if
+	   " \14\80" print
+	  endif
+	 endif
+	endif
+	0 avtime :=
+	x 30 <
+	if
+	 x ++
+	 // test collision
+	 x 0 >
+	 if
+	   24 y - 0 x 1 + 2 / floor tab <
+
+	   if
+		// bing
+		" b1col.vtx" sendpage
+		vies --
+		vies 0 >
+		if
+		 init_game
+		 aff_score
+		 aff_niv
+		 aff_vies
+		else
+		 // game over
+		 " b1over.vtx" sendpage
+		 " b1sco.vtx" sendpage
+		 false go_on :=
+		endif
+	   endif
+	 else
+	  x -2 >
+	  if
+	   24 y - 0 0 tab <
+	   if
+		// bing
+
+		" b1col.vtx" sendpage
+		vies --
+		vies 0 >
+		if
+		 init_game
+		 aff_score
+		 aff_niv
+		 aff_vies
+		else
+		 // game over
+		 " b1over.vtx" sendpage
+		 false go_on :=
+		endif
+	   endif
+	  endif
+	 endif
+	else
+	 -2 x :=
+	 y ++
+	 y 24 >
+	 if
+	  " b1niv.vtx" sendpage
+	  niveau ++
+	  adapt_niv
+	  init_game
+	  aff_score
+	  aff_niv
+	  aff_vies
+	 endif
+	endif
+   endif
+   btime 1 >
+   if
+	// bombe tombe ... test collision ...
+	xb 0 >
+	if  // une bombe tombe ...
+	 yb xb locate
+	 "  " print
+	 yb 24 <
+	 if
+	   yb ++
+	   yb xb locate
+	   " o" print
+	   24 yb - 0 xb 1 - 2 / floor tab <
+	   if      						// bombe touche soit immeuble soit sol
+		2 0 xb 1 - 2 / floor tab -=
+		0 xb 1 - 2 / floor tab -2 >
+		if
+		  score ++
+		  aff_score
+		  2 reste -=
+		  reste 0 ==
+		  if
+			" b1niv.vtx" sendpage
+			niveau ++
+			adapt_niv
+			init_game
+			aff_score
+			aff_niv
+			aff_vies
+		  endif
+		else
+		 " plus rien ici ..." line0
+		endif
+		xb 1 - 2 / floor 2 * 1 + xb :=
+		yb 1 - xb locate
+		"   " print
+		yb xb locate
+		"   " print
+		yb ++
+		yb 25 <
+		if
+		 yb xb locate
+		 "   " print
+		endif
+		0 xb :=
+	   endif
+	 else
+	   0 xb :=
+	 endif
+	endif
+	0 btime :=
+   endif
+ repeat
+;
+
+
+: v_scores
+
+   " b1sco.vtx" sendpage
+
+   begin
+        clavier 3 !=
+
+   while
+
+   repeat
+
+   0 clavier :=
+
+;
+
+
+: v_regles
+
+   " b1r.vtx" sendpage
+
+   begin
+        clavier 3 == clavier 1 == ||
+
+   until
+
+   0 clavier :=
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affectation des redirections de touches
+//
+: AffectTable
+
+   setlocalfkey fksommaire f_so
+   setlocalfkey fkannulation f_an
+   setlocalfkey fkretour f_re
+   setlocalfkey fkrepetition f_rep
+   setlocalfkey fkguide f_gu
+   setlocalfkey fkcorrection f_co
+   setlocalfkey fksuite f_su
+   setlocalfkey fkenvoi f_en
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Menu principal
+//
+: menu
+
+  " b1menu.vtx" sendpage
+  true go_on :=
+  0 clavier :=
+  2 cpt :=
+  cpt 3 * _YPOS + 9 locate blinkon _CURSEUR print blinkoff
+
+  begin
+       go_on TRUE ==
+
+  while
+       clavier
+       case
+
+           3 of                 // retour
+
+	     0 clavier :=
+	     cpt 3 * _YPOS + 9 locate "  " print
+	     cpt 0 >
+	     if
+	       cpt --
+
+	     else
+	         3 cpt :=
+
+	     endif
+
+	     cpt 3 * _YPOS + 9 locate blinkon _CURSEUR print blinkoff
+
+	   endof
+
+           5 of                 // Guide
+
+             0 clavier :=
+             EmptyLocalFkeyTable
+             " modules\pages\Editeur.vtx" SendPage
+             wait
+             " b1menu.vtx" sendpage
+             AffectTable
+             cpt 3 * _YPOS + 9 locate blinkon _CURSEUR print blinkoff
+
+           endof
+
+
+           7 of                 // suite
+
+	     0 clavier :=
+	     cpt 3 * _YPOS + 9 locate "  " print
+
+	     cpt 3 <
+	     if
+	       cpt ++
+
+	     else
+	         0 cpt :=
+
+	     endif
+
+	     cpt 3 * _YPOS + 9 locate blinkon _CURSEUR print blinkoff
+
+	   endof
+
+           8 of                 // envoi
+
+	     0 clavier :=
+
+	     cpt
+	     case
+	         0 of           // rgles
+
+		   v_regles
+		   0 cpt :=
+
+		 endof
+
+	         1 of  // scores
+
+		   v_scores
+		   1 cpt :=
+
+		 endof
+
+	         2 of  // jeu
+
+		   1 niveau :=
+		   game
+		   0 clavier :=
+		   true go_on :=
+		   2 cpt :=
+
+		 endof
+
+	         3 of  // quitter
+
+		   false go_on :=
+		   3 cpt :=
+
+		 endof
+
+	         drop
+
+	     endcase
+
+	     cpt 3 !=
+	     if
+	       " b1menu.vtx" sendpage
+	       2 cpt :=
+	       cpt 3 * _YPOS + 9 locate blinkon _CURSEUR print blinkoff
+
+	     endif
+
+	   endof
+
+           1 of
+
+	     0 clavier :=
+	     false go_on :=
+
+	   endof
+
+           drop
+
+       endcase
+
+  repeat
+
+;
+
+
+: Intro
+
+   " b1pres.vtx" sendpage
+   5000 delay
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Accs restreint }
+//
+: AccesT2  // --- b
+   1
+   " ACCEST2.VTX" sendpage
+   cursoron
+
+   begin
+        16 32 locate fdheight setfont
+        "  " Acces3614 :=
+        Acces3614 InputVar
+        Acces3614 alltrim display
+        Acces3614 alltrim _PSWD ==
+        if
+         " OK" line0
+         drop true dup
+
+         else
+             1 + dup 3 >
+             if
+               " Fin de communication" line0
+
+               // Dconnexion
+               " \27\57\103" print
+               false
+
+             else
+
+                 false
+
+             endif
+
+         endif
+
+   until
+
+;
+
+
+: b1bombermain
+
+   Palier 99 !=
+   if
+     Intro
+
+   endif
+
+   " %.0f" using
+   AffectTable
+   menu
+
+;
+
+
+: main
+
+    Palier 82 ==                // 3614
+    if
+      AccesT2
+
+    endif
+
+    b1bombermain
+
+;

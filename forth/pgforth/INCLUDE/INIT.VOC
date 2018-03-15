@@ -1,0 +1,80 @@
+\ ------------------------------------------------------------------------------
+\                           Bannire et Vecteur BOOT.
+\ ------------------------------------------------------------------------------
+\
+\   ณ ด ต ถ ท ธ น บ ป ผ ฝ
+\
+\   พ ฟ ภ ม ร ฤ ป ผ ว ศ ษ
+\
+\   ส ห ฬ อ ฮ ฯ ะ ั า ำ ิ
+\
+\   ี ึ ื ุ ู ฺ Û Ü Ý Þ ฿
+\
+\   ฐ ฑ ฒ
+\
+\ Lecture et xcution d'un ventuel fichier STARTUP.
+\
+
+CR .( Chargement de la bannire et du vecteur BOOT )
+
+15 STRING STARTUP-FILE
+STARTUP-FILE LEN$ NIP ERASE
+" STARTUP.FTH" STARTUP-FILE $!
+
+: STARTUP
+  STARTUP-FILE DROP READ (OPEN)
+  0=
+  IF
+    (INCLUDE)
+  ELSE
+    DROP
+  THEN
+;
+
+: HERALD  ( --- )
+  ATTRIBUTS @ ATTRIBUTS ON
+  ATTOFF
+  DARK
+  BOLD
+  ." ษอออออออออออออออออออออออออออออออออออออป" CR
+  ." บ        PGForth  Version 1.00        บ ฑ" CR
+  ." วฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤถ ฑ" CR
+  ." บ       Auteur  : P.Guillaumaud       บ ฑ" CR
+  ." ศอออออออออออออออออออออออออออออออออออออผ ฑ" CR
+  ."   ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ" CR
+  CR
+  ATTOFF
+  ATTRIBUTS !
+;
+
+: START
+  STARTUP
+  CMDLINE?
+  IF
+    CMDLINE
+  ELSE
+    HERALD
+  THEN
+;
+
+\ Directive de compilation.
+
+: IFNDEF  ( nom_mot commandes --- )
+  DEFINED NIP
+  IF
+    [COMPILE] \
+  THEN
+;
+IMMEDIATE
+
+: IFDEF  ( nom_mot commandes --- )
+  DEFINED NIP 0= 
+  IF 
+    [COMPILE] \ 
+  THEN 
+; 
+IMMEDIATE
+
+EOF
+
+

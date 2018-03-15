@@ -1,0 +1,40 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+DECIMAL
+
+VARIABLE OLDMODE
+VARIABLE ATTRIBUT
+VARIABLE CARACTERE
+
+: FGDEMO28 ( --- )
+   FASTGRAPH?
+   IF
+      FGGETMODE OLDMODE !
+      3 FGSETMODE
+      0 FGCURSOR
+
+      9 7 0 FGSETATTR
+      24 0 FGLOCATE
+      " D‚monstration de FastGraph (Appuyez sur une touche)" FGTEXT
+      24 0 FGGETCHAR CARACTERE !
+      24 0 FGGETATTR ATTRIBUT !
+      1 0 FGLOCATE
+      " (Appuyez sur une touche)" FGTEXT
+      FGWAITKEY
+      OLDMODE @ FGSETMODE
+      FGRESET
+      1 FGCURSOR
+      CR ." CARACTERE = " CARACTERE @ EMIT
+      CR ." ATTRIBUT  = " ATTRIBUT @ .
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

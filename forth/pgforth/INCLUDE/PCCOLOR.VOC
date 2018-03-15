@@ -1,0 +1,171 @@
+\ ------------------------------------------------------------------------------
+\                       Primitives de gestion des couleurs
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement des primitives de gestion des couleurs )
+
+\ Positionnement du curseur
+CODE (AT)  ( col lig --- col lig )
+  AX POP
+  DX POP
+  DX PUSH
+  AX PUSH
+  AL DH MOV
+  BH BH XOR
+  2 # AH MOV
+  16 INT
+  NEXT
+END-CODE
+
+: AT  ( col lig --- )
+  (AT) #LINE ! #OUT !
+;
+
+CODE UPSCROLL  ( ch lh cb lb nbl --- )
+  AX POP
+  DX POP
+  BX POP
+  DL DH MOV
+  BL DL MOV
+  BX POP
+  CX POP
+  BL CH MOV
+  6 # AH MOV
+  7 # BH MOV
+  16 INT
+  NEXT
+END-CODE
+
+\ Lecture de la position du curseur
+CODE (CURSOR)  ( --- col lig )
+  0 # BX MOV
+  3 # AH MOV
+  16 INT
+  DH AL MOV
+  DH DH SUB
+  AH AH SUB
+  2PUSH
+END-CODE
+
+\ Fixe le format du curseur
+CODE (FRAME)  ( lig_debut lig_fin --- )
+  CX POP
+  BX POP
+  BL CH MOV
+  1 # AH MOV
+  16 INT
+  NEXT
+END-CODE
+
+: ((CCR))
+  #OUT OFF
+  (CURSOR) NIP 24 >=
+  IF
+    0 0 80 24 1 UPSCROLL
+    #OUT @ 24 AT
+  ELSE
+    #LINE 1+!
+    #OUT @ #LINE @ AT
+  THEN
+;
+
+' ((CCR)) IS (CCR)
+
+: (CCONS)
+  9 (STDOUT)
+;
+
+: ((CCONSOLE))
+  DUP BS =
+  IF
+    DROP
+    (CURSOR) SWAP 1- SWAP AT
+  ELSE
+    DUP BELL =
+    IF
+      DROP
+    ELSE
+       #COLOR @ (CCONS)
+       (CURSOR) DROP 79 >=
+       IF
+         (CCR)
+       ELSE
+         #OUT 1+!
+         #OUT @ (CURSOR) NIP AT
+       THEN
+    THEN
+  THEN
+;
+
+' ((CCONSOLE)) IS (CCONSOLE)
+
+\ Couleurs pr‚d‚finies (valables pour le mode EGA).
+: #COLOR!  ( n --- )
+  #COLOR !
+;
+
+: BLACK
+  0 #COLOR!
+;
+
+: BLUE
+  1 #COLOR!
+;
+  
+: GREEN
+  2 #COLOR!
+;
+
+: CYAN
+  3 #COLOR!
+;
+
+: RED
+  4 #COLOR!
+;
+
+: MAGENTA
+  5 #COLOR!
+;
+
+: BROWN
+  20 #COLOR!
+;
+
+: LIGHTGRAY
+  7 #COLOR!
+;
+
+: DARKGRAY
+  56 #COLOR!
+;
+
+: LIGHTBLUE
+  57 #COLOR!
+;
+
+: LIGHTGREEN
+  58 #COLOR!
+;
+
+: LIGHTCYAN
+  59 #COLOR!
+;
+
+: LIGHTRED
+  58 #COLOR!
+;
+
+: LIGHTMAGENTA
+  61 #COLOR!
+;
+
+: YELLOW
+  62 #COLOR!
+;
+
+: WHITE
+  63 #COLOR!
+;
+
+

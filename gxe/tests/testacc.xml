@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<FxML version="1.0">
+<TestLib>
+<accents>écrit avec un accent en français</accents>
+<param>&gt;inferieur</param>
+</TestLib>
+</FxML>
+
+

@@ -1,0 +1,24 @@
+// test onlib
+local
+number toto
+
+: onlib
+   " ONLIB" display
+   " toto" display
+   toto display
+   begin
+      toto ++
+//      toto 10 % 0 ==
+//      if
+//         " toto" display toto display
+//      endif
+   again
+;
+
+: main
+  cls " test ONLIB" print cr wait
+  0 toto :=
+  " toto = " print toto print cr
+  wait
+;
+

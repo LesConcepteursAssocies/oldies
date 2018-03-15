@@ -1,0 +1,11 @@
+#echo = on
+// test outofmemory
+local
+number[] 9000 9000 ntab1
+
+: main
+   cls
+   " test outofmemory" print
+   wait
+;
+

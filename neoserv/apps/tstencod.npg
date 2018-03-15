@@ -1,0 +1,21 @@
+// test encode
+
+: DtoS   // "JJ/MM/AAAA" --- "AAAAMMJJ"
+   " JJ/MM/AAAA" " AAAAMMJJ" rot encode
+;
+
+: main
+  cls " test encode" print cr wait
+  " '123' '3 2 1' 'ABC' = " print
+  " 123" " 3 2 1" " ABC" encode print cr
+  " '123' '1&2&3' 'ABC' = " print
+  " 123" " 1&2&3" " ABC" encode print cr
+  " '123456789A' '789A4512' '30-12/1990' = " print cr
+  " 123456789A" " 789A4512" " 30-12/1990" encode print cr
+  " 'ABCDEFGH' 'EF/GH/CD' '19901230' = " print cr
+  " ABCDEFGH" " EF/GH/CD" " 19901230" encode print cr
+  " DATE DTOS = " print
+  DATE dtos print cr
+  wait
+;
+

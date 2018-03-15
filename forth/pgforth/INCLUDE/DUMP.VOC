@@ -1,0 +1,69 @@
+\ ------------------------------------------------------------------------------
+\                          Dumping m‚moire.
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement des utilitaires de DUMPING m‚moire )
+
+VARIABLE SEGMENT>
+
+: D.2
+  BOUNDS
+  ?DO
+    SEGMENT> @ I LC@ 0
+    <# # # #> TYPE SPACE
+  LOOP
+;
+
+: DUMP  ( adr long --- )
+  OBASE @ -ROT
+  OBASE HEX
+  SWAP DUP -16 AND SWAP 15 AND
+  CR ."  Adresse   "
+  8 0
+  DO
+    I 2 .R SPACE
+  LOOP SPACE
+  16 8
+  DO
+    I 2 .R SPACE
+  LOOP SPACE
+  16 0
+  DO
+    I 1 .R
+  LOOP CR
+   9 ASCII - REPLICATE 2 SPACES
+  23 ASCII - REPLICATE 2 SPACES
+  23 ASCII - REPLICATE 2 SPACES
+  16 ASCII - REPLICATE
+  ROT + BOUNDS
+  DO
+    CR SEGMENT> @ 4 U.R
+    ASCII : EMIT
+    I DUP 4 U.R
+    2 SPACES
+    8 2DUP   D.2 SPACE
+    OVER + 8 D.2 SPACE
+    16 BOUNDS
+    ?DO
+      SEGMENT> @ I LC@ 127 AND
+      DUP BL 126 BETWEEN NOT
+      IF
+        DROP ASCII .
+      THEN
+      EMIT
+    LOOP
+    STOP? ?LEAVE
+    16
+  +LOOP
+  OBASE ! CR
+;
+
+: LDUMP ( seg off long --- )
+  SEGMENT> @ >R
+  ROT SEGMENT> ! DUMP
+  R> SEGMENT> !
+;
+
+EOF
+
+

@@ -1,0 +1,654 @@
+#PATHVTX jeux\VTX
+
+local
+number oldtime totime first last num clavier niveau
+number[] 1 800 listex
+number[] 1 800 listey
+char chaine ch lastc
+number[] 40 23 tab
+number x y x1 y1 cpt rep lastn
+number direction sover fut_dir pastilles longueur lives tableau
+number level maxwait minlong maxtab await
+
+
+
+: prout
+
+;
+
+: timerf
+ timer dup
+ oldtime !=
+ if
+  oldtime :=
+  totime ++
+  niveau ++
+  " time : " chaine := totime str chaine strcat chaine display
+ else
+  drop
+ endif
+;
+
+
+: add_liste
+ " add_liste" display
+
+ longueur ++
+ 5  x 1 - y 1 - tab :=
+ x 0 last listex :=
+ y 0 last listey :=
+ last 799 <
+ if
+  last ++
+ else
+  0 last :=
+ endif
+;
+
+
+: suppr_liste
+ " suppr_liste" display
+ longueur --
+ 0 first listex x1 :=
+ 0 first listey y1 :=
+ 0 x1 1 - y1 1 - tab :=
+ first 799 <
+ if
+  first ++
+ else
+  0 first :=
+ endif
+;
+
+
+
+: f_so
+ 1 clavier :=
+;
+
+
+: f_an
+ 2 clavier :=
+;
+
+
+: f_re
+ 3 clavier :=
+;
+
+
+: f_rep
+ 4 clavier :=
+;
+
+
+: f_gu
+ 5 clavier :=
+;
+
+
+: f_co
+ 6 clavier :=
+;
+
+
+: f_su
+ 7 clavier :=
+;
+
+
+: f_en
+ 8 clavier :=
+;
+
+
+
+: load_tab
+ " tab" chaine :=
+ dup
+ 10 <
+ if
+  " 0" chaine strcat
+ endif
+ str chaine strcat
+ chaine dbseek
+
+ 0 x :=
+ 0 y :=
+ 0 cpt :=
+
+ " TABLEAU" dbfield chaine :=
+
+ 0 pastilles :=
+
+ cls
+ 127 tab afill
+ 22 0
+ do
+    0 x :=
+    begin
+     cpt --
+     begin
+      cpt ++
+      chaine cpt 1 substr ch :=
+      ch " 9.oO " strin
+     until
+     
+     ch
+     case
+      " 9" of
+            127 x i tab :=
+            " \27\65\127" print
+            
+            127 lastn :=
+           endof
+      " ." of
+            46  x i tab :=
+            " \27\66\46" print
+            pastilles ++
+            46 lastn :=
+           endof
+      " o" of
+            111 x i tab :=
+            " \27\68\111" print
+            pastilles ++
+            111 lastn :=
+           endof
+      " O" of
+            79  x i tab :=
+            " \27\67\79" print
+            pastilles ++
+            79 lastn :=
+           endof
+      "  " of
+            0  x i tab :=
+            32 emit
+            0 lastn :=
+           endof
+      beep
+      drop
+     endcase
+     x ++
+     0 rep :=
+     ch lastc :=
+     begin
+      begin
+       cpt ++
+       chaine cpt 1 substr ch :=
+       ch " 9.oO " strin
+      until
+      x 40 < ch lastc == &&
+     while
+      lastn x i tab :=
+      rep ++
+      x ++
+     repeat
+     rep 2 <
+     if
+      rep 1 ==
+      if
+        lastn
+        case
+          0 of
+              32 emit
+            endof
+         emit
+        endcase
+
+      endif
+     else
+      18 emit
+      64 rep + emit
+     endif
+     x 40 ==
+    until
+ loop
+ " \27\65\127\18\103" print
+
+
+ " Appuyez sur ENVOI pour commencer ..." line0
+ begin clavier 0 != until 0 clavier :=
+ "  " line0
+;
+
+
+
+: print_lives
+ " \31\88\65Lives " chaine :=
+ lives str chaine strcat
+ chaine print
+;
+
+
+: serpent_OO
+  " serpent OO" display
+  pastilles --
+  case
+    6 of x ++ endof
+    7 of y ++ endof
+    5 of x -- endof
+    3 of y -- endof
+   drop
+  endcase
+  add_liste
+  y x  locate
+  " @" print
+  suppr_liste
+  y1 x1 locate
+  32 emit
+  begin
+    longueur minlong >
+  while
+    suppr_liste
+    y1 x1 locate
+    32 emit
+  repeat
+  0 await :=
+;
+
+: serpent_0
+  " serpent 0" display
+  case
+    6 of x ++ endof
+    7 of y ++ endof
+    5 of x -- endof
+    3 of y -- endof
+   drop
+  endcase
+  add_liste
+  y x locate
+  " @" print
+  suppr_liste
+  y1 x1 locate
+  32 emit
+  0 await :=
+;
+
+: serpent_pt
+  " serpent pt" display
+
+  case
+    6 of x ++ endof
+    7 of y ++ endof
+    5 of x -- endof
+    3 of y -- endof
+   drop
+  endcase
+  add_liste
+  y x locate
+  " @" print
+  0 await :=
+;
+
+
+: serpent_o
+  " serpent o" display
+  case
+    6 of x ++ endof
+    7 of y ++ endof
+    5 of x -- endof
+    3 of y -- endof
+   drop
+  endcase
+  add_liste
+  y x locate
+  " @" print
+  suppr_liste
+  y1 x1 locate
+  32 emit
+  longueur minlong >
+  if
+    suppr_liste
+    y1 x1 locate
+    32 emit
+  endif
+  0 await :=
+;
+
+
+: game
+ 
+ 1 tableau :=
+ 5 lives :=
+ begin
+  lives 0 !=
+ while
+     0 first :=
+     0 last :=
+     
+     0 clavier :=
+     tableau load_tab
+     
+     print_lives
+
+     
+
+     0 longueur :=
+     1 x :=
+     22 y :=
+     begin
+      longueur minlong <
+     while
+         x ++
+         add_liste
+         y x locate
+         " @" print
+     repeat
+
+
+     " pt 1" display
+     
+
+     10 num :=
+     6 direction :=
+     0 fut_dir :=
+     0 await :=
+     0 niveau :=
+     0 sover :=
+
+     pastilles display
+     sover display
+
+
+     begin
+      pastilles 0 != sover 0 == &&
+     while
+         " pt 2" display
+         0 totime :=
+         timer oldtime :=
+         begin
+           totime num <
+         while
+             " pt 3" display
+             clavier 0 != fut_dir 0 != ||
+             if
+               fut_dir 0 !=
+               if
+                 fut_dir clavier :=
+               endif
+
+               clavier
+               case
+                1 of // retour menu
+                   0 clavier :=
+                   1 sover :=
+                   num totime :=
+                  endof
+                5 of // gauche
+                   0 clavier :=
+                   x 2 - y 1 - tab 127 !=
+                   if
+                    5 direction :=
+                    0 fut_dir :=
+                   else
+                    5 fut_dir :=
+                   endif
+                  endof
+                6 of // droite
+                   0 clavier :=
+                   x y 1 - tab 127 !=
+                   if
+                    6 direction :=
+                    0 fut_dir :=
+                   else
+                    6 fut_dir :=
+                   endif
+                  endof
+                3 of // haut
+                   0 clavier :=
+                   x 1 - y 2 - tab 127 !=
+                   if
+                    3 direction :=
+                    0 fut_dir :=
+                   else
+                    3 fut_dir :=
+                   endif
+                  endof
+                7 of // bas
+                   0 clavier :=
+                   x 1 - y tab 127 !=
+                   if
+                    7 direction :=
+                    0 fut_dir :=
+                   else
+                    7 fut_dir :=
+                   endif
+                  endof
+                drop
+               endcase
+             endif
+
+             timerf
+             niveau level > num 1 > &&
+             if
+              num --
+              0 niveau :=
+             endif
+         repeat
+
+         // faire avancer
+
+         " avancer ..." display
+         x display
+         y display
+         " val :" chaine := x y 1 - tab str chaine strcat chaine display
+         direction display
+
+         
+
+         direction
+         case
+           6 of // droite
+               " yeepee" display
+               x display
+               y display
+               x y 1 - tab display
+               x y 1 - tab
+               case
+                 0 of  // avance
+                     " avance ..." line0 beep
+                     direction serpent_0
+                   endof
+                 46 of  // grossit
+                     direction serpent_pt
+                    endof
+                 111 of  // diminue d'un
+                     direction serpent_o
+                    endof
+                 127 of  // mur => rien
+                      " mur !!!" display beep
+                      await ++
+                      0 fut_dir :=
+                      await maxwait >
+                      if
+                       2 sover :=
+                      endif
+                     endof
+                 79 of  // diminue au maximum ...
+                     direction serpent_OO
+                    endof
+
+                 // default serpent => dead ...
+                 " burp" display
+                 3 sover :=
+                drop
+               endcase
+             endof
+
+           5 of // gauche
+               x 2 - y 1 - tab
+               case
+                 0 of  // avance
+                     direction serpent_0
+                   endof
+                 46 of  // grossit
+                     direction serpent_pt
+                    endof
+                 111 of  // diminue d'un
+                     direction serpent_o
+                    endof
+                 127 of  // mur => rien
+                      await ++
+                      0 fut_dir :=
+                      await maxwait >
+                      if
+                       2 sover :=
+                      endif
+                     endof
+                 79 of  // diminue au maximum ...
+                     direction serpent_OO
+                    endof
+
+                 // default serpent => dead ...
+                 3 sover :=
+                drop
+               endcase
+             endof
+           7 of // bas
+               x 1 - y tab
+               case
+                 0 of  // avance
+                     direction serpent_0
+                   endof
+                 46 of  // grossit
+                     direction serpent_pt
+                    endof
+                 111 of  // diminue d'un
+                     direction serpent_o
+                    endof
+                 127 of  // mur => rien
+                      await ++
+                      0 fut_dir :=
+                      await maxwait >
+                      if
+                       2 sover :=
+                      endif
+                     endof
+                 79 of  // diminue au maximum ...
+                     direction serpent_OO
+                    endof
+
+                 // default serpent => dead ...
+                 3 sover :=
+                drop
+               endcase
+             endof
+           3 of // haut
+               x 1 - y 2 - tab
+               case
+                 0 of  // avance
+                     direction serpent_0
+                   endof
+                 46 of  // grossit
+                     direction serpent_pt
+                    endof
+                 111 of  // diminue d'un
+                     direction serpent_o
+                    endof
+                 127 of  // mur => rien
+                      await ++
+                      0 fut_dir :=
+                      await maxwait >
+                      if
+                       2 sover :=
+                      endif
+                     endof
+                 79 of  // diminue au maximum ...
+                     direction serpent_OO
+                    endof
+
+                 // default serpent => dead ...
+                 3 sover :=
+                drop
+               endcase
+             endof
+           " chiotte " display
+           drop
+         endcase
+     repeat
+
+     " pt 4" display
+
+
+     pastilles 0 !=
+     if
+       // perdu
+       begin
+         longueur 0 !=
+       while
+        suppr_liste
+        y1 x1 locate
+        32 emit
+       repeat
+
+       sover
+       case
+        1 of
+            1 lives :=
+          endof
+        2 of
+            " sbing.vtx" sendpage
+            begin clavier 0 != until 0 clavier :=
+          endof
+        3 of
+            " queue.vtx" sendpage
+            begin clavier 0 != until 0 clavier :=
+          endof
+        drop
+       endcase
+       lives --
+
+     else
+       // fin du tableau
+        " Gagn‚ !!! Appuyez une touche !" line0
+        begin clavier 0 != until 0 clavier :=
+        tableau maxtab <
+        if
+          tableau ++
+        else
+          1 tableau :=
+        endif
+     endif
+ repeat
+;
+
+
+: menu
+ 
+ game
+;
+
+
+
+
+: serpentmain
+  " serpento.vtx" sendpage
+  " %.0f" using
+  " serpent" dbopen
+  if
+    500 level :=
+    10 maxwait :=
+    5 minlong :=
+    6 maxtab :=
+    setlocalfkey fksommaire f_so
+    setlocalfkey fkannulation f_an
+    setlocalfkey fkretour f_re
+    setlocalfkey fkrepetition f_rep
+    setlocalfkey fkguide f_gu
+    setlocalfkey fkcorrection f_co
+    setlocalfkey fksuite f_su
+    setlocalfkey fkenvoi f_en
+    menu
+    " serpent" dbclose
+
+    " fin appli" line0
+    wait
+  else
+     " erreur DBOPEN SERPENT.DBF" line0
+  endif
+;
+
+
+: main
+ serpentmain
+;

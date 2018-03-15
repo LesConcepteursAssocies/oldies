@@ -1,0 +1,22 @@
+//
+: main
+   cls " test alias" print cr wait
+   " appsys" dbopen
+   if
+      " base " print dbselected print "  ouverte" print cr
+      " appsys" " mysys" dbsetalias
+      " base " print dbselected print "  ouverte" print cr
+      dbfieldcount print " champs " print cr
+      dbfieldcount 0
+      do
+         i 1 + dbnumfield->name print cr
+      loop
+//      " NOMAPP = " print " NOMAPP" dbfieldtype print
+//      " NOMAPP = " print " NOMAPP" dbfieldlen print
+      " mysys" dbclose
+   else
+      " ERREUR DBOPEN" line0
+   endif
+   wait
+;
+

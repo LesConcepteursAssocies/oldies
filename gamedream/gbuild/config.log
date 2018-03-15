@@ -1,0 +1,63 @@
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+configure:595: checking for a BSD compatible install
+configure:652: checking whether build environment is sane
+configure:709: checking whether make sets ${MAKE}
+configure:756: checking for working aclocal
+configure:769: checking for working autoconf
+configure:782: checking for working automake
+configure:795: checking for working autoheader
+configure:808: checking for working makeinfo
+configure:829: checking for gcc
+configure:942: checking whether the C compiler (gcc   ) works
+configure:958: gcc -o conftest    conftest.c  1>&5
+configure:984: checking whether the C compiler (gcc   ) is a cross-compiler
+configure:989: checking whether we are using GNU C
+configure:1017: checking whether gcc accepts -g
+configure:1049: checking for POSIXized ISC
+configure:1072: checking for gcc
+configure:1185: checking whether the C compiler (gcc -g -O2  ) works
+configure:1201: gcc -o conftest -g -O2   conftest.c  1>&5
+configure:1227: checking whether the C compiler (gcc -g -O2  ) is a cross-compiler
+configure:1232: checking whether we are using GNU C
+configure:1260: checking whether gcc accepts -g
+configure:1295: checking for gcc option to accept ANSI C
+configure:1376: checking for c++
+configure:1408: checking whether the C++ compiler (c++   ) works
+configure:1424: c++ -o conftest    conftest.C  1>&5
+configure:1450: checking whether the C++ compiler (c++   ) is a cross-compiler
+configure:1455: checking whether we are using GNU C++
+configure:1483: checking whether c++ accepts -g
+configure:1536: checking maximum warning verbosity option
+configure:1563: checking how to run the C preprocessor
+configure:1647: checking for X
+configure:1961: checking for dnet_ntoa in -ldnet
+configure:2002: checking for dnet_ntoa in -ldnet_stub
+configure:2050: checking for gethostbyname
+configure:2149: checking for connect
+configure:2242: checking for remove
+configure:2335: checking for shmat
+configure:2437: checking for IceConnectionNumber in -lICE
+configure:2531: checking for gtk-config
+configure:2566: checking for GTK - version >= 1.2.0
+configure:2667: gcc -o conftest -g -O2 -Wall -I/usr/include/gtk-1.2 -I/usr/include/glib-1.2 -I/usr/lib/glib/include -I/usr/X11R6/include   conftest.c -L/usr/lib -L/usr/X11R6/lib -lgtk -lgdk -rdynamic -lgmodule -lglib -ldl -lXi -lXext -lX11 -lm  1>&5
+configure:2791: checking for imlib-config
+configure:2826: checking for IMLIB - version >= 1.9.5
+configure:2888: gcc -o conftest -g -O2 -Wall -I/usr/include/gtk-1.2 -I/usr/include/glib-1.2 -I/usr/lib/glib/include -I/usr/X11R6/include -I/usr/X11R6/include   conftest.c  -L/usr/lib -lgdk_imlib -L/usr/lib -L/usr/X11R6/lib -lgtk -lgdk -rdynamic -lgmodule -lglib -ldl -lXi -lXext -lX11 -lm 1>&5
+configure: In function `main':
+configure:2875: warning: int format, double arg (arg 2)
+configure:2875: warning: int format, double arg (arg 3)
+configure:3001: checking for glBegin in -lMesaGL
+configure:3041: checking for glBegin in -lGL
+configure:3125: checking for GtkGLArea
+configure:3135: gcc -o conftest -g -O2 -Wall   conftest.c  -L/usr/lib -L/usr/X11R6/lib -lgtk -lgdk -rdynamic -lgmodule -lglib -ldl -lXi -lXext -lX11 -lm   -lglut -lMesaGLU -lMesaGL  -L/usr/X11R6/lib -lXi -lXmu -lpthread -lm  -lgtkgl 1>&5
+/usr/bin/ld: cannot find -lMesaGLU
+collect2: ld returned 1 exit status
+configure: failed program was:
+#line 3128 "configure"
+#include "confdefs.h"
+
+int main() {
+ char gtk_gl_area_new(); gtk_gl_area_new(); 
+; return 0; }

@@ -1,0 +1,21 @@
+//
+// test CR, EMIT, GETCURSORPOS
+//
+
+: main
+  " test (touche)" print
+  wait
+  getcursorpos
+  " Colonne = " PRINT PRINT
+  " ligne = " PRINT PRINT
+  " test CR " print
+  wait
+  cls
+  " premiäre ligne" print cr
+  " deuxiäme ligne" print
+  wait
+  " test emit" print wait
+  65 emit 66 emit 67 emit
+  wait
+;
+

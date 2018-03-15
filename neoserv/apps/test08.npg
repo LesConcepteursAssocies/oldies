@@ -1,0 +1,14 @@
+//
+// Test input
+//
+
+local char nom
+
+: main
+   cls " test input" print cr
+   " entrez votre nom " print
+   input nom :=
+   cr " bonjour " print nom print
+   wait
+;
+

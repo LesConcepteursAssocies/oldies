@@ -1,0 +1,9 @@
+//
+: main
+   cls
+  " test acquitements" print cr
+  " \27\57\127" print
+  data print cr
+  wait
+;
+

@@ -1,0 +1,21 @@
+// Test des couleurs
+
+: main
+        cls
+        " %0.f" using
+
+        7 0 do
+               7 0 do
+			0 setbackground
+			7 setcolor
+			i str print "   " print
+        j str print "   " print
+        i setbackground
+        j setcolor
+                       " TEST    " print cr
+
+                loop
+
+        loop
+        usingoff
+;

@@ -1,0 +1,112 @@
+                         Gestion de la m‚moire ‚tendue
+                         -----------------------------
+
+Ce programme permet de g‚rer la m‚moire ‚tendue (au dela des 640 Ko),
+respectant les sp‚cifications de la norme X.M.S.
+
+AVERTISSEMENT.
+--------------
+
+Ce type de m‚moire n'est g‚r‚e que par les machines de type AT
+(286 et au dela).
+
+PRINCIPE.
+---------
+
+Depuis l'avŠnement des interfaces graphiques (de type Windows 3), l'accŠs …
+la m‚moire situ‚e au dela des 640 Ko (et au dela du premier Mo adressable)
+est devenu possible, par l'interm‚diaire d'un driver (du genre HIMEM.SYS),
+charg‚ du pilotage de la broche A20 du bus d'adresse.
+
+En fait, cette m‚moire est g‚r‚e depuis plus longtemps, par l'interm‚diaire
+de diff‚rents utilitaires (du genre QEMM, 386MAX, ...), mais on avait beaucoup
+de mal … obtenir des renseignements sur la m‚thode d'accŠs.
+
+La norme XMS est depuis peu disponible, par le biais de Microsoft, dans sa
+version 2.0.
+
+GENERALITE
+----------
+
+Les æP … partir du 386, sont en th‚orie capables de g‚rer bien plus qu'1 Mo
+de m‚moire.
+Cette capacit‚ d'adressage est limit‚e pour des raisons de compatibilit‚.
+
+Le seul problŠme, c'est que ces Mo ne sont accessibles qu'en mode prot‚g‚,
+ce qui implique une programmation plus complexe.
+
+La gestion m‚moire … la norme X.M.S permet d'acc‚der (en ‚vitant au programme
+le passage en mode prot‚g‚), … la m‚moire situ‚ au dela des 640 Ko, et … la
+m‚moire ‚tendue ‚ventuellement install‚e sur la machine (au dela du premier
+Mo.) .
+
+Par une bizzarerie d'adressage, le premier segment (64 Ko) situ‚ aprŠs le
+premier Mo de m‚moire conventionnelle est accessible en mode r‚el.
+Ce segment est appel‚ High Memory Area (H.M.A). Ce segment peut contenir
+du code ‚x‚cutable.
+
+Le driver X.M.S diff‚rencie les diff‚rents blocs m‚moire accessibles :
+
+   - H.M.A : le segment pr‚c‚dement cit‚.
+   - U.M.B : Upper Memory Block. Ce sont les zones de m‚moire libres
+             situ‚ dans le premier Mo disponible, dans lesquels ont
+             peut placer du code ‚x‚cutable (ce que font les utilitaires
+             du genre de QEMM.SYS).
+   - E.M.B : Extended Memory Block. Ce sont les zones de m‚moire situ‚es
+             au dela du premier Mo.
+
+Un petit sch‚ma va r‚sumer tout ceci :
+
+            +------------------------+
+            |                        |   
+            |                        |   |
+            |                        |   |
+            |------------------------|   | eXtended Memory
+            |          E.M.B         |   |
+            |------------------------|   |
+            |                        |   |
+            |                        |   |
+            |                        | <-+
+            |------------------------|
+            |    HMA (64 Ko)         |
+            +========================+ <- 1 Mo
+            |                        |
+            |                        |
+            |                        |
+            |                        |
+            |------------------------|
+            |      U.M.B             |
+            |------------------------|
+            |                        |
+            +------------------------+ <-+
+            |                        |   |
+            |                        |   |
+            |                        |   |
+            |                        |   |
+            |                        |   |
+            |                        |   |  640 Ko
+            |                        |   |
+            |                        |   |
+            |                        |   |
+            |                        |   |
+            +------------------------+ <-+
+
+PRINCIPE D'ACCES AU DRIVER.
+---------------------------
+
+Le driver X.M.S utilise l'interruption 2Fh … son installation, et offre 2
+fonctions … travers celle-ci, une de d‚tection et une de r‚cup‚ration du
+point d'entr‚e.
+
+C'est en fait … travers ce point d'entr‚e que s'effectue tout le travail
+d'une application voulant utiliser la m‚moire ‚tendue.
+
+D'une fa‡on g‚n‚rale, on met un num‚ro de fonction dans le registre AH,
+on passe un certain nombre de paramŠtres, et on effectue un appel FAR au
+point d'entr‚e.
+Au retour, un code d'erreur est renvoy‚, si le registre AX est ‚gal … 0.
+
+NOTE: Pour plus de renseignements, la norme X.M.S, dans sa version 2.0,
+      est disponible auprŠs du service client de MICROSOFT.
+
+

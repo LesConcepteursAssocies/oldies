@@ -1,0 +1,380 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Free Software Foundation, Inc.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2000-03-17 08:48+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+#: src/GBmain.cc:47
+msgid "openGL n'est pas supporté par votre système\n"
+msgstr ""
+
+#: src/GBmainmenu.cc:74
+msgid "_Projet"
+msgstr ""
+
+#: src/GBmainmenu.cc:81
+msgid "Gestion d'un projet"
+msgstr ""
+
+#: src/GBmainmenu.cc:91
+msgid "_Nouveau..."
+msgstr ""
+
+#: src/GBmainmenu.cc:98
+msgid "Creation d'un nouveau projet"
+msgstr ""
+
+#: src/GBmainmenu.cc:102
+msgid "_Ouvrir..."
+msgstr ""
+
+#: src/GBmainmenu.cc:109
+msgid "Ouvre un projet existant"
+msgstr ""
+
+#: src/GBmainmenu.cc:113
+msgid "_Sauver"
+msgstr ""
+
+#: src/GBmainmenu.cc:120
+msgid "Sauve le projet courant"
+msgstr ""
+
+#: src/GBmainmenu.cc:124
+msgid "_Quitter"
+msgstr ""
+
+#: src/GBmainmenu.cc:131
+msgid "Fin du programme"
+msgstr ""
+
+#: src/GBmainmenu.cc:139
+msgid "_Objets"
+msgstr ""
+
+#: src/GBmainmenu.cc:146
+msgid "Gestion des objets"
+msgstr ""
+
+#: src/GBmainmenu.cc:156
+msgid "no_Uveau..."
+msgstr ""
+
+#: src/GBmainmenu.cc:163
+msgid "Insertion d'un nouvel objet"
+msgstr ""
+
+#: src/GBmainmenu.cc:167
+msgid "_Importer..."
+msgstr ""
+
+#: src/GBmainmenu.cc:174
+msgid "Importe un objet..."
+msgstr ""
+
+#: src/GBmainmenu.cc:182
+msgid "_Textures"
+msgstr ""
+
+#: src/GBmainmenu.cc:189
+msgid "Gestion des textures"
+msgstr ""
+
+#: src/GBmainmenu.cc:196
+msgid "o_Utils"
+msgstr ""
+
+#: src/GBmainmenu.cc:203
+msgid "Outils..."
+msgstr ""
+
+#: src/GBmainmenu.cc:213
+msgid "o_Ptions..."
+msgstr ""
+
+#: src/GBmainmenu.cc:220
+msgid "Options du projet courant"
+msgstr ""
+
+#: src/GBmainmenu.cc:224
+msgid "p_Aramètres..."
+msgstr ""
+
+#: src/GBmainmenu.cc:231
+msgid "Paramètres du projet courant"
+msgstr ""
+
+#: src/GBmainmenu.cc:239
+msgid "_Aide"
+msgstr ""
+
+#: src/GBmainmenu.cc:246
+msgid "Aide"
+msgstr ""
+
+#: src/GBmainmenu.cc:257
+msgid "_A propos..."
+msgstr ""
+
+#: src/GBmainmenu.cc:264
+msgid "A propos de gbuild..."
+msgstr ""
+
+#: src/GBmisc.cc:52
+#, c-format
+msgid "Widget non trouvé: %s"
+msgstr ""
+
+#: src/GBobjets.cc:228
+msgid "Importer un Objet"
+msgstr ""
+
+#: src/GBobjets.cc:240
+msgid "Sauver un Objet"
+msgstr ""
+
+#. Ajout des différents bouttons
+#: src/GBtoolbar.cc:41
+msgid "Quitter"
+msgstr ""
+
+#: src/GBtoolbar.cc:42
+msgid "Nouveau projet"
+msgstr ""
+
+#: src/GBtoolbar.cc:43
+msgid "Ouvrir un projet"
+msgstr ""
+
+#: src/GBtoolbar.cc:44
+msgid "Sauver le projet courant"
+msgstr ""
+
+#: src/GBtoolbar.cc:47
+msgid "Point de vue"
+msgstr ""
+
+#: src/GBtoolbar.cc:50
+msgid "Options du projet"
+msgstr ""
+
+#. Ajout des différents bouttons
+#: src/GBtoolbar.cc:73
+msgid "Cube"
+msgstr ""
+
+#: src/GBtoolbar.cc:74
+msgid "Cylindre"
+msgstr ""
+
+#: src/GBtoolbar.cc:75
+msgid "Cone"
+msgstr ""
+
+#: src/GBtoolbar.cc:76
+msgid "Sphère"
+msgstr ""
+
+#: src/GBtoolbar.cc:77
+msgid "Plan"
+msgstr ""
+
+#: src/GBtoolbar.cc:78
+msgid "Tore"
+msgstr ""
+
+#: src/GBtoolbar.cc:79
+msgid "Texte"
+msgstr ""
+
+#: src/GBtoolbar.cc:82
+msgid "Caméra"
+msgstr ""
+
+#: src/GBtoolbar.cc:83
+msgid "Lumière"
+msgstr ""
+
+#: src/GBwinmvt.cc:240
+msgid "Mouvements"
+msgstr ""
+
+#: src/GBwinmvt.cc:256
+msgid "champ de vision"
+msgstr ""
+
+#: src/GBwinmvt.cc:271
+msgid "angle du champ de vision"
+msgstr ""
+
+#: src/GBwinmvt.cc:274
+msgid "near"
+msgstr ""
+
+#: src/GBwinmvt.cc:291
+msgid "far"
+msgstr ""
+
+#: src/GBwinmvt.cc:308
+msgid "position"
+msgstr ""
+
+#: src/GBwinmvt.cc:322
+msgid "position en x de la caméra"
+msgstr ""
+
+#: src/GBwinmvt.cc:332
+msgid "position en y de la caméra"
+msgstr ""
+
+#: src/GBwinmvt.cc:342
+msgid "position en z de la caméra"
+msgstr ""
+
+#: src/GBwinmvt.cc:345
+msgid "référence"
+msgstr ""
+
+#: src/GBwinmvt.cc:360
+msgid "position en x du point de visée"
+msgstr ""
+
+#: src/GBwinmvt.cc:370
+msgid "position en y du point de visée"
+msgstr ""
+
+#: src/GBwinmvt.cc:380
+msgid "position en z du point de visée"
+msgstr ""
+
+#: src/GBwinmvt.cc:383
+msgid "fermer"
+msgstr ""
+
+#: src/GBwinmvt.cc:390
+msgid "ferme la fenêtre"
+msgstr ""
+
+#: src/GBwinmvt.cc:392 src/GBwinparam.cc:855
+msgid "défaut"
+msgstr ""
+
+#: src/GBwinmvt.cc:398
+msgid "réinitialise avec les valeurs par défaut"
+msgstr ""
+
+#: src/GBwinmvt.cc:400
+msgid "camera"
+msgstr ""
+
+#: src/GBwinmvt.cc:411
+msgid "oeil"
+msgstr ""
+
+#: src/GBwinmvt.cc:422
+msgid "scene"
+msgstr ""
+
+#: src/GBwinparam.cc:181
+msgid "Couleur de l'axe X"
+msgstr ""
+
+#: src/GBwinparam.cc:193
+msgid "Couleur de l'axe Y"
+msgstr ""
+
+#: src/GBwinparam.cc:205
+msgid "Couleur de l'axe Z"
+msgstr ""
+
+#: src/GBwinparam.cc:298
+msgid "Couleur de la grille X"
+msgstr ""
+
+#: src/GBwinparam.cc:310
+msgid "Couleur de la grille Y"
+msgstr ""
+
+#: src/GBwinparam.cc:322
+msgid "Couleur de la grille Z"
+msgstr ""
+
+#: src/GBwinparam.cc:486
+msgid "Options générales"
+msgstr ""
+
+#: src/GBwinparam.cc:502
+msgid "Visualisation des axes"
+msgstr ""
+
+#: src/GBwinparam.cc:519 src/GBwinparam.cc:646
+msgid "Z"
+msgstr ""
+
+#: src/GBwinparam.cc:526 src/GBwinparam.cc:639
+msgid "Y"
+msgstr ""
+
+#: src/GBwinparam.cc:533 src/GBwinparam.cc:632
+msgid "X"
+msgstr ""
+
+#: src/GBwinparam.cc:554 src/GBwinparam.cc:595 src/GBwinparam.cc:612
+#: src/GBwinparam.cc:793 src/GBwinparam.cc:810 src/GBwinparam.cc:827
+msgid "Choisissez une couleur..."
+msgstr ""
+
+#: src/GBwinparam.cc:557 src/GBwinparam.cc:565 src/GBwinparam.cc:573
+#: src/GBwinparam.cc:755 src/GBwinparam.cc:763 src/GBwinparam.cc:771
+msgid "couleur"
+msgstr ""
+
+#: src/GBwinparam.cc:615
+msgid "Visualisation des grilles"
+msgstr ""
+
+#: src/GBwinparam.cc:653 src/GBwinparam.cc:661 src/GBwinparam.cc:669
+msgid "taille"
+msgstr ""
+
+#: src/GBwinparam.cc:677 src/GBwinparam.cc:685 src/GBwinparam.cc:693
+msgid "pas"
+msgstr ""
+
+#: src/GBwinparam.cc:837
+msgid "Valider"
+msgstr ""
+
+#: src/GBwinparam.cc:844
+msgid "Valide les options choisies"
+msgstr ""
+
+#: src/GBwinparam.cc:846
+msgid "Annuler"
+msgstr ""
+
+#: src/GBwinparam.cc:853
+msgid "Annule les choix"
+msgstr ""
+
+#: src/GBwinparam.cc:862
+msgid "Réinitialise avec les valeurs par défaut"
+msgstr ""
+
+#: src/GBworld.cc:112
+msgid "Ouvrir un Projet"
+msgstr ""
+
+#: src/GBworld.cc:124
+msgid "Sauver un Projet"
+msgstr ""

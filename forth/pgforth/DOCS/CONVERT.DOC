@@ -1,0 +1,220 @@
+DIGIT              c base --- n flg
+                   Conversion d'un caractŠre c en un nombre
+                   dans la base courante base.
+
+                   D‚finition :
+                   LABEL FAIL
+                     EAX EAX SUB
+                     1PUSH
+
+                   CODE DIGIT  ( c base --- n flg )
+                     EDX POP
+                     EAX POP
+                     EAX PUSH
+                     ASCII 0 # AL SUB
+                     FAIL JB
+                     9 # AL CMP
+                     >
+                     IF
+                       17 # AL CMP
+                       FAIL JB
+                       7 # AL SUB
+                     THEN
+                     DL AL CMP
+                     FAIL JAE
+                     AL DL MOV
+                     EAX POP
+                     TRUE # EAX MOV
+                     2PUSH
+                   END-CODE
+
+CONVERT            u1 adr1 --- u2 adr2
+                   Conversion d'une chaine en un nombre.
+
+                   D‚finition :
+                    : CONVERT  ( u1 adr1 --- u2 adr2 )
+                      BEGIN
+                        4+ DUP >R C@
+                        IBASE @ DIGIT
+                      WHILE
+                        SWAP IBASE @ UM*
+                        DROP ROT IBASE @
+                        UM* D+ DOUBLE?
+                        IF
+                          DPL 1+!
+                        THEN
+                        R>
+                      REPEAT
+                      DROP R>
+                    ;
+
+(NUMBER)           adr --- d flag
+                   Conversion d'une chaine en un nombre double.
+
+                   D‚finition :
+                   : (NUMBER?)  ( adr --- d flag)
+                      0 0 ROT DUP 4+ C@
+                      ASCII - = DUP
+                      >R - -1 DPL !
+                      BEGIN
+                        CONVERT DUP C@
+                        ASCII , ASCII /
+                        BETWEEN
+                      WHILE
+                        0 DPL !
+                      REPEAT
+                      -ROT R>
+                      IF
+                        DNEGATE
+                      THEN
+                      ROT C@ BL =
+                   ;
+
+BOUNDS             adr long --- adr1 adr2
+                   Renvoi l'adresse de d‚but et de fin d'une chaine.
+
+                   D‚finition :
+                   CODE BOUNDS  ( adr long --- adr1 adr2)
+                     EBX POP
+                     EAX POP
+                     EAX EDX MOV
+                     EBX EDX ADD
+                     2PUSH
+                   END-CODE
+
+NUMBER?            adr --- d flag
+                   Conversion d'une chaine en un nombre double.
+
+                   D‚finition :
+                   : NUMBER?  ( adr --- d flag)
+                     FALSE OVER COUNT
+                     BOUNDS
+                     DO
+                       I C@ IBASE @
+                       DIGIT NIP
+                       IF
+                         DROP TRUE
+                         LEAVE
+                       THEN
+                     LOOP
+                     IF
+                       (NUMBER?)
+                     ELSE
+                       DROP 0 0
+                       FALSE
+                     THEN
+                   ;
+
+(NUMBER)           adr --- d
+                   Conversion d'une chaine en un nombre double.
+
+                   D‚finition :
+                   : (NUMBER)  ( adr --- d )
+                     NUMBER? NOT ?MISSING
+                   ;
+
+NUMBER             adr --- d
+                   Conversion d'une chaine en un nombre double.
+
+                   D‚finition :
+                   DEFER NUMBER
+                   ' (NUMBER) IS NUMBER
+
+HOLD               c ---
+                   Insertion d'un caractŠre pendant un formatage.
+                   Ce mot ne s'utilise qu'entre <# et #>.
+
+                   D‚finition :
+                   : HOLD  ( c --- )
+                     HLD 1-!
+                     HLD @ C!
+                   ;
+
+<#                 ---
+                   Initialisation du formattage d'un nombre, pour
+                   affichage.
+
+                   D‚finition :
+                   : <#  ( --- )
+                     PAD HLD !
+                   ;
+
+#>                 d --- adr n
+                   Fin du formattage d'un nombre, pour affichage.
+
+                   D‚finition :
+                   : #>  ( d --- adr n )
+                     2DROP HLD @
+                     PAD OVER -
+                   ;
+
+SIGN               n ---
+                   Insertion ‚ventuelle du signe du nombre en cours de
+                   formattage, si le nombre est n‚gatif.
+                   Ce mot ne s'utilise qu'entre <# et #>.
+
+                   D‚finition :
+                   : SIGN  ( n --- )
+                     0<
+                     IF
+                       ASCII - HOLD
+                     THEN
+                   ;
+
+#                  n1 --- n2
+                   Conversion d'un nombre en caractŠre ASCII.
+                   La conversion s'effectue en fonction de la base de sortie
+                   courante.
+                   Ce mot n'est utilisable qu'entre <# et #>.
+
+                   D‚finition :
+                   : #  ( n1 --- n2)
+                     OBASE @ MU/MOD
+                     ROT 9 OVER <
+                     IF
+                       7 +
+                     THEN
+                     ASCII 0 + HOLD
+                   ;
+
+#S                 d --- 0 0
+                   Formattage des n chiffres non nuls d'un nombre en texte, pour
+                   affichage.
+                   La conversion s'effectue en fonction de la base de sortie
+                   courante.
+                   Ce mot n'est utilisable qu'entre <# et #>.
+
+                   D‚finition :
+                   : #S  ( d --- 0 0 )
+                     BEGIN
+                       # 2DUP OR 0=
+                     UNTIL
+                   ;
+
+(.)                n ---
+                   Affichage d'un entier.
+
+                   D‚finition :
+                   : (.)  ( n --- adr n )
+                     DUP ABS 0
+                     <# #S ROT SIGN #>
+                   ;
+
+.                  n ---
+                   Affichage d'un entier.
+
+                   D‚finition :
+                   : .  ( n --- )
+                     (.) TYPE SPACE
+                   ;
+
+.R                 int n ---
+                   Affiche l'entier int cadr‚ … droite sur n chiffres,
+                   compl‚t‚s ‚ventuellement avec des espaces.
+
+                   D‚finition :
+                   : .R  ( int n --- )
+                     >R (.) R>
+                     OVER - SPACES TYPE
+                   ;
+

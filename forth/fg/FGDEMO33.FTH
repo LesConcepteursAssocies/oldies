@@ -1,0 +1,45 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+DECIMAL
+
+4 CONSTANT FGPAGES
+
+VARIABLE OLDMODE
+VARIABLE ACTIVE
+VARIABLE VISUAL
+VARIABLE PAGE0
+VARIABLE PAGE1
+
+: FGDEMO33 ( --- )
+   FASTGRAPH?
+   IF
+      FGGETMODE OLDMODE !
+      4 FGSETMODE
+      1 FGALLOCATE DROP
+      1 FGSETPAGE
+      FGGETPAGE ACTIVE !
+      FGGETVPAGE VISUAL !
+      0 FGSETPAGE
+      FGGETADDR PAGE0 !
+      1 FGSETPAGE
+      FGGETADDR PAGE1 !
+      1 FGFREEPAGE DROP
+      OLDMODE @ FGSETMODE
+      FGRESET
+      1 FGCURSOR
+      CR ." Page Active    = " ACTIVE @ .
+      CR ." Page Virtuelle = " VISUAL @ .
+      CR ." Adresse de la page 0 = " PAGE0 @ U.
+      CR ." Adresse de la page 1 = " PAGE1 @ U.
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

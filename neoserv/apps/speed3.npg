@@ -1,0 +1,56 @@
+// Test d'affectation de donn‚es dans une matrice 2D puis affichage
+
+PUBLIC CHAR[] 11 11 Tab1
+
+: main
+
+	// Affectation de la matrice
+
+	cls
+	12 1 locate
+	" Initialisation de la matrice : " print TIME print
+	11 0  // Lignes
+	do
+		11 0  // Colonnes
+		do
+			" X" j i Tab1 :=
+		loop
+	loop
+
+	// Affectation de valeur
+
+	13 1 locate
+	" Affectation de valeur        : " print TIME print
+
+	" 1" 5 2 Tab1 :=
+	" 1" 5 3 Tab1 :=
+	" 1" 5 4 Tab1 :=
+	" 1" 5 5 Tab1 :=
+
+	// Affichage
+
+	14 1 locate
+	" Affichage de la matrice      : " print TIME print
+
+	11 0
+	do
+		11 0
+		do
+			j 1 + i 1 + locate
+			j i Tab1 print
+		loop
+	loop
+
+	15 1 locate
+	" Fin                          : " print TIME print
+	wait
+
+;
+
+// Ca met 25 secondes sur mon 486DX 33 SCSI 800 Mo VLBUS 
+// QEMM SMARTDRV pur monstre
+// et je me prend une GPF de type 12 kanjekite NeoServ 
+// avec le message heap corrupted...
+
+// Vivement le tri-pentium ...
+

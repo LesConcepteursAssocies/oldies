@@ -1,0 +1,700 @@
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+// JEUX                                                                      //
+// Module principal (permet le lancement des jeux par menu)                  //
+//                                                                           //
+// Date de cration     : 13/01/95                                           //
+// Date de Mise … jour  : 30/05/95                                           //
+//                                                                           //
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+
+#PATHVTX jeux\VTX
+#PATHDBF jeux
+
+// intgration des modules
+#use modules\balgp\balgp
+#use modules\quizz\quizz
+#use modules\arbo\arbo
+
+// Code du MeloChiffre
+#use jeux\m
+
+// Code du dmineur
+#use jeux\d
+
+// Code du Bombardier
+#use jeux\b1bomber
+
+// Code de la bataille navale
+#use jeux\nav
+
+// Code du serpent
+#use jeux\serpent
+
+// Code du Pachinko
+#use jeux\pachinko
+
+// Code des petites annonces
+#use modules\pagp\pagp
+
+
+LOCAL
+     NUMBER ArboNbChoix := 1
+     NUMBER Clavier
+     NUMBER Res := 0
+     NUMBER Tmp := 0
+     NUMBER InGame
+
+     CHAR Acces3614 := " "
+     CHAR iPseudo := " "
+     CHAR iPasse := " "
+     CHAR Msg := " "
+     CHAR NomGame := " "
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Ouverture des fichiers de l'application }
+//
+: Init
+
+     " jeux" DbOpen
+     if
+          " CODEPAGE" DbSetIndex
+     else
+          " 01 - Incident de service" Line0
+     endif
+
+     // { Ouverture de la base des chronomtres }
+     " CHRONO" DbOpen
+     !
+     if
+          " 02 - Incident de service" Line0
+          wait
+     endif
+
+     clear0
+     " jeux" DbSelect
+
+     FALSE InGame :=
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage des informations Editeur
+//
+: Editeur
+
+     EmptyLocalFkeyTable
+     " modules\pages\Editeur.vtx" SendPage
+     1 Arbo.MyArbo :=
+     wait
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion de la touche ENVOI
+//
+: Envoi
+
+     1 Clavier :=
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion de la touche SUITE
+//
+: Suite
+
+     2 Clavier :=
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion de la touche SOMMAIRE
+//
+: Sommaire
+
+     4 Clavier :=
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion de la touche RETOUR
+//
+: Retour
+
+     3 Clavier :=
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Position du curseur dans les menus }
+//
+: PosCursor
+
+    22   Arbo.XcursorPos :=
+    19   Arbo.YcursorPos :=
+    TRUE Arbo.CursorActive :=
+    TRUE Arbo.CursorVisible :=
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Saisie du Pseudo et du mot de passe
+//
+: Pseudo
+
+     EmptyLocalFkeyTable
+     balgp::menugen
+
+     balgp.pseudo empty? !
+     if
+       balgp.pseudo iPseudo :=
+     endif
+
+     balgp.pswd   empty? !
+     if
+       balgp.pseudo iPasse :=
+     endif
+
+     CursorOn
+     " Bonjour " Msg :=
+
+     iPseudo empty? !
+     if
+       balgp.pseudo Msg StrCat
+     endif
+
+     Msg Line0
+     1 Arbo.MyArbo :=
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affectation des touches de fonctions
+//
+: AffectTouches
+
+     setlocalfkey FKGUIDE Editeur
+     setlocalfkey FKSOMMAIRE Sommaire
+     setlocalfkey FKRETOUR Retour
+     setlocalfkey FKENVOI Envoi
+     setlocalfkey FKSUITE Suite
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Rinitialisation des touches de fonctions … leur valeur par dfaut }
+//
+: DefautTouches
+
+     EmptyLocalFkeyTable
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Affichage de la page dsol }
+//
+: Desole
+
+     " Desole.vtx" Sendpage
+     5000 delay
+     10 Arbo.MyArbo /=
+     Arbo.MyArbo Int Arbo.MyArbo :=
+     cls
+     " BdxBas.vtx" SendPage
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Boucle principale de traitement }
+//
+: run
+     1 arbo::arbo
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Ecriture de la date et heure systme d'un module
+//   Paramtres : Nom du module }
+//
+: EcritCNX
+
+     dup
+     NomGame :=
+     " CHRONO" DbSelect
+     DbAppendBlank
+               " NOMAPP"   DbReplace
+     NumCv     " NUMCV"    DbReplace
+     Palier    " PALIER"   DbReplace
+     Date      " DATECNX"  DbReplace
+     Time      " HEURECNX" DbReplace
+     " Entre" " TYPE"     DbReplace
+     TRUE InGame :=
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Ecriture de la date et heure d'accs … un module
+// Paramtre : Nom du module }
+//
+: EcritDCNX     // nom ---
+
+     " CHRONO" DbSelect
+     DbAppendBlank
+               " NOMAPP"   DbReplace
+     NumCv     " NUMCV"    DbReplace
+     Palier    " PALIER"   DbReplace
+     Date      " DATECNX"  DbReplace
+     Time      " HEURECNX" DbReplace
+     " Sortie" " TYPE"     DbReplace
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Retour … jeux aprs excution d'un jeu }
+//
+: Retourjeux
+
+     " jeux" dbselect
+     " CODEPAGE" dbsetindex
+     cls
+     clear0
+     AffectTouches
+
+     1 Arbo.MyArbo !=
+     if
+          10 Arbo.MyArbo /=
+          Arbo.MyArbo Int Arbo.MyArbo :=
+          " BDXHAUT.VTX" SendPage
+          " BDXBAS.VTX" SendPage
+
+     endif
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Procedure de dmarrage du MeloChiffre }
+//
+: RunMeloChiffres
+
+     EmptyLocalFkeyTable
+
+     balgp.pseudo empty?
+     if
+          balgp::accesbal
+          balgp.pseudo iPseudo :=
+          balgp.pswd   iPasse  :=
+
+     endif
+
+     balgp.pseudo empty? !
+     if
+       " Entre dans le MeloChiffres" Display
+       " MeloChiffres" EcritCNX
+       m::MeloMain
+       " MeloChiffres" EcritDCNX
+
+     endif
+
+     Retourjeux
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Procedure de dmarrage du Dmineur }
+//
+: RunDemin
+
+     EmptyLocalFkeyTable
+
+     balgp.pseudo empty?
+
+     if
+          balgp::accesbal
+          balgp.pseudo iPseudo :=
+          balgp.pswd   iPasse  :=
+     endif
+
+     balgp.pseudo empty? !
+     if
+       " Entre dans le dmineur" Display
+       " Dmineur" EcritCNX
+       D::DeminMain
+       " Dmineur" EcritDCNX
+
+     endif
+
+     Retourjeux
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Procedure de dmarrage du Bombardier }
+//
+: RunBomber
+
+     EmptyLocalFkeyTable
+     balgp.pseudo empty?
+     if
+          balgp::accesbal
+          balgp.pseudo iPseudo :=
+          balgp.pswd   iPasse  :=
+
+     endif
+
+     balgp.pseudo empty? !
+     if
+       " Entre dans le bombardier" Display
+       " Bombardier" EcritCNX
+       B1BOMBER::B1BomberMain
+       " Bombardier" EcritDCNX
+
+     endif
+
+     Retourjeux
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Procedure de dmarrage de la bataille navale }
+//
+: RunNav
+
+     EmptyLocalFkeyTable
+     balgp.pseudo empty?
+
+     if
+       balgp::accesbal
+       balgp.pseudo iPseudo :=
+       balgp.pswd   iPasse  :=
+
+     endif
+
+     balgp.pseudo empty? !
+     if
+       " Entre dans la Bataille Navale" Display
+       " Bataille Navale" EcritCNX
+       nav::NavMain
+       " Bataille Navale" EcritDCNX
+       Retourjeux
+
+     endif
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Procedure de dmarrage du serpent }
+//
+: RunSerpent
+
+   EmptyLocalFkeyTable
+   balgp.pseudo empty?
+   if
+     balgp::accesbal
+     balgp.pseudo iPseudo :=
+     balgp.pswd   iPasse  :=
+
+   endif
+
+   balgp.pseudo empty? !
+   if
+
+     " Serpent" Display
+     " Serpent" EcritCNX
+     Serpent::SerpentMain
+     " Serpent" EcritDCNX
+
+   endif
+
+   Retourjeux
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Procedure de dmarrage du Ttris }
+//
+: RunTetris
+
+   EmptyLocalFkeyTable
+   balgp.pseudo empty?
+   if
+     balgp::accesbal
+     balgp.pseudo iPseudo :=
+     balgp.pswd   iPasse  :=
+
+   endif
+
+   balgp.pseudo empty? !
+   if
+
+     " Ttris" Display
+     " Tetris" EcritCNX
+     " Tetris" EcritDCNX
+
+   endif
+
+   Retourjeux
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Procedure de dmarrage du quizz }
+//
+: RunQuizz
+
+     EmptyLocalFkeyTable
+
+     " Entre dans le Quizz" Display
+     " QUIZZ" EcritCNX
+     Quizz::MenuGen
+     " QUIZZ" EcritDCNX
+     Retourjeux
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Procedure de dmarrage du Pachinko }
+//
+: RunPachinko
+
+   EmptyLocalFkeyTable
+   balgp.pseudo empty?
+   if
+     balgp::accesbal
+     balgp.pseudo iPseudo :=
+     balgp.pswd   iPasse  :=
+
+   endif
+
+   balgp.pseudo empty? !
+   if
+     " Entre dans le Pachinko" Display
+     " PACHINKO" EcritCNX
+     Pachinko::PachinkoMain
+     " PACHINKO" EcritDCNX
+     Retourjeux
+
+   endif
+
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Suggestions
+//
+: RunSuggest
+
+     EmptyLocalFkeyTable
+     balgp.pseudo empty?
+     if
+
+       balgp::accesbal
+       balgp.pseudo iPseudo :=
+       balgp.pswd   iPasse  :=
+
+     endif
+
+     balgp.pseudo empty? !
+     if
+       cursoroff
+       " MODULES\BALGP\BDXECMSG.VTX" sendpage
+       cursoron
+       balgp::openbase
+       app balgp.pseudodest :=
+       " MESSAGES" dbselect
+       " DESTINA" dbsetindex
+       false balgp::EcrireMsg
+
+     endif
+
+     Retourjeux
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Lancement des petites annonces
+//
+: RunPA
+
+   EmptyLocalFkeyTable
+   app pagp.FiltreService :=
+   pagp::menugen
+   Retourjeux
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Affichage de l'intro }
+//
+: Intro
+
+     cls
+     setlocalfkey fkguide Editeur
+     "                               " Line0
+     " jeux.VTX" SendPage
+     wait
+;
+
+: Done
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Accs restreint }
+//
+: AccesT2  // --- b
+   1
+   " ACCEST2.VTX" sendpage
+   cursoron
+
+   begin
+        16 32 locate fdheight setfont
+        Acces3614 InputVar
+        Acces3614 alltrim display
+        Acces3614 alltrim " FORTH" ==
+        if
+         " OK" line0
+         drop true dup
+
+         else
+             1 + dup 3 >
+             if
+               " Fin de communication" line0
+
+               // Dconnexion
+               " \27\57\103" print
+               false
+
+             else
+
+                 false
+
+             endif
+
+         endif
+
+   until
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Procdure principale }
+//
+: Main
+
+     true balgp.bSaiCoord :=
+     cls
+     setlocalkeyword *BB RunBomber
+     Init
+     palier 99 !=
+     if
+          palier 82 ==
+          if
+               // { Accs 3614 }
+            AccesT2
+            if
+              Intro
+              AffectTouches
+              Run
+              Done
+        
+             endif
+
+          else
+
+               // { Accs 3615 }
+               Intro
+               AffectTouches
+               Run
+               Done
+
+          endif
+
+     else
+
+          // { Accs local }
+          AffectTouches
+          Run
+          Done
+
+     endif
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Procdure de dconnexion }
+//
+: Onlib
+
+   InGame
+   if
+     // { Ouverture de la base des chronos de jeu }
+
+     " CHRONO" DbOpen
+     if
+       NomGame EcritDCNX
+
+     endif
+
+     " CHRONO" DbClose
+
+   endif
+
+;

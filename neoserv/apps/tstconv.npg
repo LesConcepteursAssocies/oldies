@@ -1,0 +1,38 @@
+//
+// test encodage/d‚codage
+//
+local char ctest := "CHAINE TEST (€‚ƒ„…†‡Y‰Š) FIN"
+
+: main
+   cls
+   " test encode/d‚code" print cr
+   wait
+   " ----- XXENCODE/XXDECODE" print cr
+   ctest print cr
+   ctest dup strlen xxencode
+   over over " len=" print print cr
+   print cr
+   xxdecode
+   " len =" print print cr
+   print cr
+   wait
+   " ----- UUENCODE/UUDECODE" print cr
+   ctest print cr
+   ctest dup strlen uuencode
+   over over " len=" print print cr
+   print cr
+   uudecode
+   " len =" print print cr
+   print cr
+   wait
+   " ----- B8->7/B7->8" print cr
+   ctest print cr
+   ctest dup strlen b8->7
+   over over " len=" print print cr
+   print cr
+   b7->8
+   " len =" print print cr
+   print cr
+   wait
+;
+

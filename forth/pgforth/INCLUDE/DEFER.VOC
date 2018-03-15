@@ -1,0 +1,83 @@
+\ ------------------------------------------------------------------------------
+\                     Initialisation des Vecteurs FORTH.
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement et initialisation des VECTEURS )
+
+\ Restitution de la pile de donn‚es, fermeture des fichiers,
+\ r‚assignation du clavier et retour au mode interpr‚tation.
+: (ABORT)  ( --- )
+  SP0 @ SP!
+  ALLCLOSE
+  HANDLE OFF
+  QUIT
+;
+
+' (ABORT) IS ABORT
+
+\ Affichage du statut du systŠme si la variable STATUS? est … ON.
+: (STATUS)  ( --- )
+  CR STATUS? @
+  IF
+    OBASE @ IBASE @
+    OBASE DECIMAL
+    ." Pointeur de pile SP = "
+    DEPTH 2- . CR
+    ." Pointeur de pile RP = "
+    RDEPTH 1- . CR
+    2DUP 2 0
+    DO
+      I
+      IF
+        ." Base de sortie "
+      ELSE
+        ." Base d' entr‚e "
+      THEN
+      DUP 2 = 
+      IF
+        ." binaire"
+      ELSE
+        DUP 8 =
+        IF
+          ." octale"
+        ELSE
+          DUP 10 =
+          IF
+            ." d‚cimale"
+          ELSE
+            DUP 16 =
+            IF
+              ." hexad‚cimale"
+            ELSE
+              DUP .
+            THEN
+          THEN
+        THEN
+      THEN
+      CR DROP
+    LOOP
+    IBASE ! OBASE !
+  THEN
+;
+
+' (STATUS) IS STATUS
+
+\ Initialisation des vecteurs correspondants aux codes de touches.
+\ Correspond … l'action du switch d'impression (CTRL+P).
+: P-IN
+  PRINTING @ NOT
+  PRINTING !
+;
+
+\ R‚initialisation du systŠme FORTH.
+: RES-IN
+  FORTH TRUE
+  ABORT" Initialisation"
+;
+
+' RES-IN  C-C-F 6 + !
+' P-IN    C-C-F 32 + !
+
+EOF
+
+

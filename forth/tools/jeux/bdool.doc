@@ -1,0 +1,84 @@
+                             Jeu d'arcade "BDOOL"
+                             --------------------
+
+PRESENTATION.
+-------------
+
+Ce programme est une version personnelle de l'arch‚type des jeux d'arcades,
+o— un personnage doit ‚voluer dans divers labyrinthes de complexit‚ croissante,
+en avalant au passage des points d'‚nergie pour survivre, tout en s'efforcant
+d'‚chapper … la voracit‚ de deux monstres ayant pour nom BOBY et DOOLY.
+
+AVERTISSEMENT
+-------------
+
+Une carte de type C.G.A est n‚c‚ssaire … l'‚x‚cution du programme.
+
+FONCTIONNEMENT DU PROGRAMME.
+----------------------------
+
+Affichage des lutins.
+---------------------
+
+Chaque d‚finition de lutin est compos‚e alternativement des lignes paires et
+impaires. La routine d'affichage devra donc proc‚der en deux temps,
+en affichant d'abord la ligne paire, puis la ligne impaire, la position
+d'affichage se calculant de la fa‡on suivante
+(X repr‚sente un num‚ro de colonne, Y un num‚ro de ligne) :
+
+          0B800h:X*4+Y*640     pour les lignes paires.
+    0B800h+2000h:X*4+Y*640     pour les lignes impaires.
+
+Conception des niveaux de jeu.
+------------------------------
+
+Sept lutins sont n‚c‚ssaires pour repr‚senter chaque personnage du jeu.
+La routine de cr‚ation des lutins r‚serve l'espace n‚c‚ssaire au stockage des
+d‚finitions, chacun de ces lutins ‚tant accessible par l'interm‚diaire de son
+num‚ro d'ordre (le premier ayant le num‚ro 0).
+
+Le programme utilise un ‚cran virtuel de travail, de taille identique … l'‚cran
+r‚el, dans lequel sont stock‚s les num‚ros des lutins correspondants au niveau
+courant. Les personnages du jeu se d‚placent dans cet ‚cran virtuel.
+
+Les labyrinthes des diff‚rents niveaux sont con‡us comme autant de mots FORTH,
+l'ensemble de leurs C.F.A ‚tant rassembl‚ dans une zone m‚moire, dont l'accŠs
+s'effectue par l'interm‚diaire du mot SELECT-LAB.
+
+Principe de fonctionnement.
+---------------------------
+
+AprŠs les diverses initialisations, Le personnage du joueur est plac‚ … peu
+prŠs au milieu du premier niveau, et le jeu commence. Les d‚placements
+s'effectuent au moyen des touches fl‚ch‚es.
+
+AprŠs s'ˆtre occup‚ des mouvements du joueur, on s'occupe de ceux des monstres.
+Pour chacun d'eux, une direction est prise de fa‡on al‚atoire, puis quelques
+tests sont effectu‚s afin de v‚rifier que la nouvelle direction prise est
+valable. Quand le joueur fait une "mauvaise rencontre", il perd une vie.
+
+Am‚liorations et extensions envisageables.
+------------------------------------------
+
+Beaucoup d'am‚liorations et d'extensions peuvent ˆtre ajout‚es au programme :
+
+- SON : Une petite musique d'accompagnement peut ˆtre ajout‚e (pour faire "plus
+        vrai"), ainsi qu'un son correspondant … chaque action du personnage ou
+        des monstres. Cette animation sonore pourrait ˆtre g‚r‚e par une
+        interruption (l'interruption 28, ‚x‚cut‚e 18,2 fois par seconde,
+        par exemple), afin d'ˆtre continue.
+
+- CLAVIER : La plupart des jeux d'arcade red‚finissent l'interruption de gestion
+            du clavier, afin de supprimer le tampon (buffer) de celui-ci,
+            de fa‡on … rendre les mouvements des personnages plus instantann‚s.
+
+- MONSTRES : Les routines de gestion des mouvements de nos deux compŠres ont
+             volontairement ‚t‚ scind‚es en deux mots distincts, afin de pouvoir
+             les personnaliser (rendre leur comportement variable en fonction
+             du niveau courant, par exemple).
+
+- JEU : Le nombre de niveau peut ˆtre augment‚ dans la limite de la m‚moire
+        disponible, et l'on peut ajouter divers objets … collecter, ainsi que
+        de nouveaux monstres, pour rendre la partie plus difficile.
+
+

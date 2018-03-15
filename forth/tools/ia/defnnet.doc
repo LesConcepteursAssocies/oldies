@@ -1,0 +1,259 @@
+                 D‚finisseur de R‚seaux de Neurones Dynamiques
+                 ---------------------------------------------
+
+Ce programme est un outil exp‚rimental qui permet de d‚finir et de tester
+des r‚seaux de neurones.
+
+HISTORIQUE.
+-----------
+
+Sous le vocable "r‚seaux de neurones", est regroup‚ aujourd'hui un certain
+nombre de modŠles dont le but est d'imiter certains processus du cerveau
+humain, en reproduisant certaine de ces structures de base.
+
+FONDEMENTS BIOLOGIQUES
+----------------------
+
+Un neurone est constitu‚ des ‚l‚ments suivants :
+
+  - Un corps cellulaire.
+    Contient le noyau du neurone et effectue les transformations
+    n‚c‚ssaires … la synthŠse des diff‚rents enzymes qui assurent
+    la vie du neurone.
+
+  - Des dendrites.
+    Ce sont de fines extensions tubulaires de quelques microns de
+    diamŠtre, et sont utilis‚es pour recevoir les signaux chimiques
+    en provenance des autres neurones.
+
+  - Un axone.
+    Se distingue des dendrites par sa longueur, et sert … l'envoi
+    d'informations vers les autres neurones.
+
+Pour former le systŠme nerveux, les neurones sont interconnect‚s les uns
+aux autres de fa‡on complexe. Ces connexions s'effectuent en des endroits
+appel‚s synapses.
+
+MODELISATION GENERALE
+---------------------
+
+Les premiŠres tentatives de mod‚lisation remontent aux ann‚es 43, … l'initiative
+de Mac Culloch et Pitts.
+
+Un neurone formel est caract‚ris‚ par certaines propri‚t‚s :
+
+  - Un certain nombre d'entr‚s (correspondants aux dendrites du neurone
+    biologique)
+  - Des paramŠtres de pond‚ration (les poids des diff‚rentes connexions),
+    qui permettent de mod‚liser les synapses.
+  - Une sortie (correspondant … l'axone du neurone biologique) 
+  - Une fonction d'activation
+
+Le principe d'un tel neurone, tel que l'ont ‚nonc‚s Mac Culloch et Pitts, est
+le suivant :
+
+Le neurone formel fait la somme pond‚r‚e des potentiels d'action qui lui
+parviennent (chacun de ces potentiels ‚tant une valeur num‚rique transmise
+par le neurone connect‚), puis s'active suivant la valeur de cette somme
+pond‚r‚e.
+
+MODELISATION DANS DEFNNET
+-------------------------
+
+Dans le programme, un neurone est mod‚lis‚ par une structure de 12 octets, avec
+la description suivante :
+
+  - Un pointeur sur le vecteur des entr‚es du neurone (appel‚ EI).
+    Si ce vecteur est ‚gal … NIL, alors l'entr‚e est stock‚e dans le mot E.
+  - Un pointeur sur le vecteur des poids (synapses) des connexions
+    (appel‚ WIJ).
+    Si le vecteur EI est ‚gal … NIL, ce vecteur contient lui aussi NIL.
+  - Un pointeur sur la fonction d'entr‚e (appel‚ H).
+    Cette fonction est en g‚n‚ral appliqu‚e au vecteur des entr‚es, ainsi
+    qu'au vecteur des poids.
+  - Un mot appel‚ E, qui contient le r‚sultat de la fonction H, ou l'entr‚e
+    du neurone, dans le cas ou celle-ci est unique (vecteurs EI et WIJ = NIL).
+  - Un pointeur sur la fonction d'activation du neurone, appel‚ A.
+    Cette fonction est g‚n‚ralement une fonction de E.
+  - Un mot appel‚ S, qui contient le r‚sultat de la fonction A.
+    C'est la sortie du neurone.
+
+Les deux vecteurs EI et WIJ sont en fait des listes chain‚es (utilisation
+du programme LIST.FTH) particuliŠres, en ce sens qu'elles n'ont pas de
+tˆte de liste, ce qui permet de faire varier dynamiquement les connexions du
+r‚seau.
+
+Un petit sch‚ma va r‚sumer tout ceci :
+
+               Neurone Formel
+
+       +----+-----+---+---+---+---+
+       | EI | WIJ | H | E | A | S |
+       +----+-----+---+---+---+---+
+         |     |
+         |     |
+         |     
+         |     Liste chain‚e des poids
+         |     
+         |     
+         
+         Liste chain‚e des entr‚es.
+
+Chaque ‚l‚ment du vecteur d'entr‚e est un pointeur sur le mot S du neurone
+connect‚.
+
+Exemple : consid‚rons un r‚seau de 2 neurones complŠtement connect‚s.
+
+ N1                          N2
++----+-----+---+---+---+---++----+-----+---+---+---+---+
+| EI | WIJ | H | E | A | S || EI | WIJ | H | E | A | S |
++----+-----+---+---+---+---++----+-----+---+---+---+---+
+  |     |                     |     |                  
+  |                          |                       
+  |     +---+-------+         |     +---+-------+
+  |     |   | Poids |         |     |   | Poids |
+  |     +---+-------+         |     +---+-------+
+  |       |                   |       |                 
+  |       +---->+---+-------+ |       +---->+---+-------+
+  |             |NIL| Poids | |             |NIL| Poids |
+               +---+-------+              +---+-------+
+  +---+------+                +---+------+
+  |   | N1.S |                |   | N2.S |
+  +---+------+                +---+------+
+    |                           |
+    +---->+---+------+          +---->+---+------+
+          |NIL| N2.S |                |NIL| N1.S |
+          +---+------+                +---+------+
+
+ROLE ET DETAIL DES CHAMPS
+-------------------------
+
+Chaque champ d'un neurone formel … la fonction suivante :
+
+- Champ EI :
+  ----------
+  Comme nous l'avont vu, ce champ pointe sur une liste chain‚e dont chaque
+  ‚l‚ment pointe sur la sortie du neurone connect‚.
+  Les entr‚es peuvent ˆtre :
+    - Binaires : (-1,+1) ou (0,1)
+    - r‚elles
+  Ceci permet de mod‚liser les dendrites du neurone biologique.
+  En utilisant le principe de la liste chain‚e, il est possible de connecter
+  un neurone … un nombre non fini d'autres neurones, le nombre de connexions
+  n'‚tant limit‚ que par l'espace m‚moire disponible.
+  Ce champ peut ˆtre vide (NIL) dans le cas o— le neurone ne possŠde qu'une
+  entr‚e unique (ce qui est g‚n‚ralement le cas quand la couche correspondante
+  est la couche d'entr‚e, sur laquelle est appliqu‚ le signal … traiter).
+
+- Champ WIJ :
+  -----------
+  Ce champ pointe lui aussi sur une liste chain‚e, dont chaque ‚l‚ment contient
+  ce qu'il est convenu d'appeler le "poids" de la connection entre
+  deux neurones.
+  Ce poids permet de mod‚liser les synapses.
+  A chaque ‚l‚ment du vecteur EI doit correspondre un ‚l‚ment dans le vecteur
+  WIJ.
+  C'est en modifiant les valeurs de ce vecteur qu'il est possible de formaliser
+  de diff‚rentes fa‡ons le processus d'apprentissage d'un r‚seau.
+  Si le neurone ne possŠde qu'une unique entr‚e, ce champ peut ˆtre vide (NIL).
+
+- Champ H :
+  ---------
+  Ce champ pointe sur la fonction d'entr‚e du neurone.
+  Cette fonction, qui est appliqu‚e en g‚n‚ral sur les vecteurs d'entr‚es et
+  de poids, peut ˆtre :
+    - Bool‚enne
+    - lin‚aire, de la forme : H(e1..en) = äi=1..n Wi.ei
+    - affine, de la forme : H(e1..en) = äi=1..n Wi.ei-a
+    (ces deux derniers cas sont les plus fr‚quents)
+    - polynomiale de degr‚ sup‚rieur … 2.
+  Dans le cas d'une entr‚e unique, la fonction H peut ˆtre consid‚r‚e comme la
+  fonction identit‚ : E=H(e)= e.
+  Quel que soit son type, la fonction H DOIT initialiser le champ E du neurone.
+  Dans DEFNNET, la fonction d'entr‚e re‡oit comme paramŠtre l'adresse de d‚but
+  du neurone courant (correspondant au champ EI).
+
+- Champ E :
+  ---------
+  Ce champ contient le r‚sultat de la fonction d'entr‚e H.
+
+- Champ A :
+  ---------
+  Ce champ pointe sur la fonction d'activation du neurone.
+  C'est en g‚n‚ral une fonction de E.
+  Elle peut ˆtre :
+    - Une fonction binaire … seuil :
+      Dans ce cas, on s'arrange pour que la forme de H soit telle que l'on
+      puisse utiliser la fonction signe (-1,0,1).
+    - Une fonction lin‚aire … seuil.
+    - Une fonction sigmo‹de, de la forme : a(e**kx -1)/(e**kx +1)
+    _ Une fonction stochastique (probabiliste), de la forme : 1/(1 + Exp(-x/T)
+  Quel que soit son type, la fonction A DOIT initialiser le champ S du neurone.
+  Dans DEFNNET, la fonction d'activation re‡oit comme paramŠtre l'adresse de
+  d‚but du neurone courant (correspondant au champ EI).
+
+- Champ S :
+  ---------
+  Ce champ contient le r‚sultat de la fonction A.
+  C'est la sortie du neurone, qui est utilis‚e comme entr‚e par les neurones
+  connect‚s.
+  
+TYPES D'UTILISATION
+-------------------
+
+Les diff‚rentes fonctions disponibles permettent d'utiliser le neurone comme
+un automate programmable.
+
+Les automates les plus utilis‚s actuellement sont les suivants :
+
+- Automate bool‚en :
+  Les entr‚es et la sortie sont bool‚ennes.
+  La sortie est une fonction bool‚enne des entr‚es.
+
+- Automate … seuil :
+  Les entr‚es peuvent ˆtres binaires ou r‚elles.
+  La fonction d'entr‚e est affine.
+  La sortie est binaire.
+  La fonction de sortie est la fonction signe, ou la fonction de Heaviside.
+
+- Automate lin‚aire :
+  Les entr‚es et les sorties sont r‚elles.
+  La fonction d'entr‚e est lin‚aire.
+  La fonction de sortie est l'identit‚.
+
+- Automate … saturation :
+  Les entr‚es et les sorties sont comprises dans un intervalle [u,v].
+  La fonction d'entr‚e est lin‚aire.
+  La fonction de sortie est la fonction SATUR (fonction lin‚aire … seuil),
+  de la forme :
+     - SATUR(x) = x si x appartient … [u,v].
+     -    "     = u si x <= u.
+     -    "     = v si x >= v.
+
+- Automate continu :
+  Les entr‚es et la sortie sont r‚elles.
+  La fonction d'entr‚e est lin‚aire ou affine.
+  La fonction d'activation est une fonction sigmo‹de.
+
+- Automate probabiliste :
+  Les entr‚es sont quelconques.
+  La sortie est binaire.
+  La fonction d'entr‚e est lin‚aire ou affine.
+  La fonction de sortie est stochastique.
+
+STRUCTURE DES CONNEXIONS
+------------------------
+
+Au niveau biologique, le nombre de connexions dans le cerveau est colossal
+(chaque neurone est connect‚ … environ 100.000 autres !).
+Des chercheurs ont d‚montr‚s que le cortex ‚tait divis‚ en diff‚rentes
+couches, … l'int‚rieur desquelles les interactions entre neurones sont trŠs
+grandes. Les neurones d'une couche sont aussi reli‚s aux autres neurones
+d'autres couche, ce qui nous donne un systŠme d'une effroyable complexit‚.
+
+Au niveau des neurones formels, l'architecture des r‚seaux peut aller d'une
+connectivit‚ totale (tous les neurones sont reli‚s les uns aux autres) …
+une connectivit‚ locale o— les neurones ne sont reli‚s qu'… leurs plus
+proches voisins.
+
+

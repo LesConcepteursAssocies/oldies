@@ -1,0 +1,43 @@
+// ีอออออออออออออัอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออธ
+// ณINTROCNX.NPG ณ                                                           ณ
+// รฤฤฤฤฤฤฤฤฤฤฤฤฤู                                                           ณ
+// ณDernire modification : 10/03/1995                                       ณ
+// ณ                                                                         ณ
+// ณAppel d'applications                                                     ณ
+// ิอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออพ
+//
+#warning = on
+
+local
+char cNomApp                 // Nom de l'application a appeler
+char cLine                   // Pour l'affichage en ligne 0, si erreur
+
+: main
+   cursoroff
+   " MODULES\INTROCNX\INTROCNX.VTX" sendpage
+   cursoron
+   // On vide la variable
+   "  " alltrim cNomApp :=
+   // Boucle infinie
+   begin
+      // Positionnement du curseur, en fonction du contenu dj… saisi
+      17 3 cNomApp alltrim strlen + locate
+      fdheight setfont
+      cNomApp InputVar
+      cNomApp empty? !
+      if
+         // On cherche l'application donne dans la liste
+         cNomApp searchapp
+         if
+            // L'application existe, on l'excute
+            cNomApp executeapp
+         else
+            // Application inexistante
+            cNomApp cLine :=
+            "  inconnue !!" cLine strcat
+            cLine line0
+         endif
+      endif
+   again
+;
+

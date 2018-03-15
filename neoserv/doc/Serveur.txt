@@ -1,0 +1,218 @@
+                          UTILISATION DU SERVEUR TELEMATIQUE
+
+Lancement et Commandes du serveur
+---------------------------------
+
+IMPORTANT: SHARE doit ˆtre lanc‚ avant N‚oServ.
+***********************************************
+
+AprŠs son lancement, le serveur est en attente de flux sur les ports de
+communications d‚finis dans son paramŠtrage. Si aucune application n'est
+charg‚e, rien de particulier ne se passe (forc‚ment !!!).
+Le prompt (curseur) est positionn‚ dans la fenˆtre systŠme, et attend la
+frappe d'une commande.
+Les diff‚rentes commandes reconnues par le serveur sont les suivantes: 
+
+   QUIT       Met fin au programme, et reviens sous D.O.S.
+              Si des connect‚s sont encores actifs, un message d'erreur
+              est affich‚, et le serveur reste actif.
+              Voir la commande LCX pour lib‚rer les connect‚s encores
+              actifs.
+
+   CLS        Restaure la fenˆtre d'informations g‚n‚rales.
+
+   VIEW <Opt> Visualisation de diverses informations sur le systŠme.
+              <Opt> est une des options suivantes:
+
+              STAT 
+                   Visualisation des statistiques g‚n‚rales du serveur
+                   (nombre d'appels, temps de connexion des divers paliers,
+                   date et heure de la 1Šre et derniŠre connexion, etc...).
+
+              CNX
+                   Visualisation de l'‚tat des diff‚rentes connexions
+                   avec, pour chaque connect‚, son Nø de CV, le code en
+                   cours d'ex‚cution.
+                   Dans cette option, les touches PGUP et PGDN (Page Up,
+                   et Page Down) permettent de faire d‚filer les diff‚rentes
+                   pages d'affichage.
+
+              CV <n>
+                   Visualisation des informations d'un connect‚ actif
+                   avec <n>, le nø du cv … consulter.
+                   Diverses informations systŠmes relatives au connect‚
+                   sont alors affich‚es (Service appel‚, d‚partement, pavi,
+                   palier, type de minitel, etc...).
+
+              APP <Nom>
+                   Visualisation des informations relatives … une application
+                   (si <Nom> est donn‚) o— … toutes les applications pr‚sentes
+                   dans le serveur (si <Nom> est omis).
+                   Affiche l'‚tat des applications (actives ou pas, num‚ro
+                   compl‚mentaire, etc...).
+
+              PORTS
+                   Visualisation de l'‚tat des ports de communication actifs
+                   (Taille des buffers, nombre de paquets re‡us, transmis,
+                   etc ...).
+
+              SYSINFO
+                   Visualisation de diverses informations sytŠmes (version du
+                   D.O.S, type de processeur, ...).
+
+              VAR <NomVar>
+                   Visualisation des informations d'une variable.
+                   Cette option n'est utilisable qu'en mode trace (voir la
+                   commande DEBUG).
+                   Affiche les informations de la variable <NomVar> (nom,
+                   port‚e, type, contenu) dans la fenˆtre des variables du
+                   mode trace.
+
+              HISTORY
+                   Permet la Visualisation des 20 derniŠres commandes clavier,
+                   qui sont conserv‚es par N‚oServ.
+
+              POINTES
+                   Affiche un tableau repr‚sentant les pointes de connexions
+                   de la journ‚e courante, heure par heure, par tranches de
+                   5 minutes.
+
+   Exemples: VIEW CV 2
+             VIEW CNX
+             VIEW APP TOTO
+             VIEW SYSINFO
+             VIEW HISTORY
+             VIEW POINTES
+
+   SEND <msg> <n> | ALL
+              Envoi un message <msg> , sur la ligne 0 du minitel, … un
+              o— tous les connect‚s pr‚sents. Si le second paramŠtre est un
+              chiffre (<n>), alors c'est un num‚ro de connect‚, sinon "ALL"
+              doit ˆtre donn‚. Le message <msg> doit ˆtre d‚limit‚ par des
+              guillemets.
+
+   Exemples: SEND "Salut les gars !!!" ALL
+             SEND "coucou" 5
+
+   SET <Opt>  Permet de modifier certaines variables systŠmes.
+              <Opt> est une des options suivantes:
+
+              PALIER <Param>
+                   Permet la modification d'un des paliers g‚r‚s par le
+                   serveur. <Param> est de la mˆme forme que dans la section
+                   [TarifsPalier] du fichier d'initialisation (voir FICINI.DOC).
+
+              COLOR <Param>
+                   Permet la modification des couleurs de diverses zones
+                   d'affichage du serveur. <Param> est de la mˆme forme que
+                   dans la section [Couleurs] du fichier d'initialisation
+                   (voir FICINI.DOC).
+
+              SYSTEM <Param>
+                   Permet la modification des divers paramŠtres du serveur.
+                   <Param> est de la mˆme forme que dans la section [System]
+                   du fichier d'initialisation (voir FICINI.DOC).
+
+   Exemples: SET PALIER 3615 T34 = 0.61
+             SET COLOR SYS = BLEU / NOIR
+             SET SYSTEM ARRETSERVEUR = 21:50
+             SET SYSTEM ARRETAUTO = NON
+
+   LOAD <NomApp>
+              Chargement et compilation d'une application de nom <NomApp>.
+              Si une application de mˆme nom est d‚j… active, une erreur est
+              ‚mise. Par d‚faut le nom du fichier est pris comme nom de 
+              l'application. Une unit‚ et/ou un chemin D.O.S peuvent ˆtre
+              sp‚cifi‚s.
+              Si aucune extension n'est donn‚e, ".NPG" (N‚oserv ProGramme)
+              est pris par d‚faut.
+              Si auncun chemin n'est sp‚cifi‚, l'‚ventuel chemin d‚finit par
+              la commande PATHAPPS (voir section [System] de FICINI.DOC)
+              est pris, sinon c'est le chemin courant.
+
+   Exemples: LOAD TOTO
+             Charge et compile TOTO.NPG
+             LOAD C:\APP\DEMO.SRC
+             Charge et compile C:\APP\DEMO.SRC
+
+   UNLOAD <NomApp>
+              Permet de d‚charger une application de nom <NomApp>, et de
+              r‚cup‚rer ainsi la m‚moire occup‚e par celle-ci.
+
+   Exemple: UNLOAD TOTO
+
+   LCX <n> | ALL | <NomApp>
+              Lib‚ration d'un connect‚, de tous les connect‚s ou des
+              connect‚s d'une application.
+
+              LCX <n> LibŠre le connect‚ nø <n>.
+
+              LCX ALL LibŠre tous les connect‚s actifs.
+
+              LCX <NomApp> LibŠre tous les connect‚s de l'application <NomApp>.
+
+   Exemples: LCX 128
+             LCX ALL
+             LCX NOMSERVICE
+
+   DEBUG <n>  Met le connect‚ nø <n> en mode trace.
+              A partir de ce moment, le code du connect‚ est ex‚cut‚
+              <nb instruction> par <nb instruction>, chaque ex‚cution ‚tant
+              conditionn‚e par l'appui sur la touche F1.
+              <nb instruction> est de 1 par d‚faut, et peut ˆtre modifi‚
+              par la commande DEBUGSTEP (voir plus loin).
+              Il ne peut y avoir qu'un seul connect‚ en mode trace, une
+              nouvelle commande DEBUG <n> annule le mode trace du connect‚
+              pr‚c‚dent.
+              La fenˆtre d'affichage des informations g‚n‚rales du serveur
+              est alors divis‚e en 4 sous-fenˆtres:
+              
+              La sous-fenˆtre sup‚rieure est utilis‚e … des fins d'informations
+              (Nom de l'application, pointeur de pile, ...).
+
+              La sous-fenˆtre gauche est utilis‚e pour l'affichage du nom de
+              la primitive en cours d'ex‚cution.
+              Le code compil‚ n'est pas forc‚ment le reflet exact du source
+              correspondant (en particulier la compilation des primitives de
+              controle IF...ENDIF, BEGIN...UNTIL, DO...LOOP, ainsi que l'accŠs
+              aux variables locales et externes).
+
+              La sous-fenˆtre sup‚rieure droite est utilis‚e pour l'affichage
+              du contenu de la pile de donn‚e (Nom des symboles empil‚s, ainsi
+              que leurs ‚ventuels contenus).
+
+              La sous-fenˆtre inf‚rieure droite est utilis‚e pour l'affichage
+              des informations relatives aux variables (voir la commande
+              VIEW VAR).
+
+              L'ex‚cution d'une commande quelconque annule le mode trace.
+
+   Exemple: DEBUG 0
+
+   UNDEBUG    Annule le mode trace du connect‚ mis dans ce mode par la
+              commande DEBUG (voir plus haut). L'ex‚cution du code
+              du connect‚ reprend normalement.
+
+   Exemple: UNDEBUG
+
+   DEBUGSTEP <Pas>
+              Permet de d‚finir le nombre d'instructions ex‚cut‚es … chaque
+              Pas du mode trace.
+              Chaque appui sur la touche F1 (voir la commande DEBUG plus haut)
+              provoquera l'ex‚cution de <Pas> instructions.
+              Par d‚faut, <Pas> est de 1.
+
+   Exemple: DEBUGSTEP 500
+
+   CONNECT <NomApp> <nPort>
+              Permet de simuler une connexion … l'application <NomApp>, sur
+              le port nø nPort, … partir du clavier du serveur.
+              nPort doit ˆtre du type LOCAL.
+
+   Exemple: CONNECT BENCH 2
+
+   HELP
+              Affiche un rappel des commandes disponibles sur le serveur.
+
+   Exemple: HELP
+

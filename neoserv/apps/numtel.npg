@@ -1,0 +1,14 @@
+//
+//
+
+: main
+  cls
+  " composition" print cr wait
+  " compose le 3614" print cr
+  " \27\57\83" print  // ESC+"9S"
+  " \27\59\97\92\83" print
+  " 3614" print
+  " \27\57\104" print
+   wait
+;
+

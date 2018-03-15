@@ -1,0 +1,24 @@
+// test adir
+local
+char[] 1 1 ctab
+
+: toto
+  1 :=
+;
+
+: main
+   cls " test adir" print cr wait
+   toto
+   " *.h" ctab adir
+   " len ctab = " print ctab alen print print cr
+   ctab alen drop 0
+   do
+      i 0 ctab @ "  " 13 padl print space print
+      i 1 ctab @ "  " 6 padl print space print
+      i 2 ctab print space print
+      i 3 ctab @ 0 5 substr print
+      cr
+   loop
+   wait
+;
+

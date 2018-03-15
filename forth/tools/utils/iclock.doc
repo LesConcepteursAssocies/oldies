@@ -1,0 +1,53 @@
+                  DETOURNEMENT D'UNE INTERRUPTION
+                  -------------------------------
+
+Le programme suivant d‚tourne l'interruption 0Ch (appel‚e 18,2 fois par
+seconde par le D.O.S) et permet l'affichage de l'heure.
+
+PRINCIPES
+---------
+
+Ce programme n'utilise pas de technique particuliŠre pour d‚tourner
+l'interruption 0Ch, et est de ce fait, relativement simple … comprendre.
+
+Hormis le fait que Turbo FORTH est par essence multitƒche, d‚tourner une
+interruption, d'une fa‡on g‚n‚rale, est un exercice qui peut s'av‚rer
+instructif.
+
+Quelques rŠgles sont … respecter :
+
+ - Conserver l'adresse de l'ancienne interruption, de fa‡on … permettre
+   l'enchainement des diff‚rents utilitaires r‚sidents qui pourraient
+   ˆtre install‚s avant ou aprŠs vous.
+   L'appel de l'ancienne interruption est laiss‚ … la discr‚tion du
+   programmeur (ici, on effectue cet appel … la fin de la routine).
+
+ - Du fait de la non r‚entrance du D.O.S, l'appel des fonctions de celui-ci
+   est fortement d‚conseill‚ (pour ne pas dire interdit !), sous peine
+   de plantage divers.
+   La routine pr‚sente pallie … ce "d‚faut" du D.O.S en affichant l'heure
+   directement dans la R.A.M vid‚o.
+
+CONSEIL D'UTILISATION
+---------------------
+
+le mot CLOCK active la nouvelle routine d'interruption 0Ch, et l'affichage
+de l'heure est imm‚diat.
+
+                                *********
+                                ATTENTION
+                                *********
+
+Dans sa version actuelle, le programme ne fait aucun cas des divers
+op‚rations (en particulier celles ayant trait aux disques) pouvant
+survenir dans Turbo FORTH, je pense particuliŠrement … la commande
+SAVE-SYSTEM.
+
+DESACTIVEZ L'HORLOGE AVANT TOUTE OPERATION "SENSIBLE".
+
+Pour bien faire, il faudrait d‚tourner certaines interruptions "critiques"
+du D.O.S (13h,...) et g‚rer des flags permettant ces divers manipulations.
+
+Ce qui constitue en soi un bon exercice.....
+
+

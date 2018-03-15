@@ -1,0 +1,20 @@
+//
+// info systŠmes.
+//
+
+: main
+   cls
+   " informations du connect‚" print cr
+   " Num‚ro de cv  = " print numcv   print cr
+   " trame d'appel = " print cnxdata print cr
+   " date  de cnx  = " print cnxdate print cr
+   " heure de cnx  = " print cnxtime print cr
+   " d‚partement   = " print dept print cr
+   " pavi          = " print pavi print cr
+   " palier        = " print palier print cr
+   " num‚ro comp.  = " print ncomp print cr
+   " service       = " print app print cr
+   " minitel       = " print mtype print cr
+   wait
+;
+

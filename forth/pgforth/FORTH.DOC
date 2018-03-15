@@ -1,0 +1,38 @@
+
+
+PREAMBULE.
+
+
+
+FORTH a ‚t‚ con‡u par Charles H. MOORE, vers la fin des ann‚es 60.
+
+Malgr‚ le fort potentiel de ce langage, celui-ci est rest‚ peu
+connu des informaticiens.
+
+
+Contrairement … beaucoup d'autres langages, FORTH n'est pas limit‚
+par une liste finie d'instructions.
+L'utilisateur a la possibilit‚ de cr‚er ses propres structures de
+contr“le, ses propres structures de donn‚es, de modeler FORTH … son image,
+de le sp‚cialiser en fonction de ses applications.
+
+Programmer en FORTH consiste … ajouter de nouveaux MOTS … un VOCABULAIRE,
+initialement trŠs riche mais impersonnel, en n'utilisant que des mots d‚ja
+connus de la machine.
+
+Ce type de programmation se prŠte trŠs bien … une d‚composition rigoureuse
+des problŠmes, et garantie des logiciels fiables … 100 %, en permettant une
+maintenance ais‚e et rapide.
+
+De par sa structure, FORTH permet d'‚crire des programmes trŠs rapides,
+dont le code peut Štre plus compacte que l'assembleur.
+
+Malgr‚ cette trŠs grande souplesse, FORTH fait l'objet d'une standardisation,
+garantissant une portabilit‚ des applications FORTH sur toutes les machines
+en poss‚dant une version.
+
+Cette standardisation est issue de l'International FORTH Standard Team, dont
+la derniŠre norme date de 1983, et porte sur la maniŠre dont doivent
+se comporter les mots de base du langage.
+
+La norme constitue le noyau initial de toutes les versions de FORTH.

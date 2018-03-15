@@ -1,0 +1,152 @@
+                       Simulation simplifi‚e du Perceptron
+                       -----------------------------------
+
+Le programme suivant est une version simplifi‚e du perceptron.
+
+HISTORIQUE.
+-----------
+
+Sous le vocable "r‚seaux de neurones", est regroup‚ aujourd'hui un certain
+nombre de modŠles dont le but est d'imiter certains processus du cerveau
+humain, en reproduisant certaine de ces structures de base.
+
+FONDEMENTS BIOLOGIQUES
+----------------------
+
+Un neurone est constitu‚ des ‚l‚ments suivants :
+
+  - Un corps cellulaire.
+    Contient le noyau du neurone et effectue les transformations
+    n‚c‚ssaires … la synthŠse des diff‚rents enzymes qui assurent
+    la vie du neurone.
+
+  - Des dendrites.
+    Ce sont de fines extensions tubulaires de quelques microns de
+    diamŠtre, et sont utilis‚es pour recevoir les signaux chimiques
+    en provenance des autres neurones.
+
+  - Un axone.
+    Se distingue des dendrites par sa longueur, et sert … l'envoi
+    d'informations vers les autres neurones.
+
+Pour former le systŠme nerveux, les neurones sont interconnect‚s les uns
+aux autres de fa‡on complexe. Ces connexions s'effectuent en des endroits
+appel‚s synapses.
+
+MODELISATION
+------------
+
+Les premiŠres tentatives de mod‚lisation remontent aux ann‚es 43, … l'initiative
+de Mac Culloch et Pitts.
+
+Un neurone formel est caract‚ris‚ par certaines propri‚t‚s :
+  - Un certain nombre d'entr‚s (correspondants aux dendrites du neurone
+    biologique)
+  - Une sortie (correspondant … l'axone du neurone biologique) 
+  - Un seuil
+  - Des paramŠtres de pond‚ration (les poids des diff‚rentes connexions)
+  - Une fonction de seuillage
+
+Le principe d'un tel neurone, tel que l'ont ‚nonc‚s Mac Culloch et Pitts, est
+le suivant :
+
+Le neurone formel fait la somme pond‚r‚e des potentiels d'action qui lui
+parviennent (chacun de ces potentiels ‚tant une valeur num‚rique transmise
+par le neurone connect‚), puis s'active suivant la valeur de cette somme
+pond‚r‚e. Si cette somme d‚passe un certain seuil le neurone est activ‚ et
+transmet … son tour une r‚ponse, qui servira aux neurones auxquels il est
+connect‚.
+
+LE PERCEPTRON
+-------------
+
+Vers les ann‚es 50, un chercheur du nom de Rosenblatt, en utilisant les
+travaux de Mac Culloch et Pitts, mis au point le premier modŠle solide
+permettant de simuler un r‚seau de neurone, qu'il appela le Perceptron.
+
+Un perceptron comprend trois ‚l‚ments principaux :
+
+  - Une r‚tine
+    La r‚tine est constitu‚ de cellules sur lesquelles s'inscrit le
+    stimulus (le signal d'entr‚e). Dans la plupart des modŠles, ces
+    cellules r‚pondent par une loi du tout-ou-rien, mais on peut aussi
+    produire une r‚ponse modul‚e.
+
+  - Une couche de cellules d'associations
+    Chacune de ces cellules peut ˆtre connect‚e … une ou plusieurs
+    cellules de la r‚tine, et … des cellules de la couche de d‚cision (voir
+    plus bas).
+    Chaque cellule applique les principes du neurone formel, en effectuant
+    la somme pond‚r‚e des impulsion qui lui parviennent des cellules de la
+    r‚tine … laquelle elle est connect‚e.
+
+  - Une couche de cellules de d‚cision.
+    Ces cellules fonctionnent comme la couche des cellules d'association.
+    Elles recoivent leurs entr‚es des cellules de la couche d'association,
+    ou d'autres cellules de la couche de d‚cision.
+    Les connections sont bidirectionnelles, ce qui permet un "feed-back"
+    de la sortie sur le r‚seau.
+
+Pour faciliter l'‚tude du comportement d'un perceptron, il est courant
+d'utiliser un version simplifi‚e, compos‚e des ‚l‚ments suivants :
+
+  - Une r‚tine
+  
+  - Une couche de cellules d'associations
+
+  - Une cellule de d‚cision
+
+Toutes les valeurs renvoy‚es par les cellules sont de type binaire, 0 ou 1.
+On considŠre d'autre part qu'il n'existe pas de connexions entre les cellules
+de la couche d'association, et la liaison est unidirectionnelle.
+
+PRINCIPES DE FONCTIONNEMENT DU PERCEPTRON
+-----------------------------------------
+
+L'utilisation principale du perceptron est la reconnaissance de formes.
+On applique sur la r‚tine une forme donn‚e, et, le r‚seau va "apprendre"
+… reconnaitre celle-ci (en fournissant une r‚ponse appropri‚e sur la
+cellule de d‚cision). Les cellules de la couche association vont "lire"
+le contenu de la r‚tine, par l'application d'une fonction (la plupart
+du temps de type bool‚enne). Le r‚sultat de cette fonction est stock‚
+dans les cellules de la couche association. L'apprentissage s'effectue
+par une modification des poids des diff‚rentes connexions entre les cellules
+de la couche association et la cellule de d‚cision, jusqu'… l'obtention de
+la r‚ponse souhait‚e.
+
+Ensuite, il s'agit de trouver un compromis entre les r‚ponses correctes
+et les r‚ponses incorrecte (par exemple, en introduisant une forme
+diff‚rente, le perceptron doit r‚pondre n‚gativement).
+
+PRINCIPE DE FONCTIONNEMENT DU PROGRAMME
+---------------------------------------
+
+Le programme donn‚ est surtout con‡u dans un but exp‚rimental.
+
+Par d‚faut, chaque cellule de la couche association est connect‚e aux cellules
+adjacentes.
+Ces connexions sont ‚tablies par l'interm‚diaire de la matrice CONNEXIONS.
+
+Le mot LIT-RETINE permet de calculer les valeurs des cellules de la couche
+association, par l'application d'un fonction bool‚enne … chaque cellule
+connect‚e.
+
+Le mot SEUILLAGE effectue la somme pond‚r‚e des cellules de la couche
+association de la fa‡on suivante :
+
+  - Chaque connexion entre la cellule de d‚cision et une cellule de la
+    couche association est affect‚e d'un poids.
+
+  - Ce poids est ajout‚ au contenu de la cellule donn‚e, puis somm‚ au
+    reste des cellules.
+
+En outre, le perceptron est capable d'apprendre certaines configurations
+pr‚sent‚es sur sa r‚tine, par l'interm‚diaire du mot APPREND, qui utilise
+pour ce faire la rŠgle de Hebb, qui consiste en fait … modifier les poids
+des connexions entre les cellules de la couche association et la cellule de
+d‚cision.
+
+Les configurations peuvent ˆtres sauvegard‚, et relues, dans le fichier
+PCONFIG.DAT, par l'interm‚diaire des mots LIT-CONFIG et ECRIT-CONFIG.
+
+

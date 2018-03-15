@@ -1,0 +1,47 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+HEX
+CREATE ARROW
+   00 C, 0C C, 00 C, 00 C, 0F C, 00 C, FF C, FF C, C0 C,
+   FF C, FF C, F0 C, FF C, FF C, C0 C, 00 C, 0F C, 00 C,
+   00 C, 0C C, 00 C,
+DECIMAL
+
+VARIABLE OLDMODE
+
+: FGDEMO39 ( --- )
+   FASTGRAPH?
+   IF
+      4 1 FGTESTMODE
+      0=
+      IF
+         ABORT" Cette d‚monstration n‚c‚ssite le mode CGA 320x200"
+      THEN
+      FGGETMODE OLDMODE !
+      4 FGSETMODE
+      0 15 0 199 FGSETCLIP
+      10 10 FGMOVE
+      ARROW 3 7 FGDRWIMAGE
+      10 20 FGMOVE
+      ARROW 3 7 FGCLPIMAGE
+      8 30 FGMOVE
+      ARROW 3 7 FGREVIMAGE
+      8 40 FGMOVE
+      ARROW 3 7 FGFLPIMAGE
+      " (Appuyez sur une touche)" FGTEXT
+      FGWAITKEY
+      OLDMODE @ FGSETMODE
+      FGRESET
+      1 FGCURSOR
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

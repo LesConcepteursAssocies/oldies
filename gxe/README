@@ -1,0 +1,33 @@
+Gnu Xml Engine v 0.0.1beta
+2000-2001, Guillaumaud philippe <pguillaumaud@april.org>
+
+Français/French
+===============
+
+GXE est un serveur de commandes XML, basé sur le modèle client/serveur.
+GXE est un Logiciel Libre, distribué sous licence GPL.
+
+Prérequis
+---------
+Pour compiler et/ou utiliser les programmes fournis, vous aurez besoin des
+libraries suivantes:
+
+- glib, version 1.2.6 minimum (ftp://ftp.gtk.org/pub/gtk/v1.2/)
+- libxml, version 2.2.3 minimum (http://www.xmlsoft.org)
+
+Vos commentaires et/ou modifications sont les bienvenues.
+
+Anglais/English
+===============
+
+GXE is a XML command server, based on the C/S model.
+GXE is a Free Software (GPL).
+
+The following libraries are required to compile gxe:
+
+- glib, v 1.2.6 minimum (ftp://ftp.gtk.org/pub/gtk/v1.2/)
+- libxml, v 2.2.3 minimum (http://www.xmlsoft.org)
+
+Comments and/or patches are welcome.
+
+Philippe GUILLAUMAUD <pguillaumaud@april.org>

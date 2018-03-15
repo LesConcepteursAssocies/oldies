@@ -1,0 +1,33 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+DECIMAL
+80 STRING MUSIC1
+" T150 L8 EDCDEEE P DDD P EGG P EDCDEEE L16 P L8 EDDEDC$" MUSIC1 $!
+80 STRING MUSIC2
+" L16 CC#DD#EFF#GG#AA#B O+ CC#DD#EFF#GG#AA#B$" MUSIC2 $!
+80 STRING MUSIC3
+" T180 O2 L2 P L8 P GGG L2 D# L24 P L8 P FFF L2 D$" MUSIC3 $!
+
+: FGDEMO68 ( --- )
+   FASTGRAPH?
+   IF
+      CR ." Mary Had a Little Lamb..."
+      MUSIC1 DROP FGMUSIC
+      18 FGWAITFOR
+      CR ." On monte la gamme sur 2 octaves"
+      MUSIC2 DROP FGMUSIC
+      18 FGWAITFOR
+      CR ." La 5Šme de Beethoven"
+      MUSIC3 DROP FGMUSIC
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

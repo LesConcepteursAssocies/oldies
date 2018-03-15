@@ -1,0 +1,209 @@
+\ ------------------------------------------------------------------------------
+\                            Utilitaires DOS et Disque
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement des utilitaires DOS et disque)
+
+ONLY FORTH ALSO DEFINITIONS
+
+IBASE @
+IBASE HEX
+
+\ Primitive d'‚criture d'une chaine dans un fichier.
+CODE (PUT)  ( seg_buf off_buf long handle --- lon/err flag )
+  DS AX MOV
+  AX ES MOV
+  BX POP
+  CX POP
+  DX POP
+  DS POP
+  40 # AH MOV
+  21 INT
+  AX PUSH
+  ES BX MOV
+  BX DS MOV
+  U>=
+  IF
+    0 # AX MOV ( Si le 'Carry flag' est … z‚ro, pas d'erreur )
+  THEN
+  1PUSH
+END-CODE
+ 
+\ Primitive de cr‚ation d'un fichier.
+CODE (MAKE)  ( adr_fic attribut --- hdl flag )
+  CX POP
+  DX POP
+  3C # AH MOV
+  21 INT
+  AX PUSH
+  U>=
+  IF
+    0 # AX MOV              ( Si le 'Carry flag' est … z‚ro, pas d'erreur )
+    ' #FILES >BODY # BX MOV
+    1 # 0 [BX] ADD          ( Un fichier ouvert de plus )
+  THEN
+  1PUSH
+END-CODE
+
+\ Primitive de changement de nom et/ou de d‚placement d'un fichier.
+CODE (REN)  ( adr_src adr_dest --- code )
+  DI POP
+  DX POP
+  DS AX MOV
+  AX ES MOV
+  56 # AH MOV
+  21 INT
+  U>=
+  IF
+    0 # AX MOV  ( Si le 'Carry flag' est … z‚ro, pas d'erreur )
+  THEN
+  1PUSH
+END-CODE
+
+\ Recherche dans un r‚pertoire le premier fichier correspondant
+\ … un nom g‚n‚rique et … un attribut. 
+\ Le nom g‚n‚rique peut contenir des sp‚cifications
+\ d'unit‚ et de r‚pertoire et les traditionels jokers 
+\ de recherche "*" et "?".
+CODE (SEARCH0)  ( adr attribut --- flag )
+  CX POP
+  DX POP
+  4E # AH MOV
+  21 INT
+  -1 # AX MOV
+  U<
+  IF
+    0 # AX MOV  ( Si le 'Carry flag' est … un, fichier trouv‚ )
+  THEN
+  1PUSH
+END-CODE
+  
+\ Poursuite de la recherche commenc‚e par (SEARCH0).
+CODE (SEARCH)  ( --- flag )
+  4F # AH MOV
+  21 INT
+  -1 # AX MOV
+  U<
+  IF
+    0 # AX MOV  ( Si le 'Carry flag' est … un, fichier trouv‚ )
+  THEN
+  1PUSH
+END-CODE
+
+\ Renvoi des informations concernant l'espace disponible sur un disque.
+CODE (FREE)  ( nødrv --- clu sec/clu oct/sec )
+  DX POP
+  36 # AH MOV
+  21 INT
+  U<
+  IF
+    0 # AX MOV  ( Si le 'Carry flag' est … un, alors erreur )
+    1PUSH
+  THEN
+  BX PUSH
+  AX PUSH
+  CX PUSH
+  NEXT
+END-CODE
+ 
+\ AccŠs direct dans un fichier par modification du pointeur.
+CODE (SEEK)  ( d‚pl_d handle mode --- pos_d code )
+  AX POP
+  BX POP
+  CX POP
+  DX POP
+  42 # AH MOV
+  21 INT
+  AX PUSH
+  DX PUSH
+  U>=
+  IF
+    0 # AX MOV  ( Si le 'Carry flag' est … z‚ro, pas d'erreur )
+  THEN
+  1PUSH
+END-CODE
+ 
+\ Appel simple d'une fonction de l'interruption 21h. Le num‚ro
+\ de fonction est charg‚ dans le registre AH et l'argument est
+\ charg‚ dans le registre DX avant l'appel de l'interruption.
+CODE DOS  ( arg fon --- flag )
+  AX POP
+  AL AH MOV
+  DX POP
+  21 INT
+  U>=
+  IF
+    0 # AX MOV  ( Si le 'Carry flag' est … z‚ro, pas d'erreur )
+  THEN
+  1PUSH
+END-CODE
+
+\ S‚lection d'une unit‚ de disque.
+: SELECT  ( nødrv --- )
+  1- 0E DOS ?DOSERR
+;
+
+\ initialise A comme le lecteur courant.
+: A:  ( --- )
+  1 SELECT
+;
+
+\ initialise B comme le lecteur courant.
+: B:  ( --- )
+  2 SELECT
+;
+
+\ initialise C comme le lecteur courant.
+: C:  ( --- )
+  3 SELECT
+;
+ 
+\ initialise D comme le lecteur courant.
+: D:  ( --- )
+  4 SELECT
+;
+ 
+\ initialise E comme le lecteur courant.
+: E:  ( --- )
+  5 SELECT
+;
+
+\ Renvoi le num‚ro de l'unit‚ courante.
+\ Le code renvoy‚ est ‚gal … 0 pour le lecteur A:, 
+\ 1 pour le lecteur B:, 2 pour le lecteur C:, etc...
+CODE DRIVE?  ( --- nødrv )
+  19 # AH MOV
+  21 INT
+  AH AH SUB
+  1PUSH
+END-CODE
+
+\ Cr‚ation d'un r‚pertoire.
+: MKDIR  ( adr_chemin --- )
+  ASCII0
+  39 DOS ?DOSERR
+;
+
+\ Suppression d'un r‚pertoire vide.
+: RMDIR  ( adr_chemin --- )
+  ASCII0
+  3A DOS ?DOSERR
+;
+
+\ Changement de r‚pertoire courant.
+: CHDIR  ( adr_chemin --- )
+  ASCII0
+  3B DOS ?DOSERR
+;
+
+\ Efface un ou plusieurs fichier.
+: DEL ( adr_fichier --- )
+  ASCII0
+  41 DOS ?DOSERR
+;
+
+IBASE !
+
+EOF
+
+

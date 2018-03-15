@@ -1,0 +1,53 @@
+//
+// TEST.TFH
+// --------
+//
+//
+
+#PATHVTX = APPS
+
+PUBLIC CHAR CHAINE1 CHAINE2 := " CHAINE NUMERO DEUX"
+LOCAL  NUMBER NOMBRE OPT NTOTO := 125.45
+LOCAL CHAR LCHAINE := " CHAINE LOCALE"
+
+: TITI
+  cls
+  " VOUS ETES DANS TITI" PRINT
+  LCHAINE DUP
+  print
+  wait
+  print
+  wait
+;
+
+: TOTO
+   " VOUS ETES DANS TOTO" PRINT
+   WAIT
+   " TOUJOURS TOTO" line0
+   WAIT
+   cls
+   " CECI EST DANS CHAINE1" CHAINE1 :=
+   CHAINE1 PRINT
+   Wait
+   CHAINE2 PRINT
+   wait
+   LCHAINE print
+   wait
+   titi
+;
+
+// POINT D'ENTREE DU PROGRAMME
+: MAIN
+   cls
+   22 7 / print cr
+   wait
+   " test.pag" sendpage        // envoi d'une page
+   WAIT                        // Attend une action de l'utilisateur
+   TOTO                        // Appel d'une proc‚dure.
+   10 5 LOCATE
+   " je suis de retour !!!" print
+   WAIT
+   " ntoto =" print ntoto print
+   wait
+;
+

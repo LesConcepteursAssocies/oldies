@@ -1,0 +1,68 @@
+\ ------------------------------------------------------------------------------
+\                              Sortie des Nombres.
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement des primitives de Sortie des Nombres )
+
+\ Entiers simples non sign‚s
+: (U.)
+  0 <# #S #>
+;
+
+: U.  ( u --- )
+  (U.) TYPE SPACE
+;
+
+: U.R  ( u n --- )
+  >R (U.) R> OVER -
+  SPACES TYPE
+;
+
+\ Entiers doubles non sign‚s
+: (UD.)
+  <# #S #>
+;
+
+: UD.  ( ud --- )
+  (UD.) TYPE SPACE
+;
+
+: UD.R  ( ud n --- )
+  >R (UD.) R> OVER -
+  SPACES TYPE
+;
+
+\ Entiers doubles sign‚s
+: (D.)
+  TUCK DABS
+  <# #S ROT SIGN #>
+;
+
+: D.  ( d --- )
+  (D.) TYPE SPACE
+;
+
+: D.R  ( d n --- )
+  >R (D.) R> OVER -
+  SPACES TYPE
+;
+
+\ Affichage du nom d'une d‚finition
+: .ID  ( nfa --- )
+  DUP 1+ DUP C@ ROT
+  C@ 31 AND 0
+  ?DO
+    DUP 127 AND EMIT
+    128 AND
+    IF
+      ASCII _ 128 OR
+    ELSE
+      1+ DUP C@
+    THEN
+  LOOP
+  2DROP SPACE
+;
+
+EOF
+
+

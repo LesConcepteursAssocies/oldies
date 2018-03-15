@@ -1,0 +1,211 @@
+//
+// BENCHMARK NEOSERV
+// Commenc‚ : 09/11/1994
+//
+#use apps\bench2
+
+char pvar
+local
+number nombre := 0 nbFond := 0 tDeb tFin
+char[] 5 5 ctab
+char chaine := "un deux trois quatre cinq"
+char delim := " "
+char regexp := "[0-9][a-z]"
+
+// Calcule le temps d'ex‚cution (en centiŠmes de secondes)
+: CalcTime
+   tFin tDeb -
+;
+
+// Calcule et affiche le temps d'ex‚cution
+: AffTime
+   CalcTime print "  centiŠmes de seconde" print cr
+;
+
+: attend
+   " appuyez sur une touche" print cr
+   wait
+;
+
+: procedure
+   1 nombre +=
+;
+
+: recurse
+   dup 1000 <
+   if
+      1 + recurse
+   else
+      drop
+   endif
+;
+
+// Une tƒche de fond
+: TFond
+   begin
+      nbFond ++
+   again
+;
+
+: bench01
+   " BENCH01" print cr
+   " 1000 boucles simples" print cr
+   timer tDeb :=
+   1000 0 do loop
+   timer tFin :=
+   AffTime
+;
+
+: bench02
+   " BENCH02" print cr
+   " 100 boucles (10 x 10 imbriqu‚es)" print cr
+   timer tDeb :=
+   10 0 do 10 0 do loop loop
+   timer tFin :=
+   AffTime
+;
+
+: bench03
+   " BENCH03" print cr
+   " 100 boucles avec I DROP" print cr
+   timer tDeb :=
+   100 0 do i drop loop
+   timer tFin :=
+   AffTime
+;
+
+: bench04
+   " BENCH04" print cr
+   " 100 boucles avec nombre++" print cr
+   timer tDeb :=
+   100 0 do nombre ++ loop
+   timer tFin :=
+   AffTime
+   " nombre = " print nombre print cr
+;
+
+: bench05
+   " BENCH05" print cr
+   " 1000 x proc. avec 1 nombre +=" print cr
+   timer tDeb :=
+   1000 0 do procedure loop
+   timer tFin :=
+   AffTime
+   " nombre = " print nombre print cr
+;
+
+: bench06
+   " BENCH06" print cr
+   " 1000 x I RND DROP" print cr
+   timer tDeb :=
+   1000 0 do i rnd drop loop
+   timer tFin :=
+   AffTime
+;
+
+: bench07
+   " BENCH07" print cr
+   " 1000 appels r‚cursifs" print cr
+   timer tDeb :=
+   1 recurse
+   timer tFin :=
+   AffTime
+;
+
+: bench08
+   " BENCH08" print cr
+   " 1000 x strtok" print cr
+   timer tDeb :=
+   1000 0 do chaine delim ctab strtok loop
+   timer tFin :=
+   AffTime
+;
+
+: bench09
+   " BENCH09" print cr
+   " 1000 x 'procedure' execute" print cr
+   timer tDeb :=
+   1000 0 do " procedure" execute loop
+   timer tFin :=
+   AffTime
+   " nombre = " print nombre print cr
+;
+
+: bench10
+   " BENCH10" print cr
+   " 1000 x ENCODE" print cr
+   timer tDeb :=
+   1000 0 do " ABCDEFGH" " EF/GH/CD" " 19901230" encode drop loop
+   timer tFin :=
+   AffTime
+;
+
+: bench11
+   " BENCH11" print cr
+   " 100 boucles avec bench2.nombre++" print cr
+   timer tDeb :=
+   100 0 do bench2.nombre ++ loop
+   timer tFin :=
+   AffTime
+   " bench2.nombre = " print bench2.nombre print cr
+;
+
+: bench12
+   " BENCH12" print cr
+   " 1000 x bench2::proc. avec 1 nombre +=" print cr
+   timer tDeb :=
+   1000 0 do bench2::procedure loop
+   timer tFin :=
+   AffTime
+   " bench2.nombre = " print bench2.nombre print cr
+;
+
+: bench13
+   " BENCH13" print cr
+   " 1000 x strmatch " print regexp print " 0test" print cr
+   timer tDeb :=
+   1000 0 do " 0test" regexp strmatch drop drop loop
+   timer tFin :=
+   AffTime
+;
+
+: main
+   randomize
+   " %0.f" using
+   cls " benchmark NeoServ" print cr
+//   " Lancement de la tƒche de fond" print cr
+//   setlocaltask TFond
+   attend
+   clear0
+   bench01
+   attend
+   bench02
+   attend
+   bench03
+   attend
+   bench04
+   attend
+   cls
+   bench05
+   attend
+   bench06
+   attend
+   bench07
+   attend
+   bench08
+   attend
+   bench09
+   attend
+   cls
+   bench10
+   attend
+   bench11
+   attend
+   bench12
+   attend
+   bench13
+   attend
+   cr " FIN DU TEST" print cr wait
+   usingoff
+;
+

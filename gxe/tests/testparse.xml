@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<FxML version="1.0" id="200101">
+<TestLib>
+  <error>
+	<code>25</code>
+	<msg>libelle de l'erreur</msg>
+  </error>
+</TestLib>
+</FxML>
+
+

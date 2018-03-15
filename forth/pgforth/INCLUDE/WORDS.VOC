@@ -1,0 +1,74 @@
+\ ------------------------------------------------------------------------------
+\                                Words.                                                  
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement de l'utilitaire WORDS )
+
+VARIABLE LMARGIN  1 IS LMARGIN  \ Marge gauche
+VARIABLE RMARGIN 72 IS RMARGIN  \ Marge droite
+VARIABLE #WORDS                 \ Compte le nombre de d‚finitions list‚es
+VARIABLE #TAB    12 IS #TAB     \ Largeur de la tabulation
+
+: STOP? ( --- f )
+  FALSE KEY?
+  IF
+    DROP KEY DROP KEY 13 =
+  THEN
+;
+
+: ?LINE
+  #OUT @ + RMARGIN @ >
+  IF
+    CR LMARGIN @ SPACES
+  THEN
+;
+
+: ?CR
+  0 ?LINE
+;
+
+: ?TAB
+  RMARGIN @ #OUT @ - SWAP MOD SPACES
+;
+
+: LARGEST
+  OVER 0 SWAP ROT 0
+  DO
+    2DUP @ U<
+    IF
+      -ROT 2DROP DUP @ OVER
+    THEN
+    2+
+  LOOP
+  DROP
+;
+
+: WORDS
+  #WORDS OFF
+  CR LMARGIN @ SPACES
+  CONTEXT @ 'WORD #THREADS 2* CMOVE
+  BEGIN
+    'WORD #THREADS LARGEST
+    DUP STOP? NOT AND
+  WHILE
+    DUP L>NAME #TAB @ ?TAB
+    DUP C@ 31 AND ?LINE
+    DUP LINK> DUP @ ['] (VOC) @ =
+    SWAP ['] (VOC) <> AND
+    IF
+      ATTRIBUTS @ >R ATTRIBUTS ON
+      ATTOFF INVERS .ID ATTOFF       ( Affichage des vocabulaires en invers‚ )
+      R> ATTRIBUTS !
+    ELSE
+      .ID
+    THEN
+    #WORDS 1+!
+    @ SWAP !
+  REPEAT
+  2DROP
+  CR #WORDS @ . ." D‚finitions" CR
+;
+
+EOF
+
+

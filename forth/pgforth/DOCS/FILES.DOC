@@ -1,0 +1,49 @@
+((STDIN))          ---
+                   Buffer temporaire utilis‚ par les primitives d'entr‚es /
+                   sorties.
+
+                   D‚finition :
+                   CREATE ((STDIN)) 0 C,
+
+(STDIN)            --- c
+                   Primitive de lecture du p‚riph‚rique d'entr‚e
+                   standard, en g‚n‚ral le clavier.
+
+                   D‚finition :
+                   CODE (STDIN)  ( --- c )
+                     EAX EAX XOR
+                     ' EOF? >>BODY # EBX MOV
+                     EAX 0 [EBX] MOV
+                     STDIN # ECX MOV
+                     ECX EAX CMP
+                     0=
+                     IF
+                       EAX POP      ( Le handler z‚ro correspond au clavier )
+                       AL AH MOV
+                       33 INT
+                       AH AH XOR
+                       1PUSH
+                     THEN
+                     ' ((STDIN)) >>BODY # DX MOV
+                     AL 0 [DX] MOV
+                     AX POP
+                     CX BX MOV
+                     1 # CX MOV
+                     63 # AH MOV
+                     33 INT
+                     U<<
+                     IF
+                       -1 # BX MOV
+                       ' EOF? >>BODY # DX MOV  ( Si le 'Carry flag' est … un,
+                                                 alors fin )
+                       BX 0 [DX] MOV          ( du fichier. )
+                       BX BX XOR
+                       ' STDIN >>BODY # DX MOV
+                       BX 0 [DX] MOV
+                     THEN
+                     ' ((STDIN)) >>BODY # DX MOV
+                     0 [DX] AL MOV
+                     AH AH XOR
+                     1PUSH
+                   END-CODE
+

@@ -1,0 +1,40 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+DECIMAL
+CREATE HELLO
+   ASCII t C, 1 C, ASCII h C, 2 C, ASCII e C, 3 C, ASCII r C, 4 C, ASCII e C, 5 C,
+   ASCII h C, 1 C, ASCII e C, 2 C, ASCII l C, 3 C, ASCII l C, 4 C, ASCII o C, 5 C,
+CREATE IMAGE
+   ASCII T C, 0 C, 0 C, 1 C, 0 C, 1 C, 0 C, 1 C, 0 C, 1 C,
+   ASCII H C, 0 C, 0 C, 1 C, 0 C, 1 C, 0 C, 1 C, 0 C, 1 C,
+
+VARIABLE OLDMODE
+
+: FGDEMO38 ( --- )
+   FASTGRAPH?
+   IF
+      FGGETMODE OLDMODE !
+      3 FGSETMODE
+      0 FGCURSOR
+      12 37 FGLOCATE
+      HELLO 10 2 FGDRWIMAGE
+      " (Appuyez sur une touche)" FGTEXT
+      FGWAITKEY
+      IMAGE 10 2 FGDRWIMAGE
+      " (Appuyez sur une touche)" FGTEXT
+      FGWAITKEY
+      OLDMODE @ FGSETMODE
+      FGRESET
+      1 FGCURSOR
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

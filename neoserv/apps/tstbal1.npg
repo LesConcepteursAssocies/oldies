@@ -1,0 +1,22 @@
+//
+// Test bal
+//
+#use modules\balgp\balgp
+
+: main
+   cls
+//   " test BAL avec coordonn‚es" print cr
+//   wait
+//   true balgp.bSaiCoord :=
+//   balgp::menugen
+//   cr " retour" print cr
+//   wait
+
+   " test envoi d'un message … PHILIPPE" print cr
+   wait
+   " PHILIPPE" balgp.pseudodest :=
+   balgp::laisserunmsg
+   " retour" print cr
+   wait
+;
+

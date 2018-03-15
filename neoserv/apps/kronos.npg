@@ -1,0 +1,59 @@
+//
+// Appel du module STATS
+//
+#use modules\stats\stats
+
+#PATHVTX APPS\KRONO
+
+local
+char Acces3614 := " "
+
+// AccŠs restreint
+: AccesT2  // --- b
+   "  " alltrim Acces3614 :=
+   1
+   " ACCEST2.VTX" sendpage
+   cursoron
+   begin
+      16 32 locate fdheight setfont
+      Acces3614 InputVar
+      Acces3614 alltrim display
+	 	 Acces3614 alltrim " FORTH" ==
+	 	 if
+         drop true dup
+      else
+         1 + dup 3 >
+         if
+            " Fin de communication" line0
+            // D‚connexion
+            // " \27\57\103" print
+            numcv libcv
+            false
+         else
+            "  " alltrim Acces3614 :=
+            false
+         endif
+      endif
+   until
+;
+
+: MAIN
+   cls
+   palier 99 !=
+   if
+      palier 82 ==
+      if
+         AccesT2
+         if
+            begin
+               stats::StatMain
+            again
+         endif
+      else
+         stats::StatMain
+      endif
+   else
+      stats::StatMain
+   endif
+;
+

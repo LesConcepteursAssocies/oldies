@@ -1,0 +1,104 @@
+                      AFFICHAGE DU CONTENU DE LA MEMOIRE
+                      ----------------------------------
+
+Ce programme permet d'afficher le contenu de la mmoire rserve aux programmes
+transitoires (Transian Program Area) des P.C's.
+
+
+Organisation de la mmoire d'un P.C.
+------------------------------------
+
+Aprs initialisation de la machine et chargement du systme d'exploitation,
+(D.O.S, la plupart du temps), la mmoire d'un P.C est organise
+de la faon suivante:
+
+
+                                    Contenu
+     Adresse  +-------------------------------------------------+
+    0000:0000 |       Table des vecteurs d'interruptions.       |
+              |       Buffers                                   |
+              |       Variables systme                         |
+              |       Drivers fixes                             |
+              |       Kernel D.O.S (int 21h)                    |
+              |-------------------------------------------------|
+              |                                                 |
+              |                                                 |
+        6     |         Zone des Programmes Transitoires        |
+        4     |                    (T.P.A)                      |
+        0     |                                                 |
+       Ko.    |                                                 |
+              |                                                 |
+    A000:0000 |-------------------------------------------------|
+              |                 R.A.M vido                     |
+    B000:FFFF |-------------------------------------------------|
+              |                                                 |
+    F000:0000 |-------------------------------------------------|
+              |               R.O.M du B.I.O.S                  |
+    F000:FFFF +-------------------------------------------------+
+
+La T.P.A n'est pas entirement alloue … l'utilisateur, car D.O.S y place
+les drivers ajouts par l'utilisateur (lignes DEVICE= du fichier CONFIG.SYS)
+les buffers (ligne BUFFERS= du fichier CONFIG.SYS), les programmes rsidents
+(lancs dans le fichier AUTOEXEC.BAT, du genre KEYB.COM,...), ainsi que
+l'interprteur de commandes D.O.S COMMAND.COM.
+
+
+Principe de gestion de la T.P.A.
+--------------------------------
+
+Quand vous donnez l'ordre d'xcuter une action au D.O.S (commande du systme
+o— nom de programme), celui-ci effectue plusieurs manipulations avant de
+satisfaire votre demande:
+
+- Il regarde quel est le type du programme … xcuter (COM, EXE).
+
+- Si c'est un programme de type "COM", le systme alloue la totalit de la
+  mmoire restante en machine (par l'intermdiaire de l'interruption 48h),
+  puis il charge le programme en mmoire, initialise le segment de code CS
+  du programme, et effectue un saut … la premire instruction du code.
+
+- Si c'est un programme de type "EXE", le systme lit l'entte du fichier
+  pour savoir quelle est la quantit de mmoire ncssaire … l'xcution
+  du programme.
+  Cette quantit est alloue, puis le programme est charg en mmoire.
+  Ensuite, le systme initialise toutes les adresses contenues dans la
+  table de relocation, situe dans l'entte du fichier, avec l'adresse de
+  segment correspondante.
+  Ensuite, un saut est effectu … la premire instruction du programme.
+
+Pour chaque bloc de mmoire alloue, le systme place devant celui-ci un
+entte de 16 octets contenant diverses informations.
+Cet entte est appel MCB (Memory Control Block), et sa structure est la
+suivante :
+
+ษออออออออออออหอออออออออออออออออออออออออออออออออออออออออออออออออหออออออออออป 
+บ  Adresse   บ                  Contenu                        บ Longueur บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off    บ ID ( "Z" = Dernier MCB, "M" = d'autres suivent )บ 1 Octet  บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+01 บ Adresse de segment du PSP correspondant ( quand บ          บ
+บ            บ la zone alloue correspond … un programme ).    บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+03 บ Nombre de paragraphes dans la zone alloue.     บ 2 Octets บ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+05 บ Inutilis.                                      บ 11 Octetsบ
+ฬออออออออออออฮอออออออออออออออออออออออออออออออออออออออออออออออออฮออออออออออน
+บ Seg:Off+16 บ Zone de mmoire alloue.                        บ x Parag. บ
+ศออออออออออออสอออออออออออออออออออออออออออออออออออออออออออออออออสออออออออออผ 
+
+
+Principe de fonctionnement du programme.
+----------------------------------------
+
+La structure du programme est assez simple, et consiste en un balayage de
+la mmoire, et pour chaque MCB trouv, affichage des informations relatives
+… celui-ci (programme, environnement, donnes,...).
+
+Le seul problme consiste … localiser le premier MCB pour pouvoir suivre la
+chaine.
+
+Ce premier MCB, On l'obtient en allant chercher le D.I.B (voir DIB.FTH).
+
+Une fois l'adresse du premier MCB obtenue, le tracage est facile...
+
+

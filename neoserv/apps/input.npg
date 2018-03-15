@@ -1,0 +1,34 @@
+//
+// test input
+//
+local
+char toto
+
+: testguide
+   " touche guide appuy‚e" print
+   wait
+;
+
+: main
+   cls
+   setlocalfkey fkguide testguide
+   " input" print cr
+   input toto :=
+   toto empty?
+   if
+      " toto vide" print cr
+   else
+      " toto = " print toto print cr
+   endif
+   wait
+   " fkey =" print fkey print "  == [" print
+   "  " print " ]" print cr
+   fkey empty?
+   if
+      " touche vide" print cr
+   else
+      " touche non vide" print cr
+   endif
+   wait
+;
+

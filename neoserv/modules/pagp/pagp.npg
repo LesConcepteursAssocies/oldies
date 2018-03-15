@@ -1,0 +1,989 @@
+// ีอออออออออออออัอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออธ
+// ณPAGP.NPG     ณ                                                           ณ
+// รฤฤฤฤฤฤฤฤฤฤฤฤฤู                                                           ณ
+// ณVersion 1.02                                                             ณ
+// ณ                                                                         ณ
+// ณDernire modification : 09/06/1995                                       ณ
+// ณ                                                                         ณ
+// ณModule Petites Annonces Multi-Services.                                  ณ
+// ิอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออพ
+//
+// Dclaration des variables.
+
+PUBLIC
+      Number _MAXJOUR := 92
+      Number _DEBUG   := 0
+      Number bGestion
+
+LOCAL
+     number nchoix
+     number npos := 1
+     number npage := 1
+     number nquest nlig bFini
+     number ThemePa
+
+     char   csaisie clepa
+     char   cresume
+     char   ql1 ql2 ql3 ql4 ql5 ql6 ql7 ql8 ql9 ql10 ql11 ql12 ql13 ql14 ql15
+     Char   FiltreService
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Enregistrement de l'annonce }
+//
+: ValiderAnnonce
+
+   " Enregistrement en cours..." line0
+   dbappendblank
+   // On fabrique la clef.
+   // SERVICE+BVALIDE+DTOS(DATE)
+   FiltreService   " SERVICE" dbreplace
+   date dtos       " DATE"    dbreplace
+   ThemePa         " TYPEPA"  dbreplace
+   cresume alltrim " RESUME"  dbreplace
+   ql1     alltrim " QL1"     dbreplace
+   ql2     alltrim " QL2"     dbreplace
+   ql3     alltrim " QL3"     dbreplace
+   ql4     alltrim " QL4"     dbreplace
+   ql5     alltrim " QL5"     dbreplace
+   ql6     alltrim " QL6"     dbreplace
+   ql7     alltrim " QL7"     dbreplace
+   ql8     alltrim " QL8"     dbreplace
+   ql9     alltrim " QL9"     dbreplace
+   ql10    alltrim " QL10"    dbreplace
+   ql11    alltrim " QL11"    dbreplace
+   ql12    alltrim " QL12"    dbreplace
+   ql13    alltrim " QL13"    dbreplace
+   ql14    alltrim " QL14"    dbreplace
+   ql15    alltrim " QL15"    dbreplace
+
+   //===== { On marque l'annonce comme tant … valider }
+   //===== "-" : Annonce non valide.
+   //===== "+" : Annonce valide.
+
+   " -"    " BVALIDE" dbreplace
+   // Fin de la saisie
+   clear0
+   " Annonce enregistre !" line0
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Traitement des touches en saisie.
+// Empile VRAI si on sort de la saisie.
+//
+: TraiteFKSaisie  // --- b
+   fkey dup fkenvoi ==
+   if
+      // Validation ?
+      // On vrifie qu'il y ai au moins une ligne.
+      ql1 empty?
+      ql2 empty?
+      ql3 empty?
+      ql4 empty?
+      ql5 empty?
+      ql6 empty?
+      ql7 empty?
+      ql8 empty?
+      ql9 empty?
+      ql10 empty?
+      ql11 empty?
+      ql12 empty?
+      ql13 empty?
+      ql14 empty?
+      ql15 empty?
+      && && && && && && && && && && && && && &&
+      if
+         " Il faut au moins une ligne !!" line0
+         drop false
+      else
+         drop true
+      endif
+   else
+      dup fksuite ==
+      if
+         // Zone suivante.
+         npos ++
+         npos 2 >
+         if
+            // Dernire zone, on reboucle sur la premire
+            1 npos :=
+         endif
+         drop false
+      else
+         fkretour ==
+         if
+            // Zone prcdente.
+            npos --
+            npos 0 <=
+            if
+               // premire zone, on reboucle sur la dernire
+               1 npos :=
+            endif
+            false
+         else
+            // Les autres touches provoquent la fin de la saisie
+             TRUE
+
+         endif
+
+      endif
+
+   endif
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Saisie d'une annonce }
+//
+: SaisieAnnonce
+
+   begin
+
+      npos
+      case
+         1 of
+              // Saisie du rsum
+              5 3 cresume alltrim strlen + locate
+              cresume InputVar
+              // La saisie du rsum est obligatoire
+              cresume empty?
+              if
+                 " Saisie obligatoire" line0
+                 false
+
+              else
+                 TraiteFKSaisie
+
+              endif
+
+           endof
+
+         2 of
+              // Saisie de l'annonce.
+              7 1 ql1 alltrim strlen + locate
+              15 40 mlinput
+              fkey fkenvoi ==
+              if
+                 ql15 :=
+                 ql14 :=
+                 ql13 :=
+                 ql12 :=
+                 ql11 :=
+                 ql10 :=
+                 ql9 :=
+                 ql8 :=
+                 ql7 :=
+                 ql6 :=
+                 ql5 :=
+                 ql4 :=
+                 ql3 :=
+                 ql2 :=
+                 ql1 :=
+
+              else
+                  15 0 do drop loop
+
+              endif
+
+              TraiteFKSaisie
+
+           endof
+
+      endcase
+
+   until
+
+   fkey fkenvoi ==
+
+   if
+      ValiderAnnonce
+
+   endif
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Initialisation de la saisie d'une annonce }
+//
+: InitSaisie
+
+   cursoroff
+   "  " cresume :=
+   "  " Ql1 :=
+   "  " Ql2 :=
+   "  " Ql3 :=
+   "  " Ql4 :=
+   "  " Ql5 :=
+   "  " Ql6 :=
+   "  " Ql7 :=
+   "  " Ql8 :=
+   "  " Ql9 :=
+   "  " Ql10 :=
+   "  " Ql11 :=
+   "  " Ql12 :=
+   "  " Ql13 :=
+   "  " Ql14 :=
+   "  " Ql15 :=
+   " MODULES\PAGP\STSAISIE.VTX" sendpage
+   " MODULES\PAGP\BDXSAISI.VTX" sendpage
+   cursoron
+   1 npos :=
+   SaisieAnnonce
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage du dtail de l'annonce
+//
+: AfficheDetQuest
+
+   cursoroff
+   " MODULES\PAGP\STDANN.VTX" sendpage
+    5 3 locate " RESUME" dbfield alltrim print
+    7 1 locate " QL1" dbfield alltrim print
+    8 1 locate " QL2" dbfield alltrim print
+    9 1 locate " QL3" dbfield alltrim print
+   10 1 locate " QL4" dbfield alltrim print
+   11 1 locate " QL5" dbfield alltrim print
+   12 1 locate " QL6" dbfield alltrim print
+   13 1 locate " QL7" dbfield alltrim print
+   14 1 locate " QL8" dbfield alltrim print
+   15 1 locate " QL9" dbfield alltrim print
+   16 1 locate " QL10" dbfield alltrim print
+   17 1 locate " QL11" dbfield alltrim print
+   18 1 locate " QL12" dbfield alltrim print
+   19 1 locate " QL13" dbfield alltrim print
+   20 1 locate " QL14" dbfield alltrim print
+   21 1 locate " QL15" dbfield alltrim print
+   cursoron
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Menu des options en dtail
+//
+: MenuDetQuest
+
+   " MenuDetQuest" display
+   begin
+      cursoroff
+      23 20 locate
+      wait
+      fkey fksommaire !=
+
+   while
+
+      fkey
+      case
+          fksuite  of
+
+             // Annonce suivante
+             dbeof !
+             if
+
+               " ANNONCE" dbsetindex
+               1 dbskip
+               FiltreService " SERVICE" dbfield alltrim ==
+               " BVALIDE" dbfield " +" == &&
+               " TYPEPA" dbfield ThemePa == &&
+               if
+                 AfficheDetQuest
+
+               else
+                   -1 dbskip
+                   " Dernire annonce" line0
+
+               endif
+
+             else
+                 " Dernire annonce" line0
+
+             endif
+
+          endof
+
+          fkretour of
+
+               // Annonce prcdente
+               -1 dbskip
+               dbbof !
+               " ANNONCE" dbsetindex
+               FiltreService " SERVICE" dbfield alltrim ==
+               " BVALIDE" dbfield " +" == &&
+               " TYPEPA"  dbfield ThemePa == &&
+               if
+                 AfficheDetQuest
+
+               else
+                   " Premire annonce" line0
+
+               endif
+
+          endof
+
+          drop
+
+      endcase
+
+   repeat
+
+   cursoron
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage de la liste des annonces
+//
+: AfficheListe
+
+   cursoroff
+   " MODULES\PAGP\STLISTE.VTX" sendpage
+   " MODULES\PAGP\STLSTBAS.VTX" sendpage
+   1 nquest :=
+   5 nlig :=
+
+   begin
+      // On n'affiche que les annonces valides du thme choisi
+      // infrieures … 3 mois
+      // ou pas (si on est en gestion)
+
+      dbeof !
+      _DEBUG
+      if
+        " RESUME" dbfield alltrim display
+
+      endif
+
+      bGestion
+      if
+
+         " BVALIDE" dbfield " -" == &&
+
+      else
+
+         " BVALIDE" dbfield " +" == &&
+         " TYPEPA"  dbfield ThemePa == &&
+
+      endif
+
+      " DATE" dbfield dtoj _MAXJOUR + date dtos dtoj > &&
+      nlig 21 <= &&
+
+   while
+
+      nlig 2 locate black setcolor nquest str "  " 2 padl print
+      nlig 6 locate " RESUME" dbfield alltrim 0 35 substr black setcolor print
+      1 dbskip
+      nquest ++
+      nlig ++
+
+   repeat
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion de options de la liste des annonces
+//
+: MenuListe
+
+   cursoron
+   false bFini :=
+
+   // Menu de la liste
+   begin
+
+      bFini !
+      if
+         23 28 locate
+         input csaisie :=
+         fkey fksommaire !=
+      else
+          false
+
+      endif
+
+   while
+
+      csaisie val nchoix :=
+      nchoix dup 0 > swap nquest < &&
+      if
+         // On a saisi un numro
+         // SKIP -(nquest-nchoix)
+         nquest nchoix - negate
+         dbskip
+         AfficheDetQuest
+
+         bGestion
+         if
+           " [1] = Valider   [2] = Supprimer" line0
+           wait
+           fkey fksommaire !=
+           if
+             data val empty? !
+             if
+               data val
+               case
+                   1 of
+
+                     // ===== { On confirme l'annonce }
+                     " +" " BVALIDE" DbReplace
+                     " Annonce valide !" line0
+                     1000 delay
+                     " [1] = Valider   [2] = Supprimer" line0
+
+                   endof
+
+                   2 of
+
+                     // ===== { On supprime l'annonce }
+                     Dbdelete
+                     " Annonce supprime !" line0
+                     1000 delay
+                     clear0
+
+                   endof
+
+                  " Choix invalide !" line0
+                  drop
+
+               endcase
+
+             else
+                 " Choix invalide !" line0
+
+             endif
+
+             // On raffiche la liste
+             // (on se repositionne au dbut)
+             " VALIDE" dbsetindex
+             dbtop
+             " -" clepa :=
+
+             clepa dbseek
+             if
+               " il en reste" display
+//             AfficheListe
+               AfficheDetQuest
+               cursoron
+
+             else
+                 " plus d'annonces en attente" line0
+                 true bFini :=
+                 false bGestion :=
+
+             endif
+
+           else
+               true bFini :=
+               false bGestion :=
+
+           endif
+
+         else
+             MenuDetQuest
+             // On raffiche la liste
+             // (on se repositionne au dbut)
+            " ANNONCE" dbsetindex
+            dbtop
+            FiltreService "  " 10 padr clepa :=
+            ThemePA 10 <
+            if
+              "  " clepa strcat
+
+            endif
+
+            ThemePa str clepa strcat
+            " +" clepa strcat
+            clepa dbseek drop
+            AfficheListe
+            cursoron
+
+         endif
+
+      else
+         // Gestion des touches
+         fkey
+         case
+
+             fksuite  of
+
+                // Page suivante
+                // On regarde si on a encore des annonces … afficher
+                dbeof !
+                bGestion
+                if
+                  " BVALIDE" dbfield " -" == &&
+                else
+                  " BVALIDE" dbfield " +" == &&
+                endif
+
+                if
+                  AfficheListe
+                  npage ++
+
+                else
+                    " Dernire page" line0
+
+                endif
+
+             endof
+
+             fkretour of
+
+                // Page prcdente
+                npage 1 >
+                if
+                  // SKIP -((nquest-1)+17)
+                  nquest 1 - 17 + negate
+                  dbskip
+                  AfficheListe
+                  npage --
+
+                else
+                    " Premire page" line0
+
+                endif
+
+             endof
+
+             drop
+
+         endcase
+
+      endif
+
+   repeat
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Choix Lire / Ecrire d'une PA
+//
+: PALireEcrire
+
+   cursoroff
+   " MODULES\PAGP\LIRECR.VTX" SendPage
+   cursoron
+   FALSE bGestion :=
+
+   begin
+        20 23 locate
+        input csaisie :=
+        fkey fksommaire !=
+
+   while
+        // On regarde si on a saisi le mot-clef de gestion
+        csaisie " **SYSOP" ==
+        if
+          TRUE bGestion ==
+          if
+            " Dja quelqu'un en sysop" line0
+
+          else
+              TRUE bGestion :=
+              " MODE GESTIONNAIRE ACTIVE" line0
+              beep
+
+              // { On regarde si il y a des annonces en attente de validation. }
+              " VALIDE" dbsetindex
+              " -" clepa :=
+
+              clepa dbseek
+              if
+                " Il y a des annonces" line0
+                AfficheListe
+                MenuListe
+
+                // { On raffiche le menu. }
+                cursoroff
+                " MODULES\PAGP\LIRECR.VTX" sendpage
+                cursoron
+
+              else
+                  " Pas d'annonces … valider" line0
+
+              endif
+
+          endif
+
+         else
+
+             csaisie val nchoix :=
+             nchoix
+
+             case
+                 1 of                             // Lire une annonce
+
+                    // On regarde si il y a au moins une annonce
+
+                    " ANNONCE" dbsetindex
+                    FiltreService "  " 10 padr clepa :=
+                    ThemePA 10 <
+                    if
+                      "  " clepa strcat
+
+                    endif
+
+                    ThemePa str clepa strcat
+                    " +" clepa strcat
+                    clepa dbseek
+                    if
+                      AfficheListe
+                      MenuListe
+
+                      // On raffiche le menu.
+                      cursoroff
+                      " MODULES\PAGP\LIRECR.VTX" sendpage
+                      cursoron
+
+                    else
+                        " Pas d'annonces pour l'instant" line0
+
+                    endif
+
+                 endof
+
+               2 of                             // Ecrire une annonce
+                   " ANNONCE" dbsetindex
+                   " MODULES\PAGP\PAEXPL.VTX" SendPage
+                   wait
+                   fkey fksommaire !=
+                   if
+                     InitSaisie
+
+                   endif
+
+                    // On raffiche le menu.
+                    cursoroff
+                    " MODULES\PAGP\LIRECR.VTX" sendpage
+                    cursoron
+
+               endof
+
+               drop
+
+               " Choix incorrect" line0
+
+            endcase
+
+         endif
+
+      repeat
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion des annonces du sous-menu locations immobilires
+//
+: GestionMenuLocImmo
+
+   PALireEcrire
+   cursoroff
+   " MODULES\PAGP\MENIMLOC.VTX" sendpage
+   cursoron
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Sous-menu locations immobilires
+//
+: MenuLocImmo
+
+   cursoroff
+   " MODULES\PAGP\MENIMLOC.VTX" sendpage
+   cursoron
+
+   begin
+        FALSE
+        20 23 locate
+        input csaisie :=
+        fkey fksommaire !=
+        if
+          csaisie val
+          case
+              1 of
+
+                31 ThemePA :=
+                GestionMenuLocImmo
+                drop TRUE
+
+              endof
+
+              2 of
+
+                32 ThemePA :=
+                GestionMenuLocImmo
+                drop TRUE
+
+              endof
+
+              3 of
+
+                33 ThemePA :=
+                GestionMenuLocImmo
+                drop TRUE
+
+              endof
+
+              4 of
+
+                34 ThemePA :=
+                GestionMenuLocImmo
+                drop TRUE
+
+              endof
+
+              5 of
+
+                35 ThemePA :=
+                GestionMenuLocImmo
+                drop TRUE
+
+              endof
+
+              6 of
+
+                36 ThemePA :=
+                GestionMenuLocImmo
+                drop TRUE
+
+              endof
+
+              drop
+              " Saisie invalide !"
+              1000 wait
+              clear0
+
+          endcase
+
+        else
+            //===== Retour … la page de garde
+            cursoroff
+            " MODULES\PAGP\PAGARDE.VTX" sendpage
+            cursoron
+            drop TRUE
+
+        endif
+
+   until
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion des annonces du sous-menu automobiles
+//
+: GestionMenuAuto
+
+   PALireEcrire
+   cursoroff
+   " MODULES\PAGP\MENUAUTO.VTX" sendpage
+   cursoron
+
+;
+
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Sous-menu automobiles
+//
+: MenuAuto
+
+   cursoroff
+   " MODULES\PAGP\MENUAUTO.VTX" sendpage
+   cursoron
+
+   begin
+        FALSE
+        20 23 locate
+        input csaisie :=
+        fkey fksommaire !=
+        if
+          csaisie val
+          case
+              1 of
+
+                51 ThemePA :=
+                GestionMenuAuto
+                drop TRUE
+
+              endof
+
+              2 of
+
+                52 ThemePA :=
+                GestionMenuAuto
+                drop TRUE
+
+              endof
+
+              3 of
+
+                53 ThemePA :=
+                GestionMenuAuto
+                drop TRUE
+
+              endof
+
+              4 of
+
+                GestionMenuAuto
+                drop TRUE
+
+              endof
+
+              drop
+              " Saisie invalide !"
+              1000 wait
+              clear0
+
+          endcase
+
+        else
+            //===== Retour … la page de garde
+            cursoroff
+            " MODULES\PAGP\PAGARDE.VTX" sendpage
+            cursoron
+            drop TRUE
+
+        endif
+
+   until
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Menu gnral du Module.
+//
+: MenuGen
+
+   " %0.f" using
+   // On sauvegarde la base courante.
+   dbselected
+   // Ouverture du fichier principal.
+   " MODULES\PAGP\PAGP" dbopen
+   if
+     begin
+          FALSE
+          cursoroff
+          " MODULES\PAGP\PAGARDE.VTX" sendpage
+          cursoron
+
+          begin
+               FALSE
+               20 23 locate
+               input csaisie :=
+               fkey fksommaire !=
+               if
+                 csaisie val ThemePa :=
+                 ThemePa 0 > ThemePa 7 < &&
+                 if
+                   ThemePa
+                   case
+                       3 of          //===== Location immobilieres
+
+                         MenuLocImmo
+
+                       endof
+
+                       5 of          //===== Automobile
+
+                         MenuAuto
+
+                       endof
+
+                       drop
+                       PALireEcrire
+                       cursoroff
+                       " MODULES\PAGP\PAGARDE.VTX" sendpage
+                       cursoron
+
+                   endcase
+
+                 else
+                     " Choix incorrect" line0
+                     FALSE
+
+                 endif
+
+               else
+                   drop TRUE
+
+               endif
+
+          until
+
+      until
+
+      " PA" dbclose
+
+   else
+      " ERREUR A L'OUVERTURE DU FICHIER PA" line0
+   endif
+
+   // On reslecionne l'ancienne base
+   dup empty? !
+   if
+      dbselect
+   else
+      drop
+   endif
+
+   usingoff
+
+;
+
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+// Liste des thmes :
+//
+// 1  : Jeux vidos
+// 2  : Matriel informatique
+// 31 : Location studio
+// 32 : Location F2
+// 33 : Location F3
+// 34 : Location F4
+// 35 : Location pavillons
+// 36 : Location saisonnires
+// 4  : Vente appartement / maison
+// 5  : Automobile - Divers
+// 51 : Automobile - Renault
+// 52 : Automobile - Peugeot
+// 53 : Automobile - Citroen
+// 6  : Annonces diverses

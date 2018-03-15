@@ -1,0 +1,48 @@
+\ ------------------------------------------------------------------------------
+\                          Manipulation de matrices.
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement des utilitaires de manipulation de MATRICES )
+
+\ D‚claration d'une matrice d'Octets … deux dimensions
+: CARRAY        ( dimX dimY --- )
+  CREATE
+    2DUP SWAP
+    ,           ( dimX dans PFA   )
+    ,           ( dimY dans PFA+2 )
+    * ALLOT     ( reserve dimX * dimY octets )
+  DOES>         ( X Y [PFA] --- )
+    >R
+    OVER R@ @   ( X Y --- X dimX )
+    U< NOT ABORT" CARRAY : Indice X hors limites"
+    DUP R@ 2+ @ ( X Y --- Y dimY )
+    U< NOT ABORT" CARRAY : Indice Y hors limites"
+    R>
+    DUP @       ( X Y [PFA] --- dimX )
+    ROT *       ( X [PFA] --- dimX*Y )
+    + + 4 +     ( --- [PFA]+4+dimX*Y+X )
+;
+
+\ D‚claration d'une matrice de Mots … deux dimensions
+: ARRAY         ( dimX dimY --- )
+  CREATE
+    2DUP SWAP
+    ,           ( dimX dans PFA   )
+    ,           ( dimY dans PFA+2 )
+    * 2* ALLOT  ( reserve dimX * dimY mots )
+  DOES>         ( X Y [PFA] --- )
+    >R
+    OVER R@ @   ( X Y --- X dimX )
+    U< NOT ABORT" ARRAY : Indice X hors limites"
+    DUP R@ 2+ @ ( X Y --- Y dimY )
+    U< NOT ABORT" ARRAY : Indice Y hors limites"
+    R>
+    DUP @       ( X Y [PFA] --- dimX )
+    ROT * 2*    ( X [PFA] --- dimX*Y )
+    + SWAP 2* + ( --- [PFA]+dimX*2Y+2X )
+    4 +         ( --- [PFA]+dimX*2Y+2X+4 )
+;
+
+EOF
+
+

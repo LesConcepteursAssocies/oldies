@@ -1,0 +1,53 @@
+\
+\ Test de FGDRIVER
+\
+EXIST? FASTGRAF NOT ?\ INCLUDE FGDRIVER.FTH
+
+ONLY FORTH ALSO FASTGRAF ALSO
+FORTH DEFINITIONS
+DECIMAL
+
+4 CONSTANT FGPAGES
+
+VARIABLE OLDMODE
+VARIABLE NEWMODE
+
+: FGDEMO32 ( --- )
+   FASTGRAPH?
+   IF
+      80 25 FGPAGES FGBESTMODE NEWMODE !
+      NEWMODE @
+      0<
+      IF
+         ABORT" Cette d‚monstration n‚c‚ssite un ‚cran 80 colonnes"
+      THEN
+      FGGETMODE OLDMODE !
+      NEWMODE @ FGSETMODE
+      0 FGCURSOR
+      FGPAGES 0
+      DO
+         I FGALLOCATE DROP
+         I FGSETPAGE
+         7 FGSETCOLOR
+         0 FGGETMAXX 0 FGGETMAXY FGRECT
+         0 7 0 FGSETATTR
+         12 37 FGLOCATE
+         " PAGE Nø " FGTEXT
+         I (.) FGTEXT
+      LOOP
+      FGPAGES 0
+      DO
+         I FGSETVPAGE
+         18 FGWAITFOR
+         I FGFREEPAGE DROP
+      LOOP
+      OLDMODE @ FGSETMODE
+      FGRESET
+      1 FGCURSOR
+   ELSE
+      CR ." Le driver FastGraph n'est pas charg‚ !!" CR
+   THEN
+;
+
+EOF
+

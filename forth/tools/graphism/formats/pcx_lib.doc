@@ -1,0 +1,130 @@
+                 MANIPULATION DU FORMAT GRAPHIQUE PCX
+                 -------------------------------------
+
+Ce programme permet de lire les fichiers graphiques des modes 320x200,
+au format PCX.
+
+GENERALITES.
+------------
+
+Le format PCX est un des plus anciens formats graphiques, et a ‚t‚ con‡u par
+la soci‚t‚ ZSoft.
+Il est utilis‚ par le logiciel Paint Brush, entre autre.
+Son principe de codage est relativement simple et efficace, ce qui fait qu'on
+l'utilise encore beaucoup de nos jours.
+
+STRUCTURE D'UN FICHIER PCX.
+---------------------------
+
+Un fichier au format PCX est compos‚ de deux ou trois parties, suivant le
+mode graphique utilis‚ :
+
+  - Un entˆte de 128 octets (fixe).
+
+  - Une zone contenant les donn‚es de l'images (fixe).
+
+  - Une zone contenant la palette de couleurs (si l'image est au mode
+    MCGA 256 couleurs uniquement).
+
+L'entˆte du fichier, qui permet de savoir … quel type d'image l'on a … faire,
+se d‚compose de la fa‡on suivante :
+
+---------+----------------+------------------------------
+Octet nø |   Description  |      Commentaires
+---------+----------------+------------------------------
+   0     | Identificateur | Toujour … 10 (0Ah)
+---------+----------------+------------------------------
+   1     | Nø de version  | 0 = Version 2.5
+         |                | 1 = Version 2.8
+         |                | 3 = Version 2.8 Sans palette
+         |                | 5 = Version 3.0
+---------+----------------+------------------------------
+   2     | Technique      | 1 = R.L.E.
+         | d'encodage     | (Run Length Encoding)
+---------+----------------+------------------------------
+   3     | Nbre de bits   | g‚n‚ralement 1, 2,
+         | par pixel      | ou 8
+---------+----------------+------------------------------
+ 4 - 5   | Xmin           | coordonn‚es du
+---------+----------------+ coin sup‚rieur
+ 6 - 7   | Ymin           | gauche de l'image
+---------+----------------+------------------------------
+ 8 - 9   | Xmax           | coordonn‚es du
+---------+----------------+ coin inf‚rieur
+ 10 - 11 | Ymax           | droit de l'image
+---------+----------------+------------------------------
+ 12 - 13 | R‚solution     |
+         | horizontale    | taille
+---------+----------------+ de l'image
+ 14 - 15 | R‚solution     |
+         | verticale      |
+---------+----------------+------------------------------
+ 16 - 63 | Palette        | compos‚e de triplets de
+         |                | valeurs (R, G, B)
+         |                | mis … 0 si MCGA 256 couleurs
+---------+----------------+------------------------------
+   64    | R‚serv‚        | en g‚n‚ral, mis … 0
+---------+----------------+------------------------------
+   65    | Nbre de plans  | g‚n‚ralement 1 ou 4
+---------+----------------+------------------------------
+ 66 - 67 | Nbre d'octets  | g‚n‚ralement 40 ou 80,
+         | par ligne      | suivant la r‚solution
+---------+----------------+------------------------------
+ 68 - 69 | Informations   | 1 = Couleur ou N&B
+         | palette        | 2 = Niveaux de gris
+         |                | g‚n‚ralement ignor‚ par les
+         |                | convertisseurs
+---------+----------------+------------------------------
+70 - 127 | R‚serv‚s       | mis … 0
+---------+----------------+------------------------------
+
+Les octets 3 et 65 permettent de diff‚rencier le mode graphique (ce
+que fait le mot #PCX-FORMAT).
+
+Vient ensuite la zone des donn‚es de l'image.
+
+Ensuite, si la version est la 3.0, la palette des images en
+mode MCGA 256 couleurs (256 fois 3 valeurs R G B) est stock‚e
+… la fin du fichier.
+
+PRINCIPE DE CODAGE.
+-------------------
+
+La m‚thode utilis‚e est celle appel‚e "Run Length Encoding", qui consiste
+… compter le nombre d'occurence d'un octet d'image, puis … stocker dans
+le fichier ce compteur suivi de l'octet … r‚p‚ter.
+
+La question qui vient tout de suite … l'esprit est la suivante :
+comment diff‚rencier un compteur d'un octet d'image ?
+
+le format PCX pallie … ce problŠme en limitant … 63 le nombre d'occurence, et
+en ajoutant 192 au compteur (C0h), ce qui fait que toute valeur sup‚rieur …
+C0 est un compteur, suivi de l'octet … r‚p‚ter.
+
+CODAGE DES IMAGES.
+------------------
+
+L'image est cod‚e sans entrelacement, quel que soit le mode graphique.
+
+CGA :  l'image est cod‚e en s‚quence, ligne 0, ligne 1, ...
+       au d‚codage, on doit donc permuter … chaque fin de ligne, entre
+       la zone des lignes paires et impaires (ce que fait la s‚quence
+       SWAP 0200h XOR sur l'adresse de segment. En effet B800 XOR 200 = BA00,
+       et BA00 XOR 200 = B800).
+
+EGA :  l'image est cod‚e ligne par ligne, et pour chaque ligne, plan par plan,
+       ligne 0 plan0, ligne 0 plan 1, ligne 0 plan 2, ..., le d‚codage doit
+       permuter chaque plan … la fin de chaque ligne.
+       Ceci est aussi valable pour les modes VGA.
+
+MCGA : Le plus simple … d‚coder, puisque la m‚moire ‚cran est lin‚aire
+       (1 point = 1 octet).
+
+INFORMATIONS PALETTE.
+---------------------
+
+Actuellement, seule la palette MCGA 256 couleurs est r‚cup‚r‚e, mais rien ne
+vous empŠche d'exploiter la palette EGA (quelques outils sont d‚j…
+implant‚s), ce qui ne devrait pas poser de problŠmes. 
+
+

@@ -1,0 +1,16 @@
+//
+// test mlinput
+//
+
+: main
+  cls
+  cursoron
+  " test mlinput" print cr
+  3 1 locate
+  5 40 mlinput
+  cr " *** lignes saisies" print cr
+  5 0 do print cr loop
+  " *** fin" print
+  wait
+;
+

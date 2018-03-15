@@ -1,0 +1,298 @@
+                               PARAMETRAGE DU SERVEUR
+                               ----------------------
+
+Il est possible de modifier certains paramŠtres systŠmes du serveur, en
+renseignant un fichier d'initialisation, de nom "NEOSERV.INI".
+Ce fichier, lu au lancement du serveur, comporte les sections suivantes:
+
+[Local]        : Permet de paramŠtrer un port de communication LOCAL.
+
+Syntaxe g‚n‚rale:
+COM = n SPEED = n PARITY = NONE|ODD|EVEN LEN = n STOP = n IOBASE = x IRQ = n
+Avec:
+   COM    = n      Nø du port con‡ern‚ (1..4)
+   SPEED  = n      Vitesse en bauds (50..38400)
+   PARITY = ...    Parit‚ (NONE,ODD ou EVEN)
+   LEN    = n      Longueur des octets en bit (5..8)
+   STOP   = n      Nombre de bit de stop (1..2)
+   IOBASE = x      Adresse du port en HEXA (rappel: COM1=03F8, COM2=02F8)
+   IRQ    = n      Nø de l'irq (2..7) (rappel: COM1=IRQ4, COM2=IRQ3)
+
+Exemple:
+COM = 2 SPEED = 1200 PARITY = EVEN LEN = 7 STOP = 1 IOBASE = 2F8 IRQ = 3
+
+
+[X25-ASM]      : Permet de paramŠtrer un port de communication X25 … la norme
+                 ASM.
+                 Le format des trames … la norme ASM est celui d‚finit sur
+                 les cartes X25 de marque CORINTE, et est le suivant:
+                 2TC....3
+                 2 : Marqueur de d‚but de paquet (STX, caractŠre 02).
+                 T : Type du paquet, avec le codage suivant:
+                     car. 49 : Paquet d'appel.
+                     car. 48 : Paquet de donn‚es.
+                     car. 50 : Paquet de lib‚ration.
+                 C : Num‚ro de Circuit Virtuel, avec le codage suivant:
+                     CV = C - 64
+                 ..: donn‚es du paquet.
+                 3 : Marqueur de fin de paquet (ETX, caractŠre 03).
+
+                 Format d'une trame d'appel:
+                 26DDPPPPPPpp/NC/0/../DAPPEL3
+
+                 2      : Marqueur de d‚but de paquet (STX, caractŠre 02).
+                 DD     : D‚partement (2 caractŠres).
+                 PPPPPP : Pavi (6 caractŠres).
+                 pp     : Palier (2 caractŠres).
+                 NC     : Num‚ro compl‚mentaire.
+                 DAPPEL : Donn‚e d'appel (nom du service).
+                 3      : Marqueur de fin de paquet (ETX, caractŠre 03).
+
+Syntaxe g‚n‚rale:
+COM = n SPEED = n PARITY = NONE|ODD|EVEN LEN = n STOP = n IOBASE = x IRQ = n
+Avec:
+   COM    = n      Nø du port con‡ern‚ (1..4)
+   SPEED  = n      Vitesse en bauds (50..19200)
+   PARITY = ...    Parit‚ (NONE,ODD ou EVEN)
+   LEN    = n      Longueur des octets en bit (5..8)
+   STOP   = n      Nombre de bit de stop (1..2)
+   IOBASE = x      Adresse du port en HEXA (rappel: COM1=03F8, COM2=02F8)
+   IRQ    = n      Nø de l'irq (2..7) (rappel: COM1=IRQ4, COM2=IRQ3)
+
+Exemple:
+COM = 2 SPEED = 1200 PARITY = EVEN LEN = 7 STOP = 1 IOBASE = 2F8 IRQ = 3
+
+
+[X25-MITEC]    : Permet de paramŠtrer un flux X25 sur cartes MITEC.
+
+Syntaxe g‚n‚rale:
+COM = n
+Avec:
+   COM    = n      Nø du port affect‚ … la carte.
+
+Exemple:
+COM = 2
+
+
+[RTC]          : Permet de paramŠtrer un port de communication RTC.
+                 Un port de type RTC est reli‚ … un modem compatible HAYES.
+
+Syntaxe g‚n‚rale:
+COM = n SPEED = n PARITY = NONE|ODD|EVEN LEN = n STOP = n IOBASE = x IRQ = n NAME = ... APP = ...
+Avec:
+   COM    = n      Nø du port con‡ern‚ (1..4)
+   SPEED  = n      Vitesse en bauds (50..38400)
+   PARITY = ...    Parit‚ (NONE,ODD ou EVEN)
+   LEN    = n      Longueur des octets en bit (5..8)
+   STOP   = n      Nombre de bit de stop (1..2)
+   IOBASE = x      Adresse du port en HEXA (rappel: COM1=03F8, COM2=02F8)
+   IRQ    = n      Nø de l'irq (2..7) (rappel: COM1=IRQ4, COM2=IRQ3)
+   NAME   = ...    Nom du modem con‡ern‚ (25 caractŠres maxi)
+   APP    = ...    Nom de l'application … relier au port (10 caractŠres maxi)
+                   Si l'application n'existe pas … l'arriv‚e d'un appel,
+                   le processus d'autoconnexion est appliqu‚ (voir plus bas).
+
+Chaque port RTC est attach‚ … un modem identifi‚ par son NOM. Ce nom est
+utilis‚ par le serveur pour aller chercher dans la base MODEMS.DBF, les
+diverses chaines HAYES n‚c‚ssaires … son fonctionnement.
+
+La structure de la base MODEMS.DBF est la suivante:
+NOM (25 c.)     : Nom du modem, en g‚n‚ral unique dans la base (est utilis‚ comme
+                  index pour le positionnement).
+RAZ (40 c.)     : Contient la chaine d'initialisation (exemple: "ATZ") qui est
+                  envoy‚e au modem … l'initialisation du port.
+INITxxx (40 c.) : Contient la chaine d'initialisation de la vitesse donn‚e par
+                  le paramŠtre SPEED (INIT1200, INIT2400, ...)
+HANGUP (40 c.)  : Contient la chaine de raccrochage … envoyer au modem en cas
+                  de lib‚ration par le serveur.
+
+Exemple:
+COM = 2 SPEED = 1200 PARITY = EVEN LEN = 7 STOP = 1 IOBASE = 2F8 IRQ = 3 NAME = SPORTSTER14400
+
+
+[TarifsPalier] : Permet de d‚finir les montants des reversements pour les
+                 divers paliers g‚r‚s par le serveur.
+
+Syntaxe g‚n‚rale:
+NOMPALIER = xx.xx
+Avec:
+   NOMPALIER = Nom du palier con‡ern‚
+               Le serveur reconnait les paliers suivants:
+               3614 T20, 3615 T34, 3615 T36, 3615 T44,
+               3616 T34, 3616 T36, 3617 T44, 3617 T46,
+               3617 T60, 3628 T60, 3629 T70
+   xx.xx     = Montant du reversement effectu‚ par france t‚l‚com,
+               en francs par minute.
+Exemple:
+3615 T34 = 0.61
+Initialise le palier bas du 3615 … 0.61 F/mn
+
+
+[Couleurs]     : Permet de d‚finir les couleurs des diverses zones
+                 d'affichage du serveur.
+
+Syntaxe g‚n‚rale:
+NOMZONE = CC / CF
+Avec:
+   NOMZONE = Nom de la zone con‡ern‚e
+             Le serveur reconnait les zones suivantes:
+             "SYS" pour les couleurs de la fenˆtre systŠme
+             "INF" pour les couleurs de la fenˆtre d'information g‚n‚rale
+             "CMD" pour les couleurs de la fenˆtre de saisie des commandes
+             "ERR" pour les couleurs de la fenˆtre des messages d'erreur
+             "CUR" pour les couleurs du curseur
+             "BDX" pour les bandeaux d'affichages (liste des connect‚s,
+                   statistiques, ...).
+   CC      = Couleur des caractŠres
+   CF      = Couleur du fond
+             Le serveur reconnait les couleurs suivantes:
+             NOIR, BLEU, VERT, CYAN, ROUGE, MAGENTA, MARRON, BLANC
+Exemple:
+SYS = BLANC / BLEU
+Initialise la zone d'affichage des informations systŠmes, avec une couleur
+de caractŠre blanche, sur fond bleu.
+
+
+[System]       : Permet de d‚finir certains paramŠtres systŠmes.
+
+ParamŠtres disponibles:
+
+ARRETSERVEUR   : Permet de programmer l'heure d'arret du serveur.
+Syntaxe : ARRETSERVEUR = HH:MM
+          HH = Heure d'arret souhait‚e (0 … 23)
+          MM = Minutes souhait‚e (0 … 59)
+          Quand l'heure sera atteinte, le serveur s'arretera
+          automatiquement.
+          L'heure d'arret par d‚faut est 04:00
+
+          Exemple: ARRETSERVEUR = 21:50
+                   programme l'arret du serveur … 21h50mn
+
+ARRETAUTO      : Permet d'activer ou pas l'heure d'arret automatique
+                 du serveur.
+Syntaxe : ARRETAUTO = OUI|NON
+          Mettre "OUI" pour activer l'heure d'arret automatique, "NON"
+          sinon.
+          Si ARRETAUTO = NON, l'heure d'arret ci-dessus n'est pas prise
+          en compte.
+          Par d‚faut, ARRETAUTO = OUI.
+
+          Exemple: ARRETAUTO = OUI
+
+PATHAPPS       : Permet de d‚finir le chemin principal des applications.
+Syntaxe : PATHAPPS = Chemin
+          La commande LOAD cherchera les application … charger dans le
+          chemin d‚finit, ainsi que la directive #USE.
+
+          Exemple: PATHAPPS = L:\NEOSERV\APPS
+
+BEEPONCNX      : Permet d'activer ou pas le beep … chaque appel
+                 entrant sur le serveur.
+Syntaxe : BEEPONCNX = OUI|NON
+          Mettre "OUI" pour activer le beep … chaque appel, "NON"
+          sinon.
+          Par d‚faut, BEEPONCNX = NON.
+
+          Exemple: BEEPONCNX = OUI
+
+SAUVEECRAN     : Permet de param‚trer la fr‚quence sauvegarde de l'‚cran
+                 en cas d'inactivit‚ clavier.
+Syntaxe : SAUVEECRAN = Mn
+          Mn = Nombre de minutes entre chaque sauvegarde (compris entre
+          1 et 60).
+          Au bout du temps donn‚, l'‚cran s'‚teint. L'appui d'une touche
+          quelconque le rallume.
+          Si vous ne souhaitez pas de sauvegarde de l'‚cran, mettre 0.
+          Par d‚faut, SAUVEECRAN = 5
+
+          Exemple : SAUVEECRAN = 10
+                    SAUVEECRAN = 0
+
+SAUVEBASES     : Permet de param‚trer la fr‚quence de sauvegarde des bases
+                 systŠmes du serveur (APPSTAT, APPSYS, NEOSTAT, NEOSYS).
+Syntaxe : SAUVEBASES = Mn
+          Mn = Nombre de minutes entre chaque sauvegarde (compris entre
+          1 et 60).
+          Au bout du temps donn‚, les diverses informations systŠmes
+          sont sauvegard‚es.
+          Si vous ne souhaitez pas de sauvegarde p‚riodique, mettre 0.
+          Les bases systŠmes sont de toutes fa‡ons sauvegard‚es … la
+          sortie du serveur.
+          Par d‚faut, SAUVEBASES = 5
+
+          Exemple : SAUVEBASES = 10
+                    SAUVEBASES = 0
+
+AUTOCNX        : Permet de param‚trer le comportement du serveur, en cas
+                 de connexion infructueuse (connexion … une application
+                 inexistante ou non valide).
+Syntaxe : AUTOCNX = OUI|NON
+          Mettre "OUI" pour activer l'auto-connexion, "NON" sinon.
+          Si AUTOCNX = OUI, tout appel … une application inexistante ou
+          non valide provoquera l'ex‚cution de l'application d‚finie dans
+          le paramŠtre APPAUTOCNX (voir plus bas).
+
+          Exemple: AUTOCNX = OUI
+
+APPAUTOCNX     : Permet de d‚finir l'application … ex‚cuter en cas de
+                 connexion infructueuse, si le paramŠtre AUTOCNX (voir
+                 plus haut) est … OUI.
+Syntaxe : APPAUTOCNX = NomApp
+          NomApp est le nom (comportant un ‚ventuel chemin d'accŠs) de
+          l'application … ex‚cuter.
+          Si l'application n'existe pas, elle est automatiquement charg‚
+          dans le serveur. Si un problŠme survient … la compilation, ou si
+          l'application n'est pas valide (ne comporte pas de MAIN),
+          AUTOCNX est mis … NON, sinon il n'est pas modifi‚.
+
+Exemple : APPAUTOCNX = C:\APPS\INTRO.NPG
+          
+TRACEPAQUET    : Permet d'activer ou pas la trace des paquets entrants et
+                 sortants sur le serveur.
+Syntaxe : TRACEPAQUET = OUI|NON
+          Mettre "OUI" pour activer la trace des paquets, NON sinon.
+          Avec OUI, tous les paquets sont stock‚s dans le fichier
+          "TRAMES.LOG".
+          Par d‚faut, TRACEPAQUET = NON.
+
+          Exemple: TRACEPAQUET = OUI
+
+TRACESERVEUR   : Permet d'activer ou pas la trace des messages ‚mis par
+                 le serveur.
+Syntaxe : TRACESERVEUR = OUI|NON
+          Mettre "OUI" pour activer la trace des messages, NON sinon.
+          Avec OUI, tous les messages d'informations ‚mis par le serveur
+          dans la fenˆtre principale sont stock‚s dans le fichier
+          "NEOSERV.LOG", … l'exception des messages ayants traits aux
+          paquets (voir TRACEPAQUET).
+          Par d‚faut, TRACESERVEUR = NON.
+
+          Exemple: TRACESERVEUR = OUI
+
+VERIFCNX       : Permet de param‚trer la fr‚quence de v‚rification de
+                 l'inactivit‚ des connect‚s du serveur.
+Syntaxe : VERIFCNX = Mn
+          Mn = Nombre de minutes entre chaque v‚rification (compris entre
+          1 et 60).
+          Au bout du temps donn‚, les connect‚s actifs sont contr“l‚s.
+          Tout connect‚ n'ayant pas re‡u de paquet depuis 5 mn est
+          d‚connect‚.
+          Si vous ne souhaitez pas de v‚rification p‚riodique, mettre 0.
+          Par d‚faut, VERIFCNX = 5
+
+          Exemple : VERIFCNX = 10
+                    VERIFCNX = 0
+
+          Note: Cette fonctionnalit‚ est d‚j… active sur le r‚seau
+                TRANSPAC, qui d‚connecte automatiquement un usager au
+                bout de 3 minutes d'inactivit‚.
+
+[Load]         : Permet de sp‚cifier les applications … charger
+                 automatiquement au lancement du serveur.
+                 Chacune des lignes suivantes est le nom d'une application
+                 … charger.
+                 Jusqu'… 100 nom d'applications peuvent ˆtres sp‚cifi‚s.
+          Exemple : [Load]
+                    C:\APPS\APPLI1
+                    L:\NEOSERV\APPLI2
+

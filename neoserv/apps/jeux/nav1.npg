@@ -1,0 +1,445 @@
+// ========================================================================== // 
+// Bataille Navalle Version 1.00
+//
+// Date de cr‚ation : 05/07/94
+// Date de mise … jour : 09/01/95
+//
+// Librairies de fonctions du joueur 1
+//
+// ========================================================================== //
+
+#use Nav0
+
+LOCAL
+	NUMBER PosX PosY
+
+: AffectContour
+
+	// X + 1 ; Y
+	PosX ++
+	PosX 11 <
+	if
+		PosY PosX Nav0.Tab1 " 0" ==
+		if
+			" 1" PosY PosX Nav0.Tab1 :=
+		endif
+	endif
+
+	// X ; Y + 1
+	PosX --
+	PosY ++
+	PosY 11 <
+	if
+		PosY PosX Nav0.Tab1 " 0" ==
+		if
+			" 1" PosY PosX Nav0.Tab1 :=
+		endif
+	endif
+
+	// X - 1 ; Y
+	PosX --
+	PosY --
+	PosX 0 >
+	if
+		PosY PosX Nav0.Tab1 " 0" ==
+		if
+			" 1" PosY PosX Nav0.Tab1 :=
+		endif
+	endif
+
+	// X ; Y - 1
+	PosX ++
+	PosY --
+	PosY 0 >
+	if
+		PosY PosX Nav0.Tab1 " 0" ==
+		if
+			" 1" PosY PosX Nav0.Tab1 :=
+		endif
+	endif
+;
+
+//
+// Affectation des coordonn‚es du porte avion (4 cases)
+//
+: CalcPa1
+
+	// Calcul des coordonn‚es possibles X Y possibles en fonction de la taille
+	// du bateau
+
+	2 rnd Nav0.ii :=
+	Nav0.ii
+	if
+		10 Nav0.Xrange :=
+		Nav0.TaillePa Nav0.Xrange -=
+		Nav0.Xrange ++
+		10 Nav0.Yrange :=
+
+	else
+		10 Nav0.Xrange :=
+		10 Nav0.Yrange :=
+		Nav0.TaillePa Nav0.Yrange -=
+		Nav0.Yrange ++
+
+	endif
+	
+	Nav0::Hasard
+
+	" 5" Nav0.yy Nav0.xx Nav0.Tab1 :=
+
+	Nav0.ii 
+	if
+		Nav0.xx Nav0.ii :=
+		" 5" Nav0.yy Nav0.ii Nav0.Tab1 :=
+		// Case environnantes
+		Nav0.yy PosY :=
+		Nav0.ii PosX :=
+		AffectContour
+
+		3 0 
+		do
+			Nav0.ii ++
+			" 5" Nav0.yy Nav0.ii Nav0.Tab1 :=
+			Nav0.yy PosY :=
+			Nav0.ii PosX :=
+			AffectContour
+		loop
+
+	else
+
+		Nav0.yy Nav0.ii :=
+		" 5" Nav0.ii Nav0.xx Nav0.Tab1 :=
+		// Case environnantes
+		Nav0.ii PosY :=
+		Nav0.xx PosX :=
+		AffectContour
+
+		3 0 
+		do
+			Nav0.ii ++
+			" 5" Nav0.ii Nav0.xx Nav0.Tab1 :=
+			// Case environnantes
+			Nav0.ii PosY :=
+			Nav0.xx PosX :=
+			AffectContour
+
+		loop
+
+	endif
+;
+
+//
+// Affectation des coordonn‚es du croiseur (3 cases)
+//
+: CalcCr1
+
+	// Calcul des coordonn‚es possibles X Y possibles en fonction de la taille
+	// du bateau
+
+	2 rnd Nav0.ii :=
+	Nav0.ii
+	if
+		10 Nav0.Xrange :=
+		Nav0.TailleCr Nav0.Xrange -=
+		Nav0.Xrange ++
+		10 Nav0.Yrange :=
+
+	else
+		10 Nav0.Xrange :=
+		10 Nav0.Yrange :=
+		Nav0.TailleCr Nav0.Yrange -=
+		Nav0.Yrange ++
+
+	endif
+	
+	Nav0::Hasard
+
+	// On v‚rifie que le coordonn‚es choisies sont libres
+	1 Nav0.Res :=
+
+	Nav0.yy Nav0.xx Nav0.Tab1 " 0" !=
+	if
+		0 Nav0.Res :=
+	endif
+
+	Nav0.ii
+	if
+		Nav0.xx Nav0.jj :=
+		Nav0.jj ++
+		Nav0.yy Nav0.jj Nav0.Tab1 " 0" !=
+		if
+			0 Nav0.Res :=
+		endif
+		Nav0.jj ++
+		Nav0.yy Nav0.jj Nav0.Tab1 " 0" !=
+		if
+			0 Nav0.Res :=
+		endif
+	else
+		Nav0.yy Nav0.jj :=
+		Nav0.jj ++
+		Nav0.jj Nav0.xx Nav0.Tab1 " 0" !=
+		if
+			0 Nav0.Res :=
+		endif
+		
+		Nav0.jj ++
+		Nav0.jj Nav0.xx Nav0.Tab1 " 0" !=
+		if
+			0 Nav0.Res :=
+		endif
+	endif
+
+	// On affecte les coordonn‚es si les coordonn‚es sont libres
+
+	1 Nav0.Res ==
+	if
+		" 4" Nav0.yy Nav0.xx Nav0.Tab1 :=
+
+		Nav0.ii 
+		if
+			Nav0.xx Nav0.ii :=
+			" 4" Nav0.yy Nav0.ii Nav0.Tab1 :=
+			// Case environnantes
+			Nav0.yy PosY :=
+			Nav0.ii PosX :=
+			AffectContour
+
+			2 0 
+			do
+				Nav0.ii ++
+				" 4" Nav0.yy Nav0.ii Nav0.Tab1 :=
+				// Case environnantes
+				Nav0.yy PosY :=
+				Nav0.ii PosX :=
+				AffectContour
+			loop
+
+		else
+
+			Nav0.yy Nav0.ii :=
+			" 4" Nav0.ii Nav0.xx Nav0.Tab1 :=
+			// Case environnantes
+			Nav0.ii PosY :=
+			Nav0.xx PosX :=
+			AffectContour
+
+			2 0 
+			do
+				Nav0.ii ++
+				" 4" Nav0.ii Nav0.xx Nav0.Tab1 :=
+				// Case environnantes
+				Nav0.ii PosY :=
+				Nav0.xx PosX :=
+				AffectContour
+			loop
+
+		endif
+
+	endif
+;
+
+//
+// Affectation des coordonn‚es du destroyer (2 cases)
+//
+: CalcDe1
+
+	// Calcul des coordonn‚es possibles X Y possibles en fonction de la taille
+	// du bateau
+
+	2 rnd Nav0.ii :=
+	Nav0.ii
+	if
+		10 Nav0.Xrange :=
+		Nav0.TailleDe Nav0.Xrange -=
+		Nav0.Xrange ++
+		10 Nav0.Yrange :=
+
+	else
+		10 Nav0.Xrange :=
+		10 Nav0.Yrange :=
+		Nav0.TailleDe Nav0.Yrange -=
+		Nav0.Yrange ++
+
+	endif
+	
+	Nav0::Hasard
+
+	// On v‚rifie que le coordonn‚es choisies sont libres
+	1 Nav0.Res :=
+
+	Nav0.yy Nav0.xx Nav0.Tab1 " 0" !=
+	if
+		0 Nav0.Res :=
+	endif
+
+	Nav0.ii
+	if
+		Nav0.xx Nav0.jj :=
+		Nav0.jj ++
+		Nav0.yy Nav0.jj Nav0.Tab1 " 0" !=
+		if
+			0 Nav0.Res :=
+		endif
+	else
+		Nav0.yy Nav0.jj :=
+		Nav0.jj ++
+		Nav0.jj Nav0.xx Nav0.Tab1 " 0" !=
+		if
+			0 Nav0.Res :=
+		endif
+	endif
+
+	// On affecte les coordonn‚es si les coordonn‚es sont libres
+
+	1 Nav0.Res ==
+	if
+		" 3" Nav0.yy Nav0.xx Nav0.Tab1 :=
+		// Case environnantes
+		Nav0.yy PosY :=
+		Nav0.xx PosX :=
+		AffectContour
+
+		Nav0.ii 
+		if
+			Nav0.xx Nav0.ii :=
+			" 3" Nav0.yy Nav0.ii Nav0.Tab1 :=
+			// Case environnantes
+			Nav0.yy PosY :=
+			Nav0.ii PosX :=
+			AffectContour
+			Nav0.ii ++
+			" 3" Nav0.yy Nav0.ii Nav0.Tab1 :=
+			// Case environnantes
+			Nav0.yy PosY :=
+			Nav0.ii PosX :=
+			AffectContour
+
+		else
+
+			Nav0.yy Nav0.ii :=
+			" 3" Nav0.ii Nav0.xx Nav0.Tab1 :=
+			// Case environnantes
+			Nav0.ii PosY :=
+			Nav0.xx PosX :=
+			AffectContour
+			Nav0.ii ++
+			" 3" Nav0.ii Nav0.xx Nav0.Tab1 :=
+			// Case environnantes
+			Nav0.ii PosY :=
+			Nav0.xx PosX :=
+			AffectContour
+
+		endif
+
+	endif
+
+;
+
+//
+// Affectation des coordonn‚es du sous-marin (1 case)
+//
+: CalcSm1
+
+	// Calcul des coordonn‚es possibles X Y possibles en fonction de la taille
+	// du bateau
+
+	10 Nav0.Xrange :=
+	10 Nav0.Yrange :=
+
+	Nav0::Hasard
+	1 Nav0.Res :=
+
+	// On v‚rifie que le coordonn‚es choisies sont libres
+	Nav0.yy Nav0.xx Nav0.Tab1 " 0" ==
+	if
+		" 2" Nav0.yy Nav0.xx Nav0.Tab1 :=
+		// Case environnantes
+		Nav0.yy PosY :=
+		Nav0.xx PosX :=
+		AffectContour
+
+	else
+		0 Nav0.Res :=
+
+	endif
+
+;
+
+// 
+// Calcul de la position des bateaux du joueur 1 sur la grille
+//
+: CalcFlotte1
+
+	// Porte-Avion
+
+	CalcPa1
+	
+	// Croiseur
+
+	2 0
+	DO
+		BEGIN
+			CalcCr1
+			Nav0.Res
+		UNTIL
+	LOOP
+
+	// Destroyer
+
+	3 0 
+	DO
+		BEGIN
+			CalcDe1
+			Nav0.Res
+		UNTIL
+	LOOP
+
+	// Sous-marin
+
+	4 0
+	DO
+		BEGIN
+			CalcSm1
+			Nav0.Res
+		UNTIL
+	LOOP
+
+;
+
+//
+// Affichage de la grille du joueur1
+//
+: AffFlotte1
+
+	1 Nav0.jj :=
+	0 Nav0.cpt1 :=
+
+	10 0
+	do
+		0 Nav0.cpt2 :=
+		Nav0.cpt1 ++
+		Nav0.cpt1 Nav0.ii :=
+		Nav0.XC1 Nav0.ii +=
+
+		10 0
+		do
+			1 Nav0.cpt2 += 
+			Nav0.cpt2 Nav0.jj :=
+			Nav0.YC1 Nav0.jj +=
+			Nav0.cpt1 Nav0.cpt2 Nav0.Tab1 " 0" !=
+
+			if
+				Nav0.cpt1 Nav0.cpt2 Nav0.Tab1 " 1" !=
+				if
+					Nav0.ii Nav0.jj locate
+					Nav0.cpt1 Nav0.cpt2 Nav0.Tab1 print
+				endif
+
+			endif
+
+		loop
+
+	loop
+;
+

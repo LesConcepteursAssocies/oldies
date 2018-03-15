@@ -1,0 +1,23 @@
+//
+// tests binaires.
+//
+
+local
+number n1 n2
+
+: main
+   cls
+   " test" print cr
+   " entrez n1 " print
+   input val n1 :=
+   cr " entrez n2 " print
+   input val n2 :=
+   " n1 & n2 = " print
+   n1 n2 & print cr
+   " n1 && n2 = " print
+   n1 n2 && print cr
+   " n1 ! = " print
+   n1 ! print cr
+   wait
+;
+

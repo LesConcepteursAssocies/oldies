@@ -1,0 +1,473 @@
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+// PACHINKO
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+// Version 1.00
+//
+// Date de Mise … jour  : 30/05/95
+//
+// Ecrit par M. Petreman
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+
+#PATHVTX = jeux\VTX
+
+PUBLIC
+      CHAR   _CURSEUR   := "\25\46"
+      CHAR   _PSWD      := "PACH"
+      NUMBER _YPOS      := 9
+
+LOCAL
+     NUMBER XcursorPos  := 0
+     NUMBER YcursorPos  := 0
+     NUMBER NbrBilles   := 0
+     NUMBER NbrCoups    := 0
+     NUMBER Clavier
+     NUMBER Cpt Go_On
+     NUMBER Sortie      := 0
+     CHAR   Acces3614
+
+: Sommaire
+
+  1 Clavier :=
+
+;
+
+
+: Retour
+
+  3 Clavier :=
+
+;
+
+: Guide
+
+  5 Clavier :=
+
+;
+
+
+: Suite
+
+  7 Clavier :=
+
+;
+
+
+: Envoi
+
+  8 Clavier :=
+
+;
+
+
+: AffectTable
+
+   setlocalfkey fksommaire sommaire
+   setlocalfkey fkretour retour
+   setlocalfkey fkguide guide
+   setlocalfkey fksuite suite
+   setlocalfkey fkenvoi envoi
+
+;
+
+
+: .CLOUS
+  03 20  LOCATE  " I" PRINT
+  04 19  LOCATE  " I I" PRINT
+  05 18  LOCATE  " I I I" PRINT
+  06 17  LOCATE  " I I I I" PRINT
+  07 16  LOCATE  " I I I I I" PRINT
+  08 15  LOCATE  " I I I I I I" PRINT
+  09 14  LOCATE  " I I I I I I I" PRINT
+  10 13  LOCATE  " I I I I I I I I" PRINT
+  11 12  LOCATE  " I I I I I I I I I" PRINT
+  12 11  LOCATE  " I I I I I I I I I I" PRINT
+  13 10  LOCATE  " I I I I I I I I I I I" PRINT
+  14 09  LOCATE  " I I I I I I I I I I I I" PRINT
+  15 08  LOCATE  " I I I I I I I I I I I I I" PRINT
+  16 07  LOCATE  " I I I I I I I I I I I I I I" PRINT
+  17 06  LOCATE  " I I I I I I I I I I I I I I I" PRINT
+  18 05  LOCATE  " I I I I I I I I I I I I I I I I" PRINT
+  19 04  LOCATE  " _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _"  PRINT
+  20 04  LOCATE  " x   1     2     4     2     1   x"  PRINT
+
+;
+
+
+: DEPART-BILLE
+
+  19 1
+  DO
+    01 I 1 + LOCATE "  o" PRINT
+    200 DELAY
+    Clavier 7 ==
+    if
+      " Test" display
+      0 Clavier :=
+
+    endif
+
+    Clavier 8 ==
+    if
+      " Test 2" display
+      0 Clavier :=
+
+    endif
+
+  LOOP
+
+  01 20 LOCATE "  " PRINT
+  02 20 LOCATE " o" PRINT
+  20 XcursorPos :=
+  02 YcursorPos :=
+
+;
+
+
+: DESCENTE-BILLE
+
+  0 Cpt :=
+
+  Begin
+    // Effacement de la bille
+    YcursorPos  XcursorPos LOCATE  "  " PRINT
+    // choix alatoire dplacement de la bille
+    1000 RND  500 >=
+    IF
+      XcursorPos 1 + XcursorPos :=
+    ELSE
+      XcursorPos 1 - XcursorPos :=
+    ENDIF
+    YcursorPos 1 + YcursorPos :=
+    // Retraage de la bille
+    YcursorPos  XcursorPos LOCATE  " o" PRINT
+
+    clavier 1 ==
+    if
+      16 cpt :=
+      TRUE Sortie :=
+      TRUE
+
+    else
+        500 DELAY
+        cpt ++
+        16 cpt ==
+
+    endif
+
+  until
+
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { affichage nombre de billes disponibles }
+//
+: .BILLES
+
+  4 30 LOCATE
+  "  Billes" PRINT
+  5 33 locate
+  " %2d  " USING
+  NbrBilles PRINT
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { affichage nombre de coups jous }
+//
+: .COUPS
+
+  7 30 LOCATE
+  "  Coups" PRINT
+  8 33 locate
+  " %2d  " USING
+  NbrCoups PRINT
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Calcul des gains }
+//
+: ESTIME-GAINS
+  // Rappel barre de scores:
+  // " x   1     2     4     2     1   x"  PRINT
+  // Estimation gain en billes:
+  XcursorPos
+  CASE
+    08 OF  1 NbrBilles +=      ENDOF
+    14 OF  2 NbrBilles +=      ENDOF
+    20 OF  4 NbrBilles +=      ENDOF
+    26 OF  2 NbrBilles +=      ENDOF
+    32 OF  1 NbrBilles +=      ENDOF
+    DROP
+  ENDCASE
+  ;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Procdure principale du jeu
+//
+: Game
+
+  RANDOMIZE
+  5 NbrBilles :=
+  0 NbrCoups  :=
+  CLS
+  " PACHGAME.VTX" SendPage
+  .BILLES
+  .COUPS
+  .CLOUS
+  EmptyLocalFkeyTable
+  "   Appuyer sur ENVOI pour dmarrer" line0
+  wait
+  clear0
+  setlocalfkey fksommaire Sommaire
+  setlocalfkey fksuite suite
+  setlocalfkey fkenvoi envoi
+
+  BEGIN
+    DEPART-BILLE
+    NbrBilles 1 - NbrBilles :=
+    1 NbrCoups +=
+    .BILLES
+    .COUPS
+    DESCENTE-BILLE
+    Sortie
+    if
+      TRUE
+
+    else
+        // attente 1 seconde et effacement bille
+        1000 DELAY
+        YcursorPos  XcursorPos LOCATE  "  " PRINT
+        ESTIME-GAINS
+        .BILLES
+        // teste s'il n'y a plus de billes
+        NbrBilles 0 ==
+
+    endif
+
+  UNTIL
+  //
+  EmptyLocalFkeyTable
+  " ATTENTE APPUI TOUCHE" LINE0
+  WAIT
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Menu principal
+//
+: menu
+
+  " PachMenu.vtx" sendpage
+  true go_on :=
+  0 clavier :=
+  2 cpt :=
+  cpt 3 * _YPOS + 9 locate blinkon _CURSEUR print blinkoff
+
+  begin
+       go_on TRUE ==
+
+  while
+       clavier
+       case
+
+           3 of                 // retour
+
+	     0 clavier :=
+	     cpt 3 * _YPOS + 9 locate "  " print
+	     cpt 0 >
+	     if
+	       cpt --
+
+	     else
+	         3 cpt :=
+
+	     endif
+
+	     cpt 3 * _YPOS + 9 locate blinkon _CURSEUR print blinkoff
+
+	   endof
+
+           5 of                 // Guide
+
+             0 clavier :=
+             EmptyLocalFkeyTable
+             " modules\pages\Editeur.vtx" SendPage
+             wait
+             " PachMenu.vtx" sendpage
+             AffectTable
+             cpt 3 * _YPOS + 9 locate blinkon _CURSEUR print blinkoff
+
+           endof
+
+
+           7 of                 // suite
+
+	     0 clavier :=
+	     cpt 3 * _YPOS + 9 locate "  " print
+
+	     cpt 3 <
+	     if
+	       cpt ++
+
+	     else
+	         0 cpt :=
+
+	     endif
+
+	     cpt 3 * _YPOS + 9 locate blinkon _CURSEUR print blinkoff
+
+	   endof
+
+           8 of                 // envoi
+
+	     0 clavier :=
+
+	     cpt
+	     case
+	         0 of           // rgles
+
+		   " Choix non disponible !" line0
+//                   1000 wait
+//                   clear0
+		   0 cpt :=
+
+		 endof
+
+	         1 of  // scores
+
+		   " Choix non disponible !" line0
+//                   1000 wait
+//                   clear0
+		   1 cpt :=
+
+		 endof
+
+	         2 of  // jeu
+
+                   game
+        AffectTable
+		   0 clavier :=
+		   true go_on :=
+		   2 cpt :=
+
+		 endof
+
+	         3 of  // quitter
+
+		   false go_on :=
+		   3 cpt :=
+
+		 endof
+
+	         drop
+
+	     endcase
+
+	     cpt 3 !=
+	     if
+	       " PachMenu.vtx" sendpage
+	       2 cpt :=
+	       cpt 3 * _YPOS + 9 locate blinkon _CURSEUR print blinkoff
+
+	     endif
+
+	   endof
+
+           1 of
+
+	     0 clavier :=
+	     false go_on :=
+
+	   endof
+
+           drop
+
+       endcase
+
+  repeat
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Dmarrage du jeu }
+//
+: PachinkoMain
+
+   " %.0f" using
+   AffectTable
+   menu
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Accs restreint }
+//
+: AccesT2  // --- b
+   1
+   " ACCEST2.VTX" sendpage
+   cursoron
+
+   begin
+        16 32 locate fdheight setfont
+        "  " Acces3614 :=
+        Acces3614 InputVar
+        Acces3614 alltrim display
+        Acces3614 alltrim _PSWD ==
+        if
+         " OK" line0
+         drop true dup
+
+         else
+             1 + dup 3 >
+             if
+               " Fin de communication" line0
+
+               // Dconnexion
+               " \27\57\103" print
+               false
+
+             else
+
+                 false
+
+             endif
+
+         endif
+
+   until
+
+;
+
+
+: Main
+
+    Palier 82 ==                // 3614
+    if
+      AccesT2
+
+    endif
+
+    PachinkoMain
+
+;
+

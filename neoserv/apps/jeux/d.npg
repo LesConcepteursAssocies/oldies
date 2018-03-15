@@ -1,0 +1,1328 @@
+// =========================================================================== //
+//  D‚mineur pour minitel ...
+//
+// Auteur: Sebastien Maitre
+//
+// =========================================================================== //
+
+#PATHVTX jeux\VTX
+
+// type_jeu -> 1 simple     2 tournois
+local
+number nb quitter type_jeu maxX maxY nbmines mines_restantes
+number x y startx starty
+number[] 20 20 table
+
+
+// gestion du mode competition ...
+// partie gagnante ... on monte de niveau ...
+: COMPET_WIN
+
+
+;
+
+
+// partie perdante ... on descend de niveau
+: COMPET_LOSE
+
+
+;
+
+
+
+// initialise nouveau joueur ou charge partie d'un ancien ...
+: COMPET_INIT
+
+
+;
+
+
+// affichage de la rŠgle du jeu
+: GEST_REGLES                         
+  1 nb := // affectation de la premiŠre page de la rŠgle ...
+  1 startx := // startx mis … 1 => affichage, sinon on ne change rien
+  begin
+  nb 4 !=
+  while                                                          
+    startx 1 ==
+    if
+     nb
+     case
+      1 of
+         " regles1.vtx" sendpage
+        endof
+      2 of
+         " regles2.vtx" sendpage
+        endof
+      3 of
+         " regles3.vtx" sendpage
+        endof
+      drop
+      beep
+     endcase
+     0 startx :=
+    endif
+    wait
+    fkey
+    case
+     fksuite  of
+               nb ++
+               1 startx :=
+              endof
+     fkretour of
+               nb 1 >
+               if
+                nb --
+                1 startx :=
+               else
+                0 startx :=
+                beep
+               endif
+              endof
+     fksommaire of
+                 4 nb :=
+                endof
+    drop
+    endcase
+  repeat
+  " menu.vtx" sendpage
+  23 33 locate
+;
+
+
+
+// sous fonction de GEST_PARAM
+: G_ANNUL
+  nb
+  case
+   1 of       // x
+      maxX 20 <
+      if
+       2 maxX +=
+       9 36 locate "    " print
+       9 36 locate maxX print
+      else
+       beep
+      endif
+     endof
+   2 of       // y
+      maxY 20 <
+      if
+       2 maxY +=
+       15 36 locate "    " print
+       15 36 locate maxY print
+      else
+       beep
+      endif
+     endof
+   3 of       // mines
+      maxX maxY *
+      nbmines >
+      if
+       nbmines ++
+       21 36 locate "    " print
+       21 36 locate nbmines print
+      else
+       beep
+      endif
+     endof
+   drop
+  endcase
+;
+
+
+// sous fonction de GEST_PARAM
+: G_CORRECTION     
+   nb
+   case
+    1 of       // x
+       maxX 6 >
+       if
+        2 maxX -=
+        9 36 locate
+        "    " print
+        9 36 locate
+        maxX print
+       else
+        beep
+       endif
+      endof
+    2 of       // y
+       maxY 6 >
+       if
+        2 maxY -=
+        15 36 locate
+        "    " print
+        15 36 locate
+        maxY print
+       else
+        beep
+       endif
+      endof
+    3 of       // mines
+       nbmines 2 >
+       if
+        nbmines --
+        21 36 locate
+        "    " print
+        21 36 locate
+        nbmines print
+       else
+        beep
+       endif
+      endof
+    drop
+   endcase
+;
+
+
+
+// configuration du jeu ( nb cases et nb mines )
+: GEST_PARAM
+ " param.vtx" sendpage
+ 1 nb :=
+ 9 36 locate "    " print
+ 9 36 locate maxX print
+ 15 36 locate "    " print
+ 15 36 locate maxY print
+ 21 36 locate "    " print
+ 21 36 locate nbmines print
+ begin
+  FALSE
+  // aff_fleche_param
+  nb
+  case
+   1 of
+      9 3 locate
+      blinkon
+      " ->" print
+      blinkoff
+     endof
+   2 of
+      15 3 locate
+      blinkon
+      " ->" print
+      blinkoff
+     endof
+   3 of
+      21 3 locate
+       blinkon
+      " ->" print
+      blinkoff
+     endof
+   drop
+  endcase
+  wait
+  fkey
+  case
+   fkenvoi   of
+              drop TRUE
+             endof
+   fkannulation   of           // d‚cr‚mentation des divers champs ...
+               g_annul
+             endof
+   fkcorrection of             // incr‚mentation des divers champs ...
+               g_correction
+             endof
+   fksuite   of                 // gestion flŠches montrant champ actif
+              nb
+              case
+               1 of
+                  9 3 locate
+                  "   " print
+                 endof
+               2 of
+                  15 3 locate
+                  "   " print
+                 endof
+               3 of
+                  21 3 locate
+                  "   " print
+                 endof
+               drop
+              endcase
+              nb 3 <
+              if
+               nb ++    
+              else 
+               1 nb :=
+              endif
+             endof
+    fksommaire of
+                drop TRUE
+               endof
+
+    fkretour of
+              nb
+              case
+               1 of
+                  9 3 locate
+                  "   " print
+                 endof
+               2 of
+                  15 3 locate
+                  "   " print
+                 endof
+               3 of
+                  21 3 locate
+                  "   " print
+                 endof
+               drop
+              endcase
+              nb 1 >
+              if
+               nb --
+              else
+               3 nb :=
+              endif
+             endof
+   drop     
+  endcase
+ until
+;
+
+
+
+
+
+// configuration du type de jeu ( simple ou tournois )
+: GEST_OPTIONS
+
+ " options.vtx" sendpage
+ 22 21 locate
+ inverton
+ " Votre choix : " print
+ invertoff
+ 
+ begin
+   22 36 locate
+   "       " print
+   22 36 locate
+   cursoron
+   input
+   cursoroff
+
+   fkey
+
+   fkenvoi ==
+   if
+    dup
+    if
+      val
+    else
+      3
+    endif
+   else
+    3
+   endif
+
+   fkey
+   fksommaire ==
+   if
+    1 quitter :=
+   else
+    nb :=
+   endif
+
+
+
+   nb
+   case
+     1 of
+         1 type_jeu :=     // mode jeu simple positionn‚
+         gest_param        // choix des param
+         1 quitter :=
+       endof
+     2 of
+         2 type_jeu :=    // mode tournois positionn‚
+         compet_init
+         1 quitter :=
+       endof
+     drop
+     beep
+   endcase
+ quitter
+ until
+ 0 quitter :=
+ " menu.vtx" sendpage
+  23 33 locate
+;
+
+
+// initialise le tableau … des valeurs al‚atoires ...
+: INIT_TABLE
+ cls
+ 0 table afill
+ randomize         // positionne nb mines ...
+ nbmines nb :=
+ begin
+  nb 0 >
+ while
+  maxX rnd x :=
+  maxY rnd y :=
+  x y table 0 ==
+  if
+    128 x y table :=
+    nb --
+  endif
+ repeat
+;
+
+
+//  met la couleur du bg de la ligne indiqu‚e sur la pile ...
+//
+: BG_FOR_LINE
+ 1 - 12 % 1 +
+ case
+   1 of white setcolor  endof
+   2 of yellow  setcolor endof
+   3 of cyan  setcolor  endof
+   4 of green  setcolor  endof
+   5 of magenta  setcolor  endof
+   6 of red  setcolor  endof
+   7 of blue  setcolor  endof
+   8 of red  setcolor  endof
+   9 of magenta  setcolor  endof
+   10 of green setcolor  endof
+   11 of cyan setcolor  endof
+   12 of yellow setcolor  endof
+   drop
+ endcase
+;
+
+
+// dessin du cadre entourant le tableau ...
+//
+: DRAW_CADRE
+
+ starty 1 - startx 1 - locate
+ 14 emit  // mode semi graphique
+ starty 1 - bg_for_line
+ 63 emit
+ 47 emit 18 emit maxX 63 + emit // rep‚ter le carac  ...
+ 111 emit  // motif fin de ligne
+
+ starty startx 1 - locate
+ maxY 0
+ do
+   14 emit  // mode semi graphique
+   i starty + bg_for_line
+   53 emit
+   white setcolor
+   127 emit 18 emit maxX 63 + emit
+   black setcolor
+   14 emit  // mode semi graphique
+   i starty + bg_for_line
+   106 emit
+   starty i + 1 + startx 1 - locate
+ loop
+
+ 
+ starty maxY + startx 1 - locate
+ 14 emit
+ starty maxY + bg_for_line
+ 125 emit
+ 124 emit 18 emit maxX 63 + emit
+ 126 emit
+
+ 
+;
+
+
+
+: AFFICHE_TABLE
+ cls
+ 24 1 locate
+ inverton
+ " ANNULATION" print
+ invertoff
+ "  Nouvelle Partie" print
+ 24 28 locate
+ inverton
+ " SOMMAIRE" print
+ invertoff
+ "  Menu" print
+
+ 40 maxX - 2 / 1 + startx :=
+ 22 maxY - 2 / 1 + starty :=
+
+
+ 1 1 locate
+ 
+ white setcolor  127 emit 18 emit 103 emit
+ yellow setcolor 127 emit 18 emit 103 emit
+ cyan setcolor   127 emit 18 emit 103 emit
+ green setcolor  127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ blue setcolor    127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ green setcolor   127 emit 18 emit 103 emit
+ cyan setcolor    127 emit 18 emit 103 emit
+ yellow setcolor  127 emit 18 emit 103 emit
+ white setcolor   127 emit 18 emit 103 emit
+ yellow setcolor  127 emit 18 emit 103 emit
+ cyan setcolor    127 emit 18 emit 103 emit
+ green setcolor   127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ blue setcolor    127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ green setcolor   127 emit 18 emit 103 emit
+
+
+ draw_cadre
+
+// maxY 0
+// do
+//   starty i + startx locate
+//   inverton
+//   maxX 0
+//   do
+//     i j table 0 ==
+//     if
+//        "  " print
+//     else
+//        " b" print
+//     endif
+//   loop
+// loop
+;
+
+
+// initialise param d'une nouvelle partie
+: NEW_GAME
+ nbmines mines_restantes :=
+ init_table
+ affiche_table
+ starty startx locate
+ 0 x :=
+ 0 y :=
+;
+
+
+
+// comptabilise les mines … proximit‚ de la case d‚sign‚e
+// par x et y de la pile   nb contient la val de retour ...
+: COMPTE_MINES
+
+ over over 16 rot rot table |=
+
+ 0 nb :=
+ over 1 >=
+ if
+  over 1 - over table 128 &
+  if
+   nb ++
+  endif
+  dup 1 >=
+  if
+    over 1 - over 1 - table 128 &
+    if
+     nb ++
+    endif
+  endif
+  dup maxY 1 - <
+  if
+    over 1 - over 1 + table 128 &
+    if
+     nb ++
+    endif
+  endif
+ endif
+ over maxX 1 - <
+ if
+  dup 1 >=
+  if
+    over 1 + over 1 - table 128 &
+    if
+     nb ++
+    endif
+  endif
+  over 1 + over table 128 &
+  if
+   nb ++
+  endif
+  dup maxY 1 - <
+  if
+    over 1 + over 1 + table 128 &
+    if
+     nb ++
+    endif
+  endif
+ endif
+ dup 1 >=
+ if
+   over over 1 - table 128 &
+   if
+    nb ++
+   endif
+ endif
+ dup maxY 1 - <
+ if
+   over over 1 + table 128 &
+   if
+    nb ++
+   endif
+ endif
+ over over nb rot rot table |= // ou bit … bit du res ...
+ drop drop             // on vire les params de la fonc ...
+ nb                    // on empile le r‚sultat ...
+;
+
+
+// fin partie !!!
+//
+: AFF_END
+ 24 1 locate
+ "   V O U S   A V E Z   P E R D U  ! ! !  " print
+ " perdu.vtx" sendpage
+ 1 1 locate
+ white setcolor  127 emit 18 emit 103 emit
+ yellow setcolor 127 emit 18 emit 103 emit
+ cyan setcolor   127 emit 18 emit 103 emit
+ green setcolor  127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ blue setcolor    127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ green setcolor   127 emit 18 emit 103 emit
+ cyan setcolor    127 emit 18 emit 103 emit
+ yellow setcolor  127 emit 18 emit 103 emit
+ white setcolor   127 emit 18 emit 103 emit
+ yellow setcolor  127 emit 18 emit 103 emit
+ cyan setcolor    127 emit 18 emit 103 emit
+ green setcolor   127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ blue setcolor    127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ green setcolor     127 emit 18 emit 103 emit
+ draw_cadre
+ 
+ maxY 0
+ do
+   maxX 0
+   starty i + startx locate
+   inverton
+   do
+     i j table 128 &
+     if
+       i j table 64 &
+       if
+         blue setcolor  // d‚tect‚e
+         " *" print
+       else            // non d‚tect‚e
+         i x == j y == &&
+         if
+           blinkon
+           red setcolor
+           " *" print
+           blinkoff
+         else
+           white setcolor
+           " *" print
+         endif
+       endif
+     else
+       i j table 64 & // pas de mine mais on en a inscrit une
+       if
+        blinkon
+        red setcolor
+        " X" print
+        blinkoff
+       else
+        i j compte_mines
+        case
+         0 of
+            yellow setcolor
+            "  " print
+           endof
+         1 of
+            cyan setcolor
+            i j table 15 & print
+           endof
+         2 of
+            green setcolor
+            i j table 15 & print
+           endof
+         3 of
+            magenta setcolor
+            i j table 15 & print
+           endof
+         4 of
+            magenta setcolor
+            i j table 15 & print
+           endof
+         5 of
+            red setcolor
+            i j table 15 & print
+           endof
+         6 of
+            red setcolor
+            i j table 15 & print
+           endof
+         7 of
+            red setcolor
+            i j table 15 & print
+           endof
+         8 of
+            red setcolor
+            i j table 15 & print
+           endof
+         drop
+        endcase
+
+       endif
+     endif
+   loop
+ loop
+
+ type_jeu 2 ==
+ if
+   compet_lose
+ endif
+ wait
+ new_game
+;
+
+
+
+: AFF_CASE
+ inverton
+ case
+     0 of
+        yellow setcolor
+        "  " print
+       endof
+     1 of
+        cyan setcolor
+        dup print
+       endof
+     2 of
+        green setcolor
+        dup print
+       endof
+     3 of
+        magenta setcolor
+        dup print
+       endof
+     4 of
+        magenta setcolor
+        dup print
+       endof
+     5 of
+        red setcolor
+        dup print
+       endof
+     6 of
+        red setcolor
+        dup print
+       endof
+     7 of
+        red setcolor
+        dup print
+       endof
+     8 of
+        red setcolor
+        dup print
+       endof
+     drop
+ endcase
+ 8 emit
+;
+
+
+// fonction recursive de recherche des cases explorables par la machine
+: DEBLAIE
+ over over table 16 & !
+ if
+   over over table 128 & !
+   if
+     over startx + over starty + swap locate
+     over over compte_mines
+     rot rot
+     over over table 64 & !
+     if
+       over over table 32 & !
+       if
+        rot
+        dup
+        aff_case
+       endif
+     endif
+
+
+     !
+     if
+       over 1 >=
+       if
+         over 1 - over deblaie
+       endif
+       over 1 >= over 1 >= &&
+       if
+         over 1 - over 1 - deblaie
+       endif
+       over 1 >= over maxY 1 - < &&
+       if
+         over 1 - over 1 + deblaie
+       endif
+       over maxX 1 - < over 1 >= &&
+       if
+         over 1 + over 1 - deblaie
+       endif
+       over maxX 1 - <
+       if
+         over 1 + over deblaie
+       endif
+       over maxX 1 - < over maxY 1 - < &&
+       if
+         over 1 + over 1 + deblaie
+       endif
+       dup 1 >=
+       if
+         over over 1 - deblaie
+       endif
+       dup maxY 1 - <
+       if
+         over over 1 + deblaie
+       endif
+     endif
+   endif
+ endif
+ drop
+ drop
+;
+
+
+
+// calcul un nouvel affichage apres la selection d'une case ...
+: ACTU_AFF
+ x y table 16 & !
+ if
+   cursoron
+   x y deblaie
+   cursoroff
+ endif
+;
+
+
+
+// regarde si la partie est finie ou non ...
+: TEST_OVER
+ 23 1 locate " Je r‚fl‚chis ..." print
+ TRUE nb :=
+ maxY 0
+ do
+   maxX 0
+   do
+     nb
+     if
+       i j table 128 &   i j table 64 & !   &&
+       if
+         i 1 >=
+         if
+           i 1 -  j table 16 &    i 1 - j table 128 &  || !
+           if
+            FALSE nb :=
+           endif
+           j 1 >=
+           if
+             i 1 - j 1 - table 16 &   i 1 - j 1 - table 128 &  || !
+             if
+               FALSE nb :=
+             endif
+           endif
+           j maxY 1 - <
+           if
+             i 1 - j 1 + table 16 &   i 1 - j 1 + table 128 &  || !
+             if
+               FALSE nb :=
+             endif
+           endif
+         endif
+         i maxX 1 - <
+         if
+           i 1 + j table 16 &   i 1 + j table 128 &  || !
+           if
+            FALSE nb :=
+           endif
+           j 1 >=
+           if
+             i 1 + j 1 - table 16 &   i 1 + j 1 - table 128 &  || !
+             if
+               FALSE nb :=
+             endif
+           endif
+           j maxY 1 - <
+           if
+             i 1 + j 1 + table 16 &   i 1 + j 1 + table 128 &  || !
+             if
+               FALSE nb :=
+             endif
+           endif
+         endif
+         j 1 >=
+         if
+           i j 1 - table 16 &   i j 1 - table 128 &  || !
+           if
+             FALSE nb :=
+           endif
+         endif
+
+         j maxY 1 - <
+         if
+           i j 1 + table 16 &   i j 1 + table 128 &  || !
+           if
+             FALSE nb :=
+           endif
+         endif
+       else
+         i j table 64 &  i j table 128 & !  &&
+         if
+          FALSE nb :=
+         endif
+       endif
+     endif
+   loop
+ loop
+ nb
+ 23 1 locate "                 " print
+;
+
+
+
+// fin partie gagnante ...
+: GAME_OVER
+ 24 1 locate
+ "   V O U S   A V E Z   G A G N E   ! ! !  " print
+ " gagne.vtx" sendpage
+ 1 1 locate
+ white setcolor  127 emit 18 emit 103 emit
+ yellow setcolor 127 emit 18 emit 103 emit
+ cyan setcolor   127 emit 18 emit 103 emit
+ green setcolor  127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ blue setcolor    127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ green setcolor   127 emit 18 emit 103 emit
+ cyan setcolor    127 emit 18 emit 103 emit
+ yellow setcolor  127 emit 18 emit 103 emit
+ white setcolor   127 emit 18 emit 103 emit
+ yellow setcolor  127 emit 18 emit 103 emit
+ cyan setcolor    127 emit 18 emit 103 emit
+ green setcolor   127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ blue setcolor    127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ magenta setcolor 127 emit 18 emit 103 emit
+ red setcolor     127 emit 18 emit 103 emit
+ draw_cadre
+ maxY 0
+ do
+   maxX 0
+   starty i + startx locate
+   inverton
+   do
+     i j table 128 &
+     if
+       i j table 64 &
+       if
+        blue setcolor  // d‚tect‚e
+       else
+        red setcolor   // non d‚tect‚e
+       endif
+       " *" print
+     else
+       i j table 64 & // pas de mine mais on en a inscrit une
+       if
+        red setcolor
+        blinkon
+        " X" print
+        blinkoff
+       else
+        i j compte_mines
+        case
+         0 of
+            yellow setcolor
+            "  " print
+           endof
+         1 of
+            cyan setcolor
+            i j table 15 & print
+           endof
+         2 of
+            green setcolor
+            i j table 15 & print
+           endof
+         3 of
+            magenta setcolor
+            i j table 15 & print
+           endof
+         4 of
+            magenta setcolor
+            i j table 15 & print
+           endof
+         5 of
+            red setcolor
+            i j table 15 & print
+           endof
+         6 of
+            red setcolor
+            i j table 15 & print
+           endof
+         7 of
+            red setcolor
+            i j table 15 & print
+           endof
+         8 of
+            red setcolor
+            i j table 15 & print
+           endof
+         drop
+        endcase
+
+       endif
+     endif
+   loop
+ loop
+
+ type_jeu 2 ==
+ if
+  compet_win
+ endif
+
+ wait
+ new_game
+;
+
+
+
+// determine actions selon les bouton appuye, si mine presente etc.
+// param sur pile   1 => envoi  2 => repet
+//
+: PLAY_GAME
+ case
+  1 of   // envoi appuye => on marche dessus !!!
+     x y table 64 & ! x y table 32 & ! && // flag bombe non pos‚ et pas de ?
+     if
+       x y table 128 &
+       if
+        // il y a une mine ...
+        aff_end
+       else
+        // il n'y a pas de mine ...
+        actu_aff
+        test_over
+        if
+          game_over
+        endif
+        starty y + startx x + locate
+       endif
+     else
+       beep
+     endif
+    endof
+  2 of   // repetition appuy‚ => pose de drapeau ...
+      starty y + startx x + locate
+      x y table 32 & // le joueur a d‚clar‚ '?' passe au chiffre ...
+      if
+        223 x y table &=
+        inverton
+        x y table 15 &
+        case
+         0 of
+             x y table 16 &
+             if
+              yellow setcolor
+              "  " print
+             else
+              white setcolor
+              x y table 128 &
+              if
+              " b" print
+              else
+              "  " print
+              endif
+             endif
+           endof
+         1 of
+            cyan setcolor
+            x y table 15 & print
+           endof
+         2 of
+            green setcolor
+            x y table 15 & print
+           endof
+         3 of
+            magenta setcolor
+            x y table 15 & print
+           endof
+         4 of
+            magenta setcolor
+            x y table 15 & print
+           endof
+         5 of
+            red setcolor
+            x y table 15 & print
+           endof
+         6 of
+            red setcolor
+            x y table 15 & print
+           endof
+         7 of
+            red setcolor
+            x y table 15 & print
+           endof
+         8 of
+            red setcolor
+            x y table 15 & print
+           endof
+         drop
+        endcase
+      else
+        x y table 64 &  // le joueur a d‚clar‚ '*' passe … '?'
+        if
+          191 x y table &=
+          32 x y table |=
+          1 mines_restantes +=
+          blue setcolor
+          inverton
+          " ?" print
+        else       // valeur quelconque => passe … '*'
+          64 x y table |=
+          1 mines_restantes -=
+
+         
+          blue setcolor
+          inverton
+          " *" print
+          test_over
+          if
+           game_over
+          endif
+        endif
+      endif
+      starty y + startx x + locate
+    endof
+  drop
+ endcase
+;
+
+
+// fait descendre si possible le curseur
+: PROC_DOWN
+ y maxY 1 - <
+ if
+  y ++
+  10 emit
+ else
+  beep
+ endif
+;
+
+
+// fait monter si possible le curseur
+: PROC_UP
+ y 0 >
+ if
+  y --
+  11 emit
+ else
+  beep
+ endif
+;
+
+
+// pareil … droite
+: PROC_RIGHT
+ x maxX 1 - <
+ if
+  x ++
+  9 emit
+ else
+  beep
+ endif
+;
+
+
+
+
+// pareil … gauche ...
+: PROC_LEFT
+ x 0 >
+ if
+  x --
+  8 emit
+ else
+  beep
+ endif
+;
+
+
+// boucle du jeu lui meme ...
+: GAME
+ begin
+  TRUE
+  cursoron
+  wait
+  cursoroff
+  fkey
+  case
+    fksuite      of      // cur bas
+                   proc_down
+                 endof
+    fkretour     of      // cur haut
+                  proc_up
+                 endof
+    fkguide      of      // cur gauche
+                  proc_left
+                 endof
+    fkcorrection of      // cur droite
+                  proc_right
+                 endof
+    fkenvoi      of      // selectionner
+                  1 play_game
+                 endof
+    fkrepetition of      // drapeau
+                  2 play_game
+                 endof
+    fkannulation of
+                  new_game
+                  endof
+    fksommaire   of
+                  drop
+                  FALSE
+                 endof
+  drop
+  endcase
+ !
+ until
+ 
+;
+
+
+
+
+// gestion du jeu lui mˆme
+: PLAY
+ new_game
+ game
+ quitter !
+ if
+  " menu.vtx" sendpage
+  23 33 locate
+ endif
+;
+
+
+
+
+
+// gestion du menu principal du jeu
+: MENU     
+  begin
+    cursoron
+    input
+    cursoroff
+
+    fkey
+    fkenvoi ==
+    if
+     dup
+     if
+       val
+     else
+       10
+     endif
+    else
+     drop
+     10
+    endif
+
+    fkey
+    fksommaire ==
+    if
+     drop
+     4
+    endif
+
+    case
+     1 of
+        gest_regles
+       endof
+     2 of
+        gest_options
+       endof
+     3 of
+        play
+       endof
+     4 of      // option quitter
+        TRUE quitter :=
+       endof
+     drop
+    // option par d‚faut
+       beep
+       23 33 locate
+       "             " print
+       23 33 locate
+    endcase
+  quitter
+  until 
+;
+
+
+
+
+
+
+// affichage bloquant qui permet de savoir quand neoserv va reprendre en main 
+// une nouvelle ex‚cution du programme ...
+: end_prog
+ 3 setfont
+ 12 emit
+ 10 10 locate
+ " FIN DE L'APPLI ..." print
+ cr cr
+ "          [ RETURN ]" print 
+ 0 setfont
+ wait
+;
+
+: Intro
+
+  " bombe.vtx" sendpage
+;
+
+: DEMINMAIN
+
+	palier 99 !=
+	if
+		intro
+	endif
+	
+  " %.0f" using
+  "                                     " line0
+  EmptyLocalFkeyTable
+  FALSE quitter :=
+  1 type_jeu :=
+  10 maxX :=
+  10 maxY :=
+  10 nbmines :=
+  " menu.vtx" sendpage
+  23 33 locate
+  menu
+;
+
+: main
+
+   DeminMain
+;
+

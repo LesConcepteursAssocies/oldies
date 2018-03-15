@@ -1,0 +1,969 @@
+// melo chiffres
+// commenc‚ le 13/01/95
+// auteur S‚bastien MAITRE ...
+
+// tableau max : x=5 y=7 ...
+
+#PATHVTX jeux\VTX
+
+
+local
+number[] 1 35 tab
+number[] 1 9 touches
+number clavier go_on x y tmp cpt maxx maxy xdeb ydeb win niv
+char chaine
+number totime
+number nb_depla
+
+
+: prout
+
+;
+
+
+
+: f_so
+ 1 clavier :=
+;
+
+: f_an
+ 2 clavier :=
+;
+
+: f_re
+ 3 clavier :=
+;
+
+: f_rep
+ 4 clavier :=
+;
+
+: f_gu
+ 5 clavier :=
+;
+
+: f_co
+ 6 clavier :=
+;
+
+: f_su
+ 7 clavier :=
+;
+
+: f_en
+ 8 clavier :=
+;
+
+
+
+
+// initialise les params d'une nouvelle partie ...
+: NEW_GAME
+ 1000 tab afill
+ maxx maxy * tmp :=
+ randomize
+
+ tmp 0
+ do
+  begin
+   tmp rnd cpt :=
+   0 cpt tab 1000 ==
+   if
+    i 0 cpt tab :=
+    TRUE
+   else
+    FALSE
+   endif
+  until
+ loop
+ 0 totime :=
+ 0 nb_depla :=
+ false win :=
+ time chaine :=
+ 10 31 locate
+ 0 print
+;
+
+
+: AFFICHE_TAB
+ 3 xdeb :=
+ 4 ydeb :=
+
+ 25 maxx 5 * - 2 / xdeb +=
+ 21 maxy 3 * - 2 / ydeb +=
+
+
+ ydeb 3 - tmp :=
+ maxx 5 * 3 + 0
+ do
+   tmp i xdeb + 2 - locate
+   " \27\68\127" print
+ loop
+
+ tmp ++
+ maxx 5 * xdeb +  cpt :=
+ maxy 3 * 2 + 0
+ do
+   tmp cpt locate
+   " \27\68\127" print
+   tmp ++
+ loop
+
+ cpt --
+ tmp --
+ maxx 5 * 1 + 0
+ do
+   tmp cpt locate
+   " \27\68\127" print
+   cpt --
+ loop
+
+ 
+ maxy 3 * 2 + 0
+ do
+   tmp cpt locate
+   " \27\68\127" print
+   tmp --
+ loop
+
+
+
+ maxy 0
+ do
+   maxx 0
+   do
+    0 i j maxx * + tab 0 !=
+    if
+      ydeb 3 j * + 1 - xdeb 5 i * + locate
+      " \27\66\14\112\112\112\112" print
+      
+      ydeb 3 j * + xdeb 5 i * + locate
+      " \27\66\14\35\35\35\35" print
+      
+      ydeb 3 j * + xdeb 5 i * + locate
+      " \27\80\27\66\27\79\27\93  " print
+      
+      ydeb 3 j * + 2 - xdeb 5 i * + locate
+      j
+      if
+       0 i j 1 - maxx * + tab 0 !=
+       if
+        " \27\66\14\115\115\115\115" print
+       else
+        " \27\66\14\112\112\112\112" print
+       endif
+      else
+       " \27\66\14\112\112\112\112" print
+      endif
+
+      ydeb 3 j * + 1 + xdeb 5 i * + locate
+      j maxy <
+      if
+       " \27\66\14\35\35\35\35" print
+      endif
+      
+      ydeb 3 j * + xdeb 5 i * +
+      0 i j maxx * + tab 10 <
+      if
+       1 +
+      endif
+      locate
+      " \27\80\27\66\27\79\27\93" print
+      0 i j maxx * + tab print
+    else
+     i x :=
+     j y :=
+    endif
+   loop
+ loop
+;
+
+
+: EFFACE
+ // chiffre
+ ydeb 3 y * + xdeb 5 x * + locate
+ " \27\80\27\66\27\79\27\93  " print
+ // dessus
+ ydeb 3 y * + 2 - xdeb 5 x * + locate
+ y
+ if
+  0 x y 1 - maxx * + tab 0 !=
+  if
+   " \27\66\14\35\35\35\35" print
+  else
+   " \27\66    " print
+  endif
+ else
+  " \27\66    " print
+ endif
+ // dessous
+ ydeb 3 y * + 1 + xdeb 5 x * + locate
+ y maxy 1 - <
+ if
+  0 x y 1 + maxx * + tab 0 !=
+  if
+   " \27\66\14\112\112\112\112" print
+  else
+   " \27\66\14\32\32\32\32" print
+  endif
+ else
+  " \27\66\14\32\32\32\32" print
+ endif
+ ydeb 3 y * + 1 - xdeb 5 x * + locate
+ " \27\66    " print
+ ydeb 3 y * + xdeb 5 x * + locate
+ " \27\66    " print
+;
+
+
+
+
+: AFFICHE
+ ydeb 3 y * + 1 - xdeb 5 x * + locate
+ " \27\66\14\112\112\112\112" print
+ ydeb 3 y * + xdeb 5 x * + locate
+ " \27\66\14\35\35\35\35" print
+ ydeb 3 y * + xdeb 5 x * + locate
+ " \27\80\27\66\27\79\27\93  " print
+ ydeb 3 y * + 2 - xdeb 5 x * + locate
+ y
+ if
+  0 x y 1 - maxx * + tab 0 !=
+  if
+   " \27\66\14\115\115\115\115" print
+  else
+   " \27\66\14\112\112\112\112" print
+  endif
+ else
+  " \27\66\14\112\112\112\112" print
+ endif
+ ydeb 3 y * + 1 + xdeb 5 x * + locate
+ y maxy 1 - <
+ if
+  0 x y 1 + maxx * + tab 0 !=
+  if
+   " \27\66\14\115\115\115\115" print
+  else
+   " \27\66\14\35\35\35\35" print
+  endif
+ else
+  " \27\66\14\35\35\35\35" print
+ endif
+ ydeb 3 y * + xdeb 5 x * +
+ 0 x y maxx * + tab 10 <
+ if
+  1 +
+ endif
+ locate
+ " \27\80\27\66\27\79\27\93" print
+ 0 x y maxx * + tab print
+;
+
+
+: check_fin
+ true tmp :=
+ maxx maxy * 1 - 0
+ do
+  i 1 + 0 i tab !=
+  if
+   false tmp :=
+  endif
+ loop
+ tmp
+;
+
+
+: aff_depla
+ nb_depla ++
+ 10 31 locate
+ nb_depla print
+;
+
+
+: aff_time
+ 5 31 locate
+ totime print
+;
+
+
+: aff_niv
+ 15 31 locate
+ niv print
+;
+
+
+: time_fonc
+ chaine time !=
+ if
+  time chaine :=
+  totime ++
+  aff_time
+ endif
+;
+
+
+: gauche
+ x 1 - 0 >=
+ if
+  0 x 1 - y maxx * + tab   0 x y maxx * + tab :=
+  0 0 x 1 - y maxx * + tab :=
+  x --
+  efface
+  x ++
+  affiche
+  x --
+  aff_depla
+  check_fin
+  if
+   true win :=
+  endif
+ else
+  beep
+ endif
+;
+
+
+
+: bas
+ y 1 + maxy <
+ if
+  y ++
+  efface
+  y --
+  0 x y 1 + maxx * + tab   0 x y maxx * + tab :=
+  0 0 x y 1 + maxx * + tab :=
+  affiche
+  y ++
+  aff_depla
+  check_fin
+  if
+   true win :=
+  endif
+ else
+  beep
+ endif
+;
+
+
+: droite
+ x 1 + maxx <
+ if
+  0 x 1 + y maxx * + tab   0 x y maxx * + tab :=
+  0 0 x 1 + y maxx * + tab :=
+  x ++
+  efface
+  x --
+  affiche
+  x ++
+  aff_depla
+  check_fin
+  if
+   true win :=
+  endif
+ else
+  beep
+ endif
+
+;
+
+
+: haut
+ y 1 - 0 >=
+ if
+  y --
+  efface
+  y ++
+  0 x y 1 - maxx * + tab   0 x y maxx * + tab :=
+  0 0 x y 1 - maxx * + tab :=
+  affiche
+  y --
+  aff_depla
+  check_fin
+  if
+   true win :=
+  endif
+ else
+  beep
+ endif
+;
+
+
+: winproc
+ beep
+ " you win !!!" line0
+ false win :=
+;
+
+
+
+// boucle principale du jeu ...
+: GAME
+ " meloc.vtx" sendpage
+ new_game
+ affiche_tab
+ aff_niv
+ TRUE go_on :=
+ begin
+  go_on TRUE ==
+ while
+  time_fonc
+
+
+  // ici on devrait pouvoir mettre : 0 clavier touches .... BUG !!!
+
+  clavier
+  case
+   1 of
+      " fin" line0
+      0 clavier :=
+      false go_on :=
+     endof
+   2 of
+      " new_game" line0
+      0 clavier :=
+      " meloc.vtx" sendpage
+      new_game
+      affiche_tab
+     endof
+   3 of
+      " bas" line0
+      0 clavier :=
+      bas
+      win
+      if
+       winproc
+       2 clavier :=
+      endif
+     endof
+   5 of
+      " droite" line0
+      0 clavier :=
+      droite
+      win
+      if
+       winproc
+       2 clavier :=
+      endif
+     endof
+   6 of
+      " gauche" line0
+      0 clavier :=
+      gauche
+      win
+      if
+       winproc
+       2 clavier :=
+      endif
+     endof
+   7 of
+      " haut" line0
+      0 clavier :=
+      haut
+      win
+      if
+       winproc
+       2 clavier :=
+      endif
+     endof
+  drop
+  endcase
+ repeat
+ true go_on :=
+;
+
+
+: keltouche
+ case
+  1 of " SOMMA" endof
+  2 of " ANNUL" endof
+  3 of " RETOU" endof
+  4 of " REPET" endof
+  5 of " GUIDE" endof
+  6 of " CORRE" endof
+  7 of " SUITE" endof
+  8 of " ENVOI" endof
+
+ beep
+ " pas bon" line0
+ beep
+ " pas bon" line0
+ beep
+ " pas bon" line0
+ beep
+ " pas bon" line0
+
+ drop
+ endcase
+;
+
+
+: pas_bon
+ beep
+ " touche d‚ja utilis‚e !" line0
+ 500 delay
+ "  " line0
+;
+
+
+: key_redef
+ " melredef.vtx" sendpage
+ 0 touches afill
+ cursoron
+ 
+ // redef haut
+ 13 14 locate
+ true cpt :=
+ begin
+  cpt true ==
+ while
+  clavier
+  if
+   clavier touches asearch
+   if
+    // trouv‚
+    drop drop
+    pas_bon
+   else
+    drop drop  // pas trouv‚
+    // ok ... on garde ...
+    clavier 0 3 touches :=
+    clavier keltouche print
+    false cpt :=
+   endif
+   0 clavier :=
+  endif
+ repeat
+
+
+ // redef bas
+ 14 14 locate
+ true cpt :=
+ begin
+  cpt true ==
+ while
+  clavier
+  if
+   clavier touches asearch
+   if
+    // trouv‚
+    drop drop
+    pas_bon
+   else
+    drop drop // pas trouv‚
+    // ok ... on garde ...
+    clavier 0 7 touches :=
+    clavier keltouche print
+    false cpt :=
+   endif
+   0 clavier :=
+  endif
+ repeat
+
+ // redef droite
+ 15 14 locate
+ true cpt :=
+ begin
+  cpt true ==
+ while
+  clavier
+  if
+   clavier touches asearch
+   if
+    // trouv‚
+    drop drop
+    pas_bon
+   else
+    drop drop // pas trouv‚
+    // ok ... on garde ...
+    clavier 0 5 touches :=
+    clavier keltouche print
+    false cpt :=
+   endif
+   0 clavier :=
+  endif
+ repeat
+
+ // redef gauche
+ 16 14 locate
+ true cpt :=
+ begin
+  cpt true ==
+ while
+  clavier
+  if
+   clavier touches asearch
+   if
+    // trouv‚
+    drop drop
+    pas_bon
+   else
+    drop drop // pas trouv‚
+    // ok ... on garde ...
+    clavier 0 6 touches :=
+    clavier keltouche print
+    false cpt :=
+   endif
+   0 clavier :=
+  endif
+ repeat
+
+
+ // redef retour menu
+ 21 21 locate
+ true cpt :=
+ begin
+  cpt true ==
+ while
+  clavier
+  if
+   clavier touches asearch
+   if
+    // trouv‚
+    drop drop
+    pas_bon
+   else
+    drop drop // pas trouv‚
+    // ok ... on garde ...
+    clavier 0 1 touches :=
+    clavier keltouche print
+    false cpt :=
+   endif
+   0 clavier :=
+  endif
+ repeat
+
+ // redef nouvelle donne
+ 22 21 locate
+ true cpt :=
+ begin
+  cpt true ==
+ while
+  clavier
+  if
+   clavier touches asearch
+   if
+    // trouv‚
+    drop drop
+    pas_bon
+   else
+    drop drop // pas trouv‚
+    // ok ... on garde ...
+    clavier 0 2 touches :=
+    clavier keltouche print
+    false cpt :=
+   endif
+   0 clavier :=
+  endif
+ repeat
+ cursoroff
+ 500 delay
+;
+
+
+
+: NIV_SET
+ " melniv.vtx" sendpage
+ true go_on :=
+ 0 clavier :=
+ 0 cpt :=
+
+ 10 27 locate maxy print
+ 12 27 locate maxx print
+
+ begin
+  go_on TRUE ==
+ while
+  clavier
+  case
+   2 of
+      0 clavier :=
+      maxx 5 <
+      if
+       maxx ++
+       12 27 locate maxx print
+      else
+       beep
+      endif
+     endof
+   6 of
+      0 clavier :=
+      maxx 3 >
+      if
+       maxx --
+       12 27 locate maxx print
+      else
+       beep
+      endif
+     endof
+   3 of
+      0 clavier :=
+      maxy 7 <
+      if
+       maxy ++
+       10 27 locate maxy print
+      else
+       beep
+      endif
+     endof
+   7 of
+      0 clavier :=
+      maxy 3 >
+      if
+       maxy --
+       10 27 locate maxy print
+      else
+       beep
+      endif
+     endof
+   8 of
+      0 clavier :=
+      false go_on :=
+     endof
+   1 of
+      0 clavier :=
+      false go_on :=
+     endof
+     drop
+  endcase
+ repeat
+ true go_on :=
+;
+
+
+: view_scores
+ " melsco.vtx" sendpage
+ begin
+  clavier 0 ==
+ while
+
+ repeat
+ 0 clavier :=
+;
+
+
+
+: gest_opt
+ " melopt.vtx" sendpage
+ true go_on :=
+ 0 clavier :=
+ 0 cpt :=
+ cpt 3 * 11 + 7 locate " *" print
+ begin
+  go_on TRUE ==
+ while
+  clavier
+  case
+   3 of // retour
+      0 clavier :=
+      cpt 3 * 11 + 7 locate "  " print
+      cpt 0 >
+      if
+       cpt --
+      else
+       3 cpt :=
+      endif
+      cpt 3 * 11 + 7 locate " *" print
+     endof
+   7 of // suite
+      0 clavier :=
+      cpt 3 * 11 + 7 locate "  " print
+      cpt 3 <
+      if
+       cpt ++
+      else
+       0 cpt :=
+      endif
+      cpt 3 * 11 + 7 locate " *" print
+     endof
+   8 of // envoi
+      0 clavier :=
+      cpt
+      case
+       0 of  // niveau
+          niv_set
+         endof
+       1 of  // meilleurs scores
+          view_scores
+         endof
+       2 of  // redef touches
+          key_redef
+         endof
+       3 of  // quitter
+          false go_on :=
+         endof
+       drop
+      endcase
+      cpt 3 !=
+      if
+       " melopt.vtx" sendpage
+       0 cpt :=
+       cpt 3 * 11 + 7 locate " *" print
+      endif
+     endof
+   0 of
+     endof
+
+  drop
+  endcase
+ repeat
+ true go_on :=
+;
+
+
+: GEST_REGLES
+ 1 cpt :=
+ " melr1.vtx" sendpage
+ 0 clavier :=
+ true go_on :=
+ begin
+  go_on true ==
+ while
+  clavier
+  case
+   7 of
+      0 clavier :=
+      cpt 3 <
+      if
+       cpt ++
+      else
+       1 cpt :=
+      endif
+      cpt
+      case
+       1 of " melr1.vtx" sendpage endof
+       2 of " melr2.vtx" sendpage endof
+       3 of " melr3.vtx" sendpage endof
+       drop
+      endcase
+     endof
+
+   3 of
+      0 clavier :=
+      cpt 1 >
+      if
+       cpt --
+      else
+       3 cpt :=
+      endif
+      cpt
+      case
+       1 of " melr1.vtx" sendpage endof
+       2 of " melr2.vtx" sendpage endof
+       3 of " melr3.vtx" sendpage endof
+        drop
+      endcase
+     endof
+   1 of
+      0 clavier :=
+      false go_on :=
+     endof
+  drop
+  endcase
+ repeat
+ true go_on :=
+;
+
+
+: menu
+ " melmenu.vtx" sendpage
+ true go_on :=
+ 0 clavier :=
+ 2 cpt :=
+ cpt 3 * 12 + 9 locate " *" print
+ begin
+  go_on TRUE ==
+ while
+  clavier
+  case
+   3 of // retour
+      0 clavier :=
+      cpt 3 * 12 + 9 locate "  " print
+      cpt 0 >
+      if
+       cpt --
+      else
+       3 cpt :=
+      endif
+      cpt 3 * 12 + 9 locate " *" print
+     endof
+   7 of // suite
+      0 clavier :=
+      cpt 3 * 12 + 9 locate "  " print
+      cpt 3 <
+      if
+       cpt ++
+      else
+       0 cpt :=
+      endif
+      cpt 3 * 12 + 9 locate " *" print
+     endof
+   8 of // envoi
+      0 clavier :=
+      cpt
+      case
+       0 of  // rŠgles
+          gest_regles
+          0 cpt :=
+         endof
+       1 of  // options
+          gest_opt
+          1 cpt :=
+         endof
+       2 of  // jeu
+          game
+          2 cpt :=
+         endof
+       3 of  // quitter
+          false go_on :=
+          3 cpt :=
+         endof
+       drop
+      endcase
+      cpt 3 !=
+      if
+       " melmenu.vtx" sendpage
+       2 cpt :=
+       cpt 3 * 12 + 9 locate " *" print
+      endif
+     endof
+   1 of
+      0 clavier :=
+      false go_on :=
+     endof
+  drop
+  endcase
+ repeat
+;
+
+: init_touches
+ 9 0
+ do
+  i 0 i touches :=
+ loop
+;
+
+
+: MeloMain
+
+ "  " line0
+ " melpres.vtx" sendpage
+ 1000 delay
+ 3 maxx :=
+ 4 maxy :=
+ " %.0f" using
+ setlocalfkey fksommaire f_so
+ setlocalfkey fkannulation f_an
+ setlocalfkey fkretour f_re
+ setlocalfkey fkrepetition f_rep
+ setlocalfkey fkguide f_gu
+ setlocalfkey fkcorrection f_co
+ setlocalfkey fksuite f_su
+ setlocalfkey fkenvoi f_en
+ 0 niv :=
+ init_touches
+ menu
+
+// cls 
+// " fin appli ..." print
+// 5000 delay
+;

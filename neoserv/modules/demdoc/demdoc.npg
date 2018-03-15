@@ -1,0 +1,334 @@
+// ีอออออออออออออัอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออธ
+// ณDEMDOC.NPG   ณ                                                           ณ
+// รฤฤฤฤฤฤฤฤฤฤฤฤฤู                                                           ณ
+// ณDernire modification : 24/05/1995                                       ณ
+// ณ                                                                         ณ
+// ณModule Demande de documentation Multi-Services.                          ณ
+// ิอออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออพ
+//
+// Dclaration des variables.
+local
+number nchoix npos := 1 npage := 1 ndem nlig bGestion bFini
+char   csaisie cledemdoc
+char   socl1 socl2 noml1 noml2 adrl1 adrl2 adrl3 cpost ville tel fax
+char   cmtl1 cmtl2
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation des variables.
+//
+: InitVar
+   "  " alltrim socl1 :=
+   "  " alltrim socl2 :=
+   "  " alltrim noml1 :=
+   "  " alltrim noml2 :=
+   "  " alltrim adrl1 :=
+   "  " alltrim adrl2 :=
+   "  " alltrim adrl3 :=
+   "  " alltrim cpost :=
+   "  " alltrim ville :=
+   "  " alltrim tel   :=
+   "  " alltrim fax   :=
+   "  " alltrim cmtl1 :=
+   "  " alltrim cmtl2 :=
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Enregistrement de la demande
+: ValiderDemDoc
+   " Enregistrement en cours..." line0
+   dbappendblank
+   // On fabrique la clef.
+   // SERVICE+BVU+DTOS(DATE)
+   app       " SERVICE" dbreplace
+   date dtos " DATE"    dbreplace
+   socl1 alltrim " SOCL1" dbreplace
+   socl2 alltrim " SOCL2" dbreplace
+   noml1 alltrim " NOML1" dbreplace
+   noml2 alltrim " NOML2" dbreplace
+   adrl1 alltrim " ADRL1" dbreplace
+   adrl2 alltrim " ADRL2" dbreplace
+   adrl3 alltrim " ADRL3" dbreplace
+   cpost alltrim " CPOST" dbreplace
+   ville alltrim " VILLE" dbreplace
+   tel   alltrim " TEL" dbreplace
+   fax   alltrim " FAX" dbreplace
+   cmtl1 alltrim " CMTL1" dbreplace
+   cmtl2 alltrim " CMTL2" dbreplace
+   // On marque la demande comme non vue.
+   // "-" : demande … voir
+   // "+" : demande vue par le gestionnaire
+   " -" " BVU" dbreplace
+   dbcommit
+   // Fin de la saisie
+   clear0
+   " MODULES\DEMDOC\FINDDOC.VTX" sendpage
+   wait
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affichage de l'enregistrement courant
+//
+: AffDemDoc
+   cursoroff
+   " MODULES\DEMDOC\DEMDOC.VTX" sendpage
+    6 11 locate " SOCL1" dbfield alltrim print
+    7 11 locate " SOCL2" dbfield alltrim print
+    9 11 locate " NOML1" dbfield alltrim print
+   10 11 locate " NOML2" dbfield alltrim print
+   12 11 locate " ADRL1" dbfield alltrim print
+   13 11 locate " ADRL2" dbfield alltrim print
+   14 11 locate " ADRL3" dbfield alltrim print
+   15 11 locate " CPOST" dbfield alltrim print
+   16 11 locate " VILLE" dbfield alltrim print
+   17 11 locate " TEL" dbfield alltrim   print
+   18 11 locate " FAX" dbfield alltrim   print
+   20  3 locate " CMTL1" dbfield alltrim print
+   21  3 locate " CMTL2" dbfield alltrim print
+   " MODULES\DEMDOC\BDXGEST.VTX" sendpage
+   cursoron
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Consultation des demandes de doc en attentes
+// (en mode GESTIONNAIRE)
+//
+: VisuDemDoc
+   false bFini :=
+   begin
+      // On n'affiche que les demandes du service
+      // non vues (!)
+      dbeof !
+      app " SERVICE" dbfield alltrim == &&
+      " BVU" dbfield " -" == &&
+      bFini ! &&
+   while
+      AffDemDoc
+      24 20 locate
+      wait
+      // On marque la demande comme vue.
+      " +" " BVU" dbreplace
+      dbcommit
+      // On se repositionne
+      cledemdoc dbseek !
+      if
+         " Plus de demandes" line0
+         true bFini :=
+      endif
+   repeat
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Traitement des touches en saisie.
+// Empile VRAI si on sort de la saisie.
+//
+: TraiteFKSaisie  // --- b
+   fkey dup fkenvoi ==
+   if
+      // Validation ?
+      // On vrifie qu'il y ai au moins une ligne du nom,
+      // et l'adresse.
+      noml1 empty?
+      adrl1 empty?
+      cpost empty?
+      ville empty?
+      || || ||
+      if
+         " coordonnes incompltes !!" line0
+         drop false
+      else
+         drop true
+      endif
+   else
+      dup fksuite ==
+      if
+         // Zone suivante.
+         npos ++
+         npos 13 >
+         if
+            // Dernire zone, on reboucle sur la premire
+            1 npos :=
+         endif
+         drop false
+      else
+         fkretour ==
+         if
+            // Zone prcdente.
+            npos --
+            npos 0 <=
+            if
+               // premire zone, on reboucle sur la dernire
+               13 npos :=
+            endif
+            false
+         else
+            // Les autres touches provoquent
+            // la fin de la saisie
+            true
+         endif
+      endif
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Saisie d'une demande
+//
+: SaisieDemDoc
+   begin
+      npos
+      case
+          1 of
+               // Saisie de la socit ligne 1
+               6 11 socl1 alltrim strlen + locate
+               socl1 InputVar
+               socl1 " **SYSOP" ==
+               if
+                  TRUE bGestion :=
+                  " MODE GESTIONNAIRE ACTIVE" line0
+                  beep
+                  // On regarde si il y a des demandes en attente.
+                  app "  " 10 padr cledemdoc :=
+                  " -" cledemdoc strcat
+                  cledemdoc dbseek
+                  if
+                     " Il y a des demandes" line0
+                     VisuDemDoc
+                  else
+                     " Pas de demandes en attente" line0
+                  endif
+                  // On sort
+                  true
+               else
+                  TraiteFKSaisie
+               endif
+            endof
+          2 of
+               // Saisie de la socit ligne 2
+               7 11 socl2 alltrim strlen + locate
+               socl2 InputVar
+               TraiteFKSaisie
+            endof
+          3 of
+               // Saisie du nom ligne 1
+               9 11 noml1 alltrim strlen + locate
+               noml1 InputVar
+               TraiteFKSaisie
+            endof
+          4 of
+               // Saisie du nom ligne 2
+               10 11 noml2 alltrim strlen + locate
+               noml2 InputVar
+               TraiteFKSaisie
+            endof
+          5 of
+               // Saisie de l'adresse ligne 1
+               12 11 adrl1 alltrim strlen + locate
+               adrl1 InputVar
+               TraiteFKSaisie
+            endof
+          6 of
+               // Saisie de l'adresse ligne 2
+               13 11 adrl2 alltrim strlen + locate
+               adrl2 InputVar
+               TraiteFKSaisie
+            endof
+          7 of
+               // Saisie de l'adresse ligne 3
+               14 11 adrl3 alltrim strlen + locate
+               adrl3 InputVar
+               TraiteFKSaisie
+            endof
+          8 of
+               // Saisie du code postal
+               15 11 cpost alltrim strlen + locate
+               cpost InputVar
+               TraiteFKSaisie
+            endof
+          9 of
+               // Saisie de la ville
+               16 11 ville alltrim strlen + locate
+               ville InputVar
+               TraiteFKSaisie
+            endof
+         10 of
+               // Saisie du tlphone
+               17 11 tel alltrim strlen + locate
+               tel InputVar
+               TraiteFKSaisie
+            endof
+         11 of
+               // Saisie du fax
+               18 11 fax alltrim strlen + locate
+               fax InputVar
+               TraiteFKSaisie
+            endof
+         12 of
+               // Saisie du commentaire ligne 1
+               20 3 cmtl1 alltrim strlen + locate
+               cmtl1 InputVar
+               TraiteFKSaisie
+            endof
+         13 of
+               // Saisie du commentaire ligne 2
+               21 3 cmtl2 alltrim strlen + locate
+               cmtl2 InputVar
+               TraiteFKSaisie
+            endof
+      endcase
+   until
+   fkey fkenvoi ==
+   bGestion ! &&
+   if
+      ValiderDemDoc
+   endif
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Initialisation de la saisie d'une demande
+//
+: InitSaisie
+   InitVar
+   cursoroff
+   " MODULES\DEMDOC\DEMDOC.VTX" sendpage
+   " MODULES\DEMDOC\BDXSAISI.VTX" sendpage
+   cursoron
+   1 npos :=
+   SaisieDemDoc
+;
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Point d'entre du Module.
+//
+: MenuGen
+   " %0.f" using
+   // On sauvegarde la base courante.
+   dbselected
+   // Ouverture du fichier principal.
+   " MODULES\DEMDOC\DEMDOC" dbopen
+   if
+      FALSE bGestion :=
+      // Pas de menu pour ce module, on passe directement
+      // en saisie.
+      InitSaisie
+      " DEMDOC" dbclose
+   else
+      " ERREUR A L'OUVERTURE DU FICHIER DEMDOC" line0
+   endif
+   // On reslecionne l'ancienne base
+   dup empty? !
+   if
+      dbselect
+   else
+      drop
+   endif
+   usingoff
+;
+

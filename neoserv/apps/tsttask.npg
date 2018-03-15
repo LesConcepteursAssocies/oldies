@@ -1,0 +1,36 @@
+//
+// test tƒche locale.
+//
+local char toto
+local number chiffre := 0
+
+: background
+   begin
+      timer 10 % 0 ==
+      if
+         // 10 1 locate time print
+         chiffre ++
+         10 1 locate chiffre print
+      endif
+      chiffre 100 >=
+      if
+         // On s'auto-d‚truit
+         " d‚sactivation" print
+         deletelocaltask
+      endif
+   again
+;
+
+: main
+   cls
+   cursoroff
+   " test tƒche locale" print cr wait
+   setlocaltask background
+   " tƒche locale lanc‚e" print cr
+   wait
+   deletelocaltask
+   " tƒche d‚sactiv‚e" print
+   wait
+;
+
+

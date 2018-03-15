@@ -1,0 +1,14 @@
+//
+// Test 03 : test DO LOOP
+//
+//
+
+: main
+   cls
+   " test DO LOOP (touche)" print
+   wait
+   10 0 do " [coucou] " print loop
+   " FIN DE MAIN" print wait
+;
+
+

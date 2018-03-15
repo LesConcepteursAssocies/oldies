@@ -1,0 +1,76 @@
+\ ------------------------------------------------------------------------------
+\                            Sauvegarde du Systäme.
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement des utilitaires de sauvegarde du systäme )
+
+ONLY FORTH DEFINITIONS
+
+IBASE @
+
+IBASE HEX
+
+\ PrÇparation de l'entàte du fichier ÇxÇcutable ( extension .EXE )
+\
+\ Code_Ref    : Adresse de la rÇfÇrence relogeable
+\ Entry_Point : Adresse du point d'entrÇe initial
+\ Here        : Fin du dictionnaire cible
+\ Seg_Buffer  : Segment du buffer d'Çcriture
+\ Adr_Buffer  : Offset du buffer d'Çcriture
+\
+: HDR-INIT  ( Code_Ref Entry_Point Here Seg_Buffer Adr_Buffer --- )
+  2DUP 4D -ROT LC!             ( Obligatoire pour fichier exe )
+  2DUP 5A -ROT 1+ LC!          ( Obligatoire pour fichier exe )
+  2 PICK 0FF AND >R            ( Calcul de la taille du fichier )
+  2DUP R> -ROT 2+ L!
+  ROT 200 / 2+ >R 
+  2DUP R> -ROT 4 + L!
+  2DUP 01 -ROT 6 + LC!         ( Nombre d'entrÇes relogeables )
+  2DUP 20 -ROT 8 + LC!         ( Taille de l'entàte en paragraphes )
+  2DUP 0001 -ROT 0A + L!       ( Nombre de paragraphes minimum requis par le fichier )
+  2DUP 3000 -ROT 0C + L!       ( Nombre de paragraphes maximum requis par le fichier )
+  ROT >R 2DUP R> -ROT 14 + L!  ( Adresse du point d'entrÇe initial )
+  2DUP 22 -ROT 18 + LC!        ( Offset de l'adresse de la table de relocation )
+  2DUP 1 -ROT 1C + LC!
+  2DUP 20FB -ROT 1E + L!
+  2DUP 6A72 -ROT 20 + L!
+  ROT 1+ -ROT 22 + L!          ( adresse de la rÇfÇrence relogeable )
+;
+
+IBASE DECIMAL
+
+\ Primitive de sauvegarde d'un segment de code FORTH.
+\
+\ Handle      : Handler du fichier Ö crÇer.
+\ Code_Ref    : Adresse de la rÇfÇrence relogeable
+\ Entry_Point : Adresse du point d'entrÇe initial
+\ Here        : Fin (Offset) du dictionnaire cible
+\ Seg_Buffer  : Segment du dictionnaire cible
+\ Adr_Buffer  : Offset du buffer d'Çcriture
+\
+: (SAVE) ( Handle Code_Ref Entry_Point Here Seg_Buffer Adr_Buffer --- Handle )
+  2DUP 256 LERASE
+  4 PICK 4 PICK 4 PICK 4 PICK 4 PICK
+  HDR-INIT                                       \ Initialisation des 256 premiers octets de l'entàte
+  2DUP 256 8 PICK (PUT) ?DOSERR DROP
+  2DUP 256 LERASE
+  2DUP 256 8 PICK (PUT) ?DOSERR DROP
+  OVER 5 PICK 1+ 2DUP L@ >R 0 -ROT L!            \ Mise Ö zÇro de la rÇfÇrence relogeable
+  DROP DUP >R 0 ROT 5 PICK (PUT) ?DOSERR DROP
+  DROP R> SWAP 1+ R> -ROT L!
+;
+
+\ Sauvegarde du Systäme Le_Forth
+: SAVE-SYSTEM ( <fichier_destination.ext> )
+  ?OPEN ASCII0 0 (MAKE) ?DOSERR
+  HANDLE DUP @ >R OFF                            \ RÇassignation du clavier
+  CODE-REF ENTRY HERE CSEGMENT 4 PICK 'BUFFER (SAVE)
+  (CLOSE)
+  R> HANDLE !
+;
+
+IBASE !
+
+EOF
+
+

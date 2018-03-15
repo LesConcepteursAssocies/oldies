@@ -1,0 +1,15 @@
+TOTO
+====
+* Faire un peu plus de documentation
+
+* Finir la prise en compte des 2 modes de fonctionnement
+
+* Utiliser libtool pour créer les libraries partagées
+
+* Finir la prise en compte du type LIST dans l'API
+
+* Finir la prise en compte du format de sortie (XML ou ASCII)
+
+* Internationaliser les messages
+
+* Faire une doc en anglais (un peu d'aide serait la bienvenue ... ;-))

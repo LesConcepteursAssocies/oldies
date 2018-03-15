@@ -1,0 +1,37 @@
+#echo = on
+//
+// test erreur d'ex‚cutions.
+//
+public
+char pchaine toto
+local
+number lnum
+char[] 5 5 tchaine
+
+: main
+   " %0.f" using
+   cls " test erreur" print cr wait
+   " lnum=" print lnum print cr
+   5.68 lnum :=
+   " lnum=" print lnum print cr
+   " pchaine=" print pchaine print
+   " (" print pchaine strlen print " )" print cr
+   " coucou" pchaine :=
+   " pchaine=" print pchaine print
+   " (" print pchaine strlen print " )" print cr
+   " contenu de tchaine" print cr
+   tchaine alen swap
+   0 do
+      dup 0
+      do
+         j i tchaine print "  -" print
+      loop
+      cr
+   loop
+   drop
+   wait
+   // Erreur
+   // toto ++
+   " ---" lnum strcat
+;
+

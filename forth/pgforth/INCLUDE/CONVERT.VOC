@@ -1,0 +1,33 @@
+\ ------------------------------------------------------------------------------
+\                                Conversions.
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement des utilitaires )
+
+( Empile l'adresse du buffer correspondant … un handler donn‚ )
+: 'BUFFER  ( handle --- adr )
+  LBUF C/PATH + 2+ * BUFFERS +
+;
+
+: H.  ( n --- )
+  OBASE DUP @ >R HEX
+  . R> OBASE !
+;
+
+: B.  ( n --- )
+  OBASE DUP @ >R BINARY
+  . R> OBASE !
+;
+
+: O.  ( n --- )
+  OBASE DUP @ >R OCTAL
+  . R> OBASE !
+;
+
+: ?  ( adr --- )
+  @ .
+;
+
+EOF
+
+

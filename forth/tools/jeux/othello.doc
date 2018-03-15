@@ -1,0 +1,87 @@
+                            Jeu de r‚flexion "OTHELLO"
+                            --------------------------
+
+PRESENTATION.
+-------------
+
+Ce programme est une version du jeu d'Othello / Reversi qui se joue seul
+contre l'ordinateur. Une carte de type C.G.A ou E.G.A est n‚c‚ssaire …
+l'‚x‚cution du programme.
+
+FONCTIONNEMENT DU PROGRAMME.
+----------------------------
+
+Le programme est con‡u pour fonctionner dans deux modes graphiques diff‚rents,
+ceci ‚tant possible de fa‡on simple par une bonne utilisation des vecteurs.
+
+RŠgle du jeu.
+-------------
+
+Othello se joue sur un damier de dimensions 8 x 8.
+Chaque joueur a … sa disposition des pions de couleur noire et blanche,
+r‚versibles. A chaque tour de jeu, il pose un de ses pions sur une des cases
+libre du damier, en respectant les conditions suivantes :
+- Il doit y avoir au moins un pion de la couleur de l'adversaire … cot‚
+  de la case choisie.
+- Il doit y avoir au moins un pion de sa couleur … l'extremit‚ du ou des
+  pions de la couleur adverse.
+Les pions ainsi "emprisonn‚s" sont retourn‚s pour prendre la couleur du joueur,
+le gagnant ‚tant celui qui a le plus de pions de sa couleur … la fin de la
+partie.
+
+Affichage des lutins C.G.A.
+---------------------------
+
+Chaque d‚finition de lutin est compos‚e alternativement des lignes paires et
+impaires. La routine d'affichage devra donc proc‚der en deux temps,
+en affichant d'abord la ligne paire, puis la ligne impaire, la position
+d'affichage se calculant de la fa‡on suivante
+(X repr‚sente un num‚ro de colonne, Y un num‚ro de ligne) :
+        0B800h:X*4+Y*640    pour les lignes paires.
+  0B800h+2000h:X*4+Y*640    pour les lignes impaires.
+
+Affichage des lutins E.G.A.
+---------------------------
+
+La routine d'affichage procŠde en quatre temps, en affichant les couleurs
+de chacun des plans de bits, la position d'affichage se calculant de la
+fa‡on suivante (X repr‚sente un num‚ro de colonne, Y un num‚ro de ligne) :
+        0A000h:X*2+Y*640
+
+Principe de fonctionnement.
+---------------------------
+
+AprŠs les diverses initialisations, Le curseur est plac‚ en haut … gauche
+du damier, et le joueur humain commence (il a les pions blancs).
+Il d‚place le curseur au moyen des touches fl‚ch‚es. La touche "Return",
+ou "Entr‚e" permet de valider le coup, la Touche "Espace" permet de passer
+son tour.
+
+Ensuite, c'est … l'ordinateur de jouer, ce qu'il fait (du mieux qu'il peut...),
+en se servant des principes suivants :
+- Dans un premier temps, il essaie de prendre un des quatres coins,
+  qui sont une position forte dans ce jeu.
+- Si aucun coin n'est prenable, il essaie de prendre position sur un des bords
+  du damier, si cela ne donne pas un coin … l'adversaire.
+- Si aucun bord n'est jouable, il essaie alors les positions internes,
+  en v‚rifiant toujours si cela ne donne pas un coin … l'adversaire.
+- Si aucun coup ne le "satisfait", il passe !.
+
+Cette strat‚gie est appliqu‚e par le mot JE-JOUE, qui simule le jeu du noir
+sur le damier, mais ne l'affiche pas (‚x‚cut‚ par les mots (>SIMUL) et
+(SIMUL>)), sauf si le coup est valable.
+
+Am‚liorations et extensions envisageables.
+------------------------------------------
+
+Certains programmes d'othello utilisent une matrice de dimensions identiques
+au damier, qui contient des coefficients donnant pour chaque case un apercu
+de sa rentabilit‚ (nombre de pions adverses retourn‚s, force de la case,
+les coins ‚tants dans ce cas privil‚gi‚s).
+
+Actuellement, le programme va syst‚matiquement passer si un coin est donn‚
+… l'adversaire, ce qui n'est pas forc‚ment une bonne strat‚gie, les derniers
+coups d'une partie ‚tant souvent d‚cisifs, mˆme si l'on n'a pas de coin.
+Les bords aussi ont leur importance … l'othello.
+
+

@@ -1,0 +1,285 @@
+\ ------------------------------------------------------------------------------
+\                            Primitives diverses
+\ ------------------------------------------------------------------------------
+
+ONLY FORTH ALSO DEFINITIONS
+
+CR .( Chargement de primitives diverses )
+
+\ Primitives diverses
+
+\ R‚cup‚ration des indices de boucles imbriqu‚es
+CODE J  ( --- n )
+  6 [RP] AX MOV
+  8 [RP] AX ADD
+  1PUSH
+END-CODE
+
+CODE K  ( --- n )
+  12 [RP] AX MOV
+  14 [RP] AX ADD
+  1PUSH
+END-CODE
+
+\ AccŠs m‚moire 8-16 bits Inter-Segment
+
+\ Lecture du contenu d'une variable (8 bits) extra-segment.
+CODE LC@  ( seg_var off_var --- val8 )
+  DS CX MOV
+  BX POP
+  DS POP
+  AX AX XOR
+  0 [BX] AL MOV
+  CX DS MOV
+  1PUSH
+END-CODE
+
+\ Lecture du contenu d'une variable (16 bits) extra-segment.
+CODE L@  ( seg_var off_var --- val16 )
+  DS CX MOV
+  BX POP
+  DS POP
+  0 [BX] PUSH
+  CX DS MOV
+  NEXT
+END-CODE
+
+\ Initialisation du contenu d'une variable (8 bits) extra-segment.
+CODE LC!  ( val8 seg_var off_var --- )
+  DS CX MOV
+  BX POP
+  DS POP
+  AX POP
+  AL 0 [BX] MOV
+  CX DS MOV
+  NEXT
+END-CODE
+
+\ Initialisation du contenu d'une variable (16 bits) extra-segment.
+CODE L!  ( val16 seg_var off_var --- )
+  DS AX MOV
+  BX POP
+  DS POP
+  0 [BX] POP
+  AX DS MOV
+  NEXT
+END-CODE
+
+\ Remplissages de zones m‚moires extra-segment.
+CODE LFILL  ( Seg Off Long Car --- )
+  CLD
+  DS BX MOV
+  AX POP
+  CX POP
+  DI POP
+  DS POP
+  DS PUSH
+  ES POP
+  REP AL STOS
+  BX DS MOV
+  NEXT
+END-CODE
+
+: LERASE  ( Seg Off Long --- )
+  0 LFILL
+;
+
+: LBLANK  ( Seg Off Long --- )
+  BL LFILL
+;
+
+\ Arithm‚tique 32 Bits
+\ Initialisation d'une variable double (32 bits).
+CODE 2!  ( d adr_var --- )
+  BX POP
+  2 [BX] POP
+  0 [BX] POP
+  NEXT
+END-CODE
+
+\ Lecture d'une variable double (32 bits) .
+CODE 2@  ( adr --- d )
+  BX POP
+  0 [BX] PUSH
+  2 [BX] PUSH
+  NEXT
+END-CODE
+
+\ Conversion d'un entier simple en entier double.
+CODE S>D  ( n --- d )
+  AX POP
+  CWD
+  DX AX XCHG
+  2PUSH
+END-CODE
+
+CODE D-  ( d1 d2 --- d3 )
+  BX POP
+  CX POP
+  AX POP
+  DX POP
+  CX DX SUB
+  BX AX SBB
+  2PUSH
+END-CODE
+
+CODE D2/  ( d --- d/2 )
+  AX POP
+  DX POP
+  AX SAR
+  DX RCR
+  2PUSH
+END-CODE
+
+CODE D2*  ( d --- d*2 )
+  AX POP
+  DX POP
+  DX SHL
+  AX RCL
+  2PUSH
+END-CODE
+
+\ Comparaison d'entiers DOUBLES.
+: D0=  ( d --- flag )
+  OR 0=
+;
+
+: D=  ( d1 d2 --- flag )
+  D- D0=
+;
+
+: DU<  ( ud1 ud2 --- flag )
+  ROT SWAP 2DUP U<
+  IF
+    2DROP 2DROP
+    TRUE
+  ELSE
+    <>
+    IF
+      2DROP FALSE
+    ELSE
+      U<
+    THEN
+  THEN
+;
+
+: D<  ( d1 d2 --- flag )
+  2 PICK OVER =
+  IF
+    DU<
+  ELSE
+    NIP ROT DROP
+    <
+  THEN
+;
+
+: D>  ( d1 d2 --- flag )
+  2SWAP D<
+;
+
+: DMAX  ( d1 d2 --- d3 )
+  4DUP D<
+  IF
+    2SWAP
+  THEN
+  2DROP
+;
+
+: DMIN  ( d1 d2 --- d3 )
+  4DUP D>
+  IF
+    2SWAP
+  THEN
+  2DROP
+;
+
+: D0<>  ( d --- flag )
+  D0= NOT
+;
+
+: D0>  ( d --- flag )
+  OR 0>
+;
+
+: D0<  ( d --- flag )
+  OR 0<
+;
+
+: D0>=  ( d --- flag )
+  D0< NOT
+;
+
+: D0<=  ( d --- flag )
+  D0> NOT
+;
+
+: D<=  ( d1 d2 --- flag )
+  D> NOT
+;
+
+: D>=  ( d1 d2 --- flag )
+  D< NOT
+;
+
+: D<>  ( d1 d2 --- flag )
+  D= NOT
+;
+
+\ Remplissage d'une zone m‚moire avec des espaces.
+: BLANK  ( adr n --- )
+  BL FILL
+;
+
+\ Renvoi la longueur d'une chaine.
+\ Celle-ci peut d‚passer 255 caractŠres.
+CODE LENGTH  ( adr_chaine --- adr_chaine+2 longueur )
+  BX POP
+  0 [BX] AX MOV
+  BX INC
+  BX INC
+  BX PUSH
+  1PUSH
+END-CODE
+
+\ Divise par deux le nombre non sign‚ situ‚ au sommet de la pile de donn‚es.
+CODE U2/  ( u --- u/2 )
+  AX POP
+  AX SHR
+  1PUSH
+END-CODE
+
+CODE 8*  ( n --- n*8 )
+  AX POP
+  AX SHL
+  AX SHL
+  AX SHL
+  1PUSH
+END-CODE
+
+\ Sortie de Le_Forth et retour au DOS
+IBASE @
+IBASE HEX
+CODE BYE
+  SS-REG # AX MOV   ( Restitution du contexte )
+  AX SS MOV
+  SP-REG # AX MOV
+  AX SP MOV
+  BP-REG # AX MOV
+  AX BP MOV
+  DS POP
+  4C00 # AX MOV
+  21 INT
+END-CODE
+IBASE !
+
+\ Mise … z‚ro des bits d'une variable, en fonction d'un masque pr‚d‚fini.
+CODE CRESET  ( masque adr_var --- )
+  BX POP
+  AX POP
+  AL 0 [BX] AND
+  NEXT
+END-CODE
+
+EOF
+
+

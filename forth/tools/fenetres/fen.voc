@@ -1,0 +1,640 @@
+****************************** Vocabulaire FEN *********************************
+
+SCREEN        --- adr
+              Constante. Empile l'adresse de segment de l'‚cran.
+              Par d‚faut, contient 0B800h (‚cran C.G.A). Mettre :
+              - 0B000h pour un ‚cran monochrome,
+              - 0A000h pour un ‚cran E.G.A.
+
+#WMAXI        --- n
+              Constante. Empile le nombre maximum de fenˆtres ouvrables
+              en mˆme temps. Par d‚faut, contient 50.
+
+SCROLLUP      --- n
+              Constante. Utilis‚e dans les fonctions de Scrolling.
+
+SCROLLDWN     --- n
+              Constante. Utilis‚e dans les fonctions de Scrolling.
+
+SHADOWCOL     --- n
+              Constante. Contient le code de la couleur utilis‚e pour
+              l'ombrage des fenˆtres. Contient 0007 (blanc sur fond noir) par
+              d‚faut.
+
+NOIR          --- n
+              Constante. Code de couleur.
+
+BLEU          --- n
+              Constante. Code de couleur.
+
+VERT          --- n
+              Constante. Code de couleur.
+
+CYAN          --- n
+              Constante. Code de couleur.
+
+ROUGE         ---- n
+              Constante. Code de couleur.
+
+MAGENTA       --- n
+              Constante. Code de couleur.
+
+BRUN          --- n
+              Constante. Code de couleur.
+
+GRIS-CLAIR    --- n
+              Constante. Code de couleur.
+
+GRIS-FONCE    --- n
+              Constante. Code de couleur.
+
+BLEU-CLAIR    --- n
+              Constante. Code de couleur.
+
+VERT-CLAIR    --- n
+              Constante. Code de couleur.
+
+CYAN-CLAIR    --- n
+              Constante. Code de couleur.
+
+ROUGE-CLAIR   --- n
+              Constante. Code de couleur.
+
+MAGENTA-CLAIR --- n
+              Constante. Code de couleur.
+
+JAUNE         --- n
+              Constante. Code de couleur.
+
+BLANC         --- n
+              Constante. Code de couleur.
+
+MAXLARG       --- n
+              Constante. Empile la largeur maximale d'une fenˆtre. Contient 78
+              par d‚faut.
+
+MAXHAUT       --- n
+              Constante. Empile la hauteur maximale d'une fenˆtre. Contient 23
+              par d‚faut.
+
+FNUM          --- adr
+              Variable. Contient le num‚ro de la fenˆtre courante.
+
+#WPARAM       --- n
+              Constante. Contient la taille en octets de la zone paramŠtres
+              d'une fenˆtre. Empile 100 par d‚faut.
+
+WPARAM        --- adr
+              Empile l'adresse de la zone paramŠtres de la fenˆtre courante.
+
+RAZ-WPARAM    ---
+              Met … z‚ro la zone paramŠtres WPARAM.
+
+WSEGMENT      --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse de segment de la zone de sauvegarde de la
+              zone recouverte.
+
+POSX          --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse de la position de la fenˆtre en X dans l'‚cran.
+
+POSY          --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse de la position de la fenˆtre en Y dans l'‚cran.
+
+LARG          --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse de la largeur de la fenˆtre (en caractŠres).
+
+HAUT          --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse de la hauteur de la fenˆtre (en caractŠres).
+
+BORD          --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse de la forme du bord de la fenˆtre.
+              codes disponibles :
+              - 0 : pas de bord.
+              - 1 : trait simple Ú¿ÀÙÄ³
+              - 2 : trait double É»È¼Íº
+              - 3 : mixage 1     Ö·Ó½Äº
+              - 4 : mixage 2     Õ¸Ô¾Í³
+
+FCOL          --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse de la couleur de la fenˆtre (fond et
+              caractŠres).
+
+CURX          --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse de la position du curseur de la fenˆtre en X.
+              La position est relative … la fenˆtre, l'origine ‚tant … la
+              position 1,1.
+
+CURY          --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse de la position du curseur de la fenˆtre en Y.
+              La position est relative … la fenˆtre, l'origine ‚tant … la
+              position 1,1.
+
+NUME          --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse du num‚ro de la fenˆtre.
+
+BCOL          --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse de la couleur du bord de la fenˆtre (fond et
+              caractŠre).
+
+$FTITRE       --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse du titre de la fenˆtre (segment, offset et
+              longueur de la chaine).
+
+TCOL          --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse de la couleur du titre de la fenˆtre (fond et
+              caractŠre).
+
+SHADOW        --- adr
+              ParamŠtre de la fenˆtre courante.
+              Empile l'adresse du flag d'ombrage de la fenˆtre (VRAI si ombre).
+
+WVECTEUR      <nom> ---
+              Mot de d‚finition.
+              Cr‚‚ la zone qui va contenir les paramŠtres des diff‚rentes
+              fenˆtres. Cette zone est situ‚e dans un autre segment que
+              celui de FORTH. Ce mot est utilis‚ une seule fois … la
+              compilation de FEN, pour cr‚er la zone WTABLE.
+
+WTABLE        nøfen adr --- seg adr
+              Zone des paramŠtres des diff‚rentes fenˆtres.
+              Empile l'adresse de segment, ainsi que l'offset correspondand …
+              un num‚ro de fenˆtre donn‚.
+
+WTABLE>       nøfen ---
+              Transfert les paramŠtres de la fenˆtre nøfen de WTABLE vers la
+              zone WPARAM.
+
+>WTABLE       nøfen ---
+              Transfert les paramŠtres de la fenˆtre nøfen de WPARAM vers la
+              zone WTABLE correspondante.
+
+3@            adr --- n1 n2 n3
+              Lecture d'une variable de 3 mots.
+
+3!            n1 n2 n3 adr ---
+              Initialisation d'une variable de 3 mots.
+
+2NIP          n1 n2 n3 --- n3
+              Le double NIP.
+
+BD0           --- adr
+              Chaine.
+              Contient les caractŠres du type de bord 0.
+
+BD1           --- adr
+              Chaine.
+              Contient les caractŠres du type de bord 1.
+
+BD2           --- adr
+              Chaine.
+              Contient les caractŠres du type de bord 2.
+
+BD3           --- adr
+              Chaine.
+              Contient les caractŠres du type de bord 3.
+
+BD4           --- adr
+              Chaine.
+              Contient les caractŠres du type de bord 4.
+
+WSELECT       <nom> ---
+              Utilis‚ … la compilation de FEN, pour cr‚er le mot CADRE, qui
+              permet de s‚lectionner un type de bord parmis les 5 propos‚s
+              (BD0, BD1, BD2, BD3, BD4).
+              N'est plus utilis‚ par la suite.
+
+CADRE         n adr --- adr
+              Empile l'adresse de la chaine des caractŠres de bord
+              correspondants au type donn‚.
+
+(WLARG)       --- lc
+              Empile la largeur, en caractŠres, de la fenˆtre courante.
+
+(WHAUT)       --- hc
+              Empile la hauteur, en caractŠres, de la fenˆtre courante.
+
+(WSIZE)       --- n
+              Empile la taille, en caractŠres, de la fenˆtre courante.
+
+(XY->OFF)     x y --- off
+              Converti une position (x,y), en offset d'‚cran.
+
+WORG          --- off
+              Converti la position de la fenˆtre courante en offset d'‚cran.
+
+WSCR          x y --- seg adr
+              Converti les coordonn‚es pr‚sentes, en adresse (seg:off) dans
+              l'‚cran.
+
+WMEM          n --- seg adr
+              Calcule l'adresse (seg:off) de la ligne n de la fenˆtre courante,
+              dans le segment point‚ par WSEGMENT.
+
+(WSCROLL)     sens attr lcid lcsg ---
+              Primitive de scrolling.
+              lcsg : Ligne, Colonne du coin Sup‚rieur Gauche.
+              lcid : Ligne, Colonne du coin Inf‚rieur Droit.
+              attr : Attributs des caractŠres … afficher.
+              sens : Sens du scrolling (SCROLLUP ou SCROLLDWN).
+
+WSCROLL       sens ---
+              Scrolling vertical d'une ligne de la fenˆtre courante.
+              sens : Sens du scrolling (SCROLLUP ou SCROLLDWN).
+
+(WLOCATE)     pos ---
+              Primitive de positionnement du curseur.
+              pos : nouvelle position (x,y) du curseur.
+
+WLOCATE       ---
+              Positionne le curseur de la fenˆtre courante, … la position
+              CURX,CURY.
+
+(WAT)         x y --- x y
+              Positionne le curseur … la position x,y. Met … jour CURX et CURY.
+
+WBS           ---
+              Emet un retour arriŠre (BackSpace) dans la fenˆtre courante.
+
+(WCR)         ---
+              Emet un retour chariot dans la fenˆtre courante.
+
+CR-ON         ---
+              Autorise l'‚mission du retour chariot.
+
+CR-OFF        ---
+              Interdit l'‚mission du retour chariot.
+
+CURSOR-OFF    ---
+              Fait disparaitre le curseur.
+
+CURSOR-ON     ---
+              Fait apparaitre le curseur.
+
+(WEMIT)       char ---
+              Primitive d'‚mission d'un caractŠre dans la fenˆtre courante, …
+              la position du curseur. Ecrit directement dans la R.A.M ‚cran.
+
+WEMIT         char ---
+              Emet le caractŠre char dans la fenˆtre courante, … la position
+              du curseur. Prend en compte le BIP (char = 7), le BS (char = 8)
+              et le CR. Met … jour la position du curseur.
+
+(WALLOC)      ---
+              Primitive d'allocation d'espace. Alloue (WSIZE) octets pour la
+              nouvelle fenˆtre.
+
+WALLOC        ---
+              Alloue l'espace n‚c‚ssaire pour une nouvelle fenˆtre. La rend
+              fenˆtre courante.
+
+(WLIBRE)      ---
+              Primitive de lib‚ration de l'espace occup‚ par une fenˆtre.
+
+WLIBRE        ---
+              LibŠre l'espace occup‚ par la fenˆtre courante.
+              La fenˆtre pr‚c‚dente devient la fenˆtre courante.
+
+LMOVE         seg_src off_src seg_dst off_dst long ---
+              D‚placement de mots (16 bits) inter-segment.
+              seg_src, off_src : Adresse de la zone source.
+              seg_dst, off_dst : Adresse de la zone destination.
+              long             : Longueur (en mots).
+
+WBACK         ---
+              Sauvegarde de la zone recouverte par la fenˆtre courante.
+
+WREST         ---
+              Restitution de la zone recouverte par la fenˆtre courante.
+
+LWFILL        seg off long n ---
+              Remplissage d'une zone avec un mot (16 bits).
+              seg, off : Adresse de d‚but de la zone … remplir.
+              long     : Longueur de la zone (en mots).
+              n        : Mot de remplissage.
+
+WBORD         ---
+              Dessine le cadre et l'ombre ‚ventuelle de la fenˆtre courante.
+              Ecrit directement dans la R.A.M ‚cran.
+
+WTITRE        ---
+              Affiche le titre ‚ventuel de la fenˆtre courante.
+              L'affichage est centr‚ sur le bord sup‚rieur de la fenˆtre, et
+              la longueur du titre est limit‚e … celle de la fenˆtre.
+
+((WDARK))     attr lcid lcsg ---
+              Primitive d'effacement.
+              C'est en fait un scrolling de toute la fenˆtre vers le haut.
+
+WDARK         ---
+              Efface la fenˆtre courante. Positionne le curseur … l'origine
+              (1,1).
+
+(W.FEN)       ---
+              Primitive d'affichage de la fenˆtre courante.
+
+F/C           coul_fond coul_caractŠre --- coul
+              Fabrique un octet de couleur (fond+caractŠre) … partir des deux
+              couleurs donn‚es.
+
+WXCHGCOL      ncoul x y long ---
+              Remplace la couleur de la fenˆtre courante par ncoul, … partir
+              de la position x,y, sur une longueur long.
+
+WXCHGCOLS     ncoul x y long n ---
+              Remplace la couleur des n lignes de la fenˆtre courante
+              par ncoul, … partir de la position x,y sur la longueur long.
+
+(WBCKCLI)     seg off --- seg off
+              Primitive de sauvegarde de la zone client de la fenˆtre courante.
+              seg, off : Adresse du buffer de sauvegarde.
+
+(WRSTCLI)     seg off --- seg off
+              Primitive de restauration de la zone client de la fenˆtre
+              courante.
+              seg, off : Adresse du buffer de sauvegarde.
+
+WCLIENTBCK    --- seg off
+              Sauvegarde la zone client de la fenˆtre courante.
+              Empile l'adresse (seg:off) du buffer de sauvegarde.
+
+WCLIENTRST    seg off ---
+              Restauration de la zone client de la fenˆtre courante.
+              seg, off : Adresse du buffer de sauvegarde.
+
+(WMOVE)       nblig adr_var ---
+              Primitive de d‚placement de la fenˆtre courante.
+              D‚place la fenˆtre courante de nblig vers le haut/la droite
+              (nblig est positif) ou vers le bas/la gauche (nblig est n‚gatif).
+              La direction d‚pend de l'adresse adr_var de la variable pass‚e
+              (POSX ou POSY).
+
+WMOVUP        ---
+              D‚place la fenˆtre courante d'une ligne vers le haut.
+
+WMOVDN        ---
+              D‚place la fenˆtre courante d'une ligne vers le bas.
+
+WMOVLFT       ---
+              D‚place la fenˆtre courante d'une ligne vers la gauche.
+
+WMOVRGT       ---
+              D‚place la fenˆtre courante d'une ligne vers la droite.
+
+(W.CLIENT)    atail seg off ---
+              Primitive de r‚affichage de la zone client de la fenˆtre
+              courante.
+              atail    : Ancienne taille de la zone client.
+              seg, off : Adresse du buffer de sauvegarde.
+              Si la nouvelle zone client est plus petite, ce qui est en trop
+              est perdu.
+
+(WRESIZE)     nc adr_var ---
+              Primitive de redimensionnement de la fenˆtre courante.
+              EnlŠve (nc est n‚gatif) ou ajoute (nc est positif) nc caractŠres
+              … la fenˆtre courante.
+              adr_var d‚termine si l'on a affaire … des lignes ou des colonnes.
+
+WHAUT-        ---
+              EnlŠve une ligne … la fenˆtre courante.
+
+WHAUT+        ---
+              Ajoute une ligne … la fenˆtre courante.
+
+WLARG-        ---
+              EnlŠve une colonne … la fenˆtre courante.
+
+WLARG+        ---
+              Ajoute une colonne … la fenˆtre courante.
+
+WRELEASE      ---
+              D‚salloue le segment des paramŠtres des fenˆtres.
+              R‚tabli les vecteurs redirig‚s.
+              ****************************************************************
+              UTILISER WINIT AVANT TOUTES NOUVELLES MANIPULATIONS DE FENETRES.
+              ****************************************************************
+
+WFERME        ---
+              Ferme la fenˆtre courante.
+              Restitue les paramŠtres de la fenˆtre pr‚c‚dente. Si la fenˆtre
+              ferm‚e ‚tait la derniŠre, se comporte comme WALLCLOSE.
+
+WALLCLOSE     ---
+              Ferme toutes les fenˆtres ouvertes.
+              D‚salloue le segment des paramŠtres des fenˆtres.
+              R‚tabli les vecteurs redirig‚s.
+              ****************************************************************
+              UTILISER WINIT AVANT TOUTES NOUVELLES MANIPULATIONS DE FENETRES.
+              ****************************************************************
+
+WINIT         ---
+              Initialisation du gestionnaire de fenˆtre.
+              ************************************************
+              A UTILISER AVANT TOUTE MANIPULATION DE FENETRES.
+              ************************************************
+              Initialise les vecteurs redirig‚s.
+              Alloue le segment des paramŠtres des fenˆtres.
+
+(WOUVRE)      px py l h fb cf cb $t ct sh ---
+              Primitive d'ouverture d'une fenˆtre.
+              px, py : Position en x,y de la fenˆtre dans l'‚cran.
+              l      : Largeur de la fenˆtre.
+              h      : Hauteur de la fenˆtre.
+              fb     : Forme du bord.
+              cf     : Couleur (fond et caractŠres) de la fenˆtre.
+              cb     : Couleur (fond et caractŠres) du bord.
+              $t     : Segment, Offset et longueur du titre ‚ventuel.
+              ct     : Couleur (fond et caractŠres) du titre ‚ventuel.
+              sh     : flag d'ombrage (VRAI si ombre).
+
+WOUVRE        px py l h fb cf cb $t ct sh ---
+              Ouvre une nouvelle fenˆtre.
+              px, py : Position en x,y de la fenˆtre dans l'‚cran.
+              l      : Largeur de la fenˆtre.
+              h      : Hauteur de la fenˆtre.
+              fb     : Forme du bord.
+              cf     : Couleur (fond et caractŠres) de la fenˆtre.
+              cb     : Couleur (fond et caractŠres) du bord.
+              $t     : Segment, Offset et longueur du titre ‚ventuel.
+              ct     : Couleur (fond et caractŠres) du titre ‚ventuel.
+              sh     : flag d'ombrage (VRAI si ombre).
+
+MHORIZONTAL   --- n
+              Constante. Contient le code du type de menu horizontal. Empile
+              0 par d‚faut.
+
+MVERTICAL     --- n
+              Constante. Contient le code du type de menu vertical. Empile
+              1 par d‚faut.
+
+$OPTIONS      --- adr
+              ParamŠtre du menu courant.
+              Empile l'adresse de la chaine contenant les options du menu
+              courant (segment, offset et longueur).
+
+#OPTIONS      --- adr
+              ParamŠtre du menu courant.
+              Empile l'adresse du nombre d'options disponibles du menu courant.
+
+OPTION#       --- adr
+              ParamŠtre du menu courant.
+              Empile l'adresse de l'option courante du menu courant.
+
+OCOL          --- adr
+              ParamŠtre du menu courant.
+              Empile l'adresse de la couleur (fond et caractŠres) de l'option
+              courante du menu courant. Les autres ont la couleur de FCOL.
+
+TMENU         --- adr
+              ParamŠtre du menu courant.
+              Empile l'adresse du type du menu courant.
+              Types disponibles :
+              - 0 : Menu horizontal.
+              - 1 : Menu vertical.
+
+OPTX          --- adr
+              ParamŠtre du menu courant.
+              Empile l'adresse de la position en X de la chaine de libell‚s
+              du menu courant. Est initialis‚ … 1 par d‚faut.
+
+OPTY          --- adr
+              ParamŠtre du menu courant.
+              Empile l'adresse de la position en Y de la chaine de libell‚s
+              du menu courant. Est initialis‚ … 1 par d‚faut.
+
+LDONE         ---
+              Label. Utilis‚ par LSKIP, LSCAN.
+
+LSKIP         seg off l c --- seg off' l'
+              Version extra-segment de SKIP.
+
+LSCAN         seg off l c --- seg off' l'
+              Version extra-segment de SCAN.
+
+LITEM         seg off l n --- seg off' l'
+              Version extra-segment de ITEM.
+
+LITEMS        seg off l --- n
+              Empile le nombre total d'items pr‚sents dans la chaine
+              extra-segment donn‚e.
+
+(.OPTION)     coul ---
+              Primitive d'affichage de l'option courante avec la couleur coul.
+
+OPTION-ON     ---
+              Affiche l'option courante avec la couleur de OCOL.
+
+OPTION-OFF    ---
+              Affiche l'option courante avec la couleur de FCOL.
+
+(W.MENU)      ---
+              Primitive d'affichage du menu courant.
+
+WGESMENU      --- n
+              Gestion du menu courant.
+              Touches g‚r‚es par d‚faut :
+                - Les quatres flŠches pour les d‚placements.
+                - La touche Return pour la validation.
+                - La touche Escape pour l'abandon.
+              Empile le num‚ro de l'option choisie (1..#OPTIONS), ou 0
+              si abandon.
+
+WMENU         px py l h fb cf cb $t ct sh $opt oc tm ---
+              Ouvre un nouveau menu.
+              px, py : Position en x,y du menu dans l'‚cran.
+              l      : Largeur de la fenˆtre.
+              h      : Hauteur de la fenˆtre.
+              fb     : Forme du bord.
+              cf     : Couleur (fond et caractŠres) de la fenˆtre.
+              cb     : Couleur (fond et caractŠres) du bord.
+              $t     : Segment, Offset et longueur du titre ‚ventuel.
+              ct     : Couleur (fond et caractŠres) du titre ‚ventuel.
+              sh     : flag d'ombrage (VRAI si ombre).
+              $opt   : Segment, Offset et longueur de la chaine d'options.
+              oc     : Couleur (fond et caractŠres) de la chaine d'options.
+              tm     : Type du menu.
+
+#F1ER         --- adr
+              ParamŠtre de la fenˆtre de s‚lection courante.
+              Empile l'adresse de l'indice … partir duquel l'affichage d‚bute.
+
+#CARH         --- adr
+              ParamŠtre de la fenˆtre de s‚lection courante.
+              Empile l'adresse de sauvegarde du caractŠre remplac‚ par le
+              symbole de continuation vers le haut.
+
+#CARB         --- adr
+              ParamŠtre de la fenˆtre de s‚lection courante.
+              Empile l'adresse de sauvegarde du caractŠre remplac‚ par le
+              symbole de continuation vers le bas.
+
+(.FNOM)       l n ---
+              Affiche le niŠme nom … la ligne l, colonne OPTX.
+
+(W.FMENU)     ---
+              Primitive d'affichage du menu de s‚lection.
+
+#CARH!        ---
+              Sauvegarde le caractŠre remplac‚ par le symbole de continuation
+              vers le haut.
+
+#CARH@        ---
+              Restitue le caractŠre remplac‚ par le symbole de continuation
+              vers le haut.
+
+(.FHAUT)      ---
+              Affiche l'‚ventuel symbole de continuation vers le haut (flŠche
+              haute).
+
+#CARB!        ---
+              Sauvegarde le caractŠre remplac‚ par le symbole de continuation
+              vers le bas.
+
+#CARB@        ---
+              Restitue le caractŠre remplac‚ par le symbole de continuation
+              vers le bas.
+
+(.FBAS)       ---
+              Affiche l'‚ventuel symbole de continuation vers le bas (flŠche
+              basse).
+
+WGSELECT      --- n
+              Gestion de la fenˆtre de s‚lection courante.
+              Touches g‚r‚es par d‚faut :
+                - Les flŠches haute et basse pour les d‚placements.
+                - La touche Home pour se placer sur le premier nom.
+                - La touche Fin pour se placer sur le dernier nom.
+                - La touche PgUp pour se placer sur la page pr‚c‚dente.
+                - La touche PgDn pour se placer sur la page suivante.
+                - La touche Return pour la validation.
+                - La touche Escape pour l'abandon.
+              Empile l'indice du nom courant (1..#OPTIONS), ou 0
+              si abandon.
+
+WSELECT       px py l h fb cf cb $t ct sh $opt oc #1er ---
+              Ouvre une nouvelle fenˆtre de s‚lection.
+              px, py : Position en x,y du menu dans l'‚cran.
+              l      : Largeur de la fenˆtre.
+              h      : Hauteur de la fenˆtre.
+              fb     : Forme du bord.
+              cf     : Couleur (fond et caractŠres) de la fenˆtre.
+              cb     : Couleur (fond et caractŠres) du bord.
+              $t     : Segment, Offset et longueur du titre ‚ventuel.
+              ct     : Couleur (fond et caractŠres) du titre ‚ventuel.
+              sh     : flag d'ombrage (VRAI si ombre).
+              $opt   : Segment, Offset et longueur de la chaine de noms.
+              oc     : Couleur (fond et caractŠres) de la chaine d'options.
+              #1er   : Indice … partir duquel l'affichage d‚bute.
+

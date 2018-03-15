@@ -1,0 +1,23 @@
+// test asearch
+local
+number[] 1 40 tab
+number nval
+
+: main
+   cls
+   " %0.f" using
+   " test asearch" print
+   40 0 do i 0 i tab := loop
+   40 0 do 0 i tab print "  " print loop
+   begin
+      20 1 locate " entrez un nombre " print
+      input val nval :=
+      nval tab asearch nip nip
+      if
+         "   trouv‚" print
+      else
+         "   NON trouv‚" print
+      endif
+   again
+;
+

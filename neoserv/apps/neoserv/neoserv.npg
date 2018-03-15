@@ -1,0 +1,612 @@
+//============================================================================//
+// NoServ 								      //
+// 									      //
+// Date de cration     : 17/02/95				              //
+// Date de Mise … jour  : 11/05/95				              //
+// 									      //
+// Exemple d'application tlmatique COMPLETE                                 //
+// 									      //
+//============================================================================//
+
+#use modules\demdoc\demdoc
+#use modules\qrep\qrep
+#use modules\arbo\arbo
+
+#PATHVTX NEOSERV\VTX
+#PATHDBF NEOSERV
+
+PUBLIC
+      NUMBER _debug := 0
+
+LOCAL
+     NUMBER Clavier
+     NUMBER Res := 0
+     NUMBER Tmp := 0
+     NUMBER go_on
+     NUMBER MaxPos
+     NUMBER npos
+
+     CHAR Acces3614 := " "
+     CHAR Msg := " "
+
+     // { Variables du fichier des commandes }
+
+     CHAR   NoCde
+     CHAR   cdate
+     CHAR   Societe
+     CHAR   Nom
+     CHAR   Prenom
+     CHAR   Adrl1
+     CHAR   Adrl2
+     CHAR   Adrl3
+     CHAR   Ville
+     CHAR   CP
+     CHAR   Telephone
+     CHAR   Fax
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Ouverture des fichiers de l'application }
+//
+: Init
+
+	// { Ouverture de l'arborescence NEOSERV }
+
+	cls
+	" NEOSERV" DbOpen
+
+	if
+          " CODEPAGE" DbSetIndex
+	else
+	    1 1 Locate
+	    " erreur ouverture du fichier NEOSERV" print cr
+	    wait
+
+	endif
+
+        Clear0
+	" NeoServ Version 1.01 - 04/05/95" Line0
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Retour … l'arboresence NEOSERV aprs excution d'une procdure spcifique }
+//
+: RetourArbo
+
+    1 Arbo.MyArbo !=
+    if
+
+      10 Arbo.MyArbo /=
+      Arbo.MyArbo Int Arbo.MyArbo :=
+
+    endif
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Bascule en mode double hauteur }
+//
+: FonteHaute
+
+    fdheight setfont
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Affiche le bandeau du bas }
+//
+: BdxBas
+
+    " BdxBas.vtx" SendPage
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Affiche le bandeau de retour au menu }
+//
+: BdxRetour
+
+    " Retour.vtx" SendPage
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Bascule en mode standard }
+//
+: FonteStandard
+
+    fsimple setfont
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Affichage des informations Editeur }
+//
+: Editeur
+
+    EmptyLocalFkeyTable
+    " Editeur.vtx" SendPage
+    wait
+    RetourArbo
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Support technique }
+//
+
+: RunQrep
+
+    EmptyLocalFkeyTable
+    qrep::menugen
+    RetourArbo
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Demande de documentation }
+//
+: DemDoc
+
+    EmptyLocalFkeyTable
+    demdoc::menugen
+    RetourArbo
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Gestion de la touche ENVOI }
+//
+: Envoi
+
+	8 Clavier :=
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion de la touche SUITE
+//
+: Suite
+
+	7 Clavier :=
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+//
+// Gestion de la touche SOMMAIRE
+//
+: Sommaire
+
+	1 Clavier :=
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Gestion de la touche RETOUR
+//
+: Retour
+
+	3 Clavier :=
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Affectation des touches de fonctions
+//
+: AffectTouches
+
+     setlocalfkey FKGUIDE Editeur
+     setlocalfkey FKSOMMAIRE Sommaire
+     setlocalfkey FKRETOUR Retour
+     setlocalfkey FKENVOI Envoi
+     setlocalfkey FKSUITE Suite
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Rinitialisation des touches de fonctions … leur valeur par dfaut }
+//
+: DefautTouches
+
+	EmptyLocalFkeyTable
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Saisie des coordonnes }
+//
+: TraiteFKSaisie  // --- b
+
+   fkey dup fkenvoi ==
+   if
+      // { Validation ? }
+      // { On vrifie qu'il y ai au moins le nom,l'adresse, le cp et la ville }
+      Nom empty?
+      Adrl1 empty?
+      cp empty?
+      ville empty?
+      && && &&
+      if
+         " Saisie incomplte !" line0
+         drop false
+      else
+         drop true
+      endif
+   else
+      dup fksuite ==
+      if
+         // Zone suivante.
+         npos ++
+         npos maxpos >
+         if
+            // { Dernire zone, on reboucle sur la premire }
+            1 npos :=
+         endif
+         drop false
+
+      else
+         fkretour ==
+         if
+            // { Zone prcdente. }
+            npos --
+            npos 0 <=
+            if
+               // { premire zone, on reboucle sur la dernire }
+               maxpos npos :=
+            endif
+            false
+
+         else
+
+            // { Les autres touches provoquent }
+            // { la fin de la saisie }
+            true
+
+         endif
+
+      endif
+
+   endif
+
+;
+
+: SaisCoor
+
+   cursoron
+   1 npos :=
+
+   begin
+      npos
+      case
+         1 of
+              // { Saisie du nom }
+              5 11 nom alltrim strlen + locate
+              nom InputVar
+              TraiteFKSaisie
+           endof
+
+         2 of
+              // { Saisie du prnom }
+              6 11 prenom alltrim strlen + locate
+              prenom InputVar
+              TraiteFKSaisie
+           endof
+
+         3 of
+              // { Saisie de la socit }
+              8 11 societe alltrim strlen + locate
+              societe InputVar
+              TraiteFKSaisie
+
+           endof
+
+         4 of
+              // { Saisie de l'adresse ligne 1 }
+              11 11 adrl1 alltrim strlen + locate
+              adrl1 InputVar
+              TraiteFKSaisie
+           endof
+
+         5 of
+              // { Saisie de l'adresse ligne 2 }
+              12 11 adrl2 alltrim strlen + locate
+              adrl2 InputVar
+              TraiteFKSaisie
+           endof
+
+         6 of
+              // { Saisie de l'adresse ligne 3 }
+              13 11 adrl3 alltrim strlen + locate
+              adrl3 InputVar
+              TraiteFKSaisie
+           endof
+
+         7 of
+              // { Saisie du code postal }
+              14 11 cp alltrim strlen + locate
+              cp InputVar
+              TraiteFKSaisie
+           endof
+
+         8 of
+              // { Saisie de la ville }
+              15 11 ville alltrim strlen + locate
+              ville InputVar
+              TraiteFKSaisie
+           endof
+
+         9 of
+              // { Saisie du tlphone }
+              17 11 telephone alltrim strlen + locate
+              telephone InputVar
+              TraiteFKSaisie
+           endof
+
+         10 of
+              // { Saisie du fax }
+              18 11 fax alltrim strlen + locate
+              fax InputVar
+              TraiteFKSaisie
+           endof
+
+           drop
+
+      endcase
+
+   until
+
+   cursoroff
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Ecriture d'une commande }
+//
+: EcritCDE
+
+   " COMMANDE" DbOpen
+   if
+     " NOCDE" DbSetIndex
+
+     // { Ecriture de la ligne de commande }
+     DbAppendBlank
+     NoCde     " NOCDE"     DbReplace
+     cdate     " DATECDE"   DbReplace
+     Societe   " SOCIETE"   DbReplace
+     Nom       " NOM"       DbReplace
+     Prenom    " PRENOM"    DbReplace
+     Adrl1     " ADRL1"     DbReplace
+     Adrl2     " ADRL2"     DbReplace
+     Adrl3     " ADRL3"     DbReplace
+     Ville     " VILLE"     DbReplace
+     CP        " CP"        DbReplace
+     TELEPHONE " TEL"       DbReplace
+     FAX       " FAX"       DbReplace
+
+     " COMMANDE" DbClose
+
+   endif
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Commande d'une disquette d'valuation de NoServ }
+//
+: Evaluation
+
+   // { Saisie des coordonnes }
+   DefautTouches
+   10 maxpos :=
+   SaisCoor
+   Nom empty? !
+   Adrl1 empty? !
+   cp empty? !
+   ville empty? !
+   && && &&
+   if
+     // { Gestion du numro de commande }
+     Societe 1 2 substr NoCde :=
+     Nom     1 2 substr NoCde strcat
+     Date DtoS 4 4 substr NoCde strcat
+
+     // { Validation de la commande }
+     EcritCDE
+
+     " Votre Commande est enregistre" line0
+     2500 delay
+     " ****************************************************" display
+     " * Commande d'une disquette d'valuation de NoServ *" display
+     " ****************************************************" display
+     clear0
+
+   endif
+
+   " RETOUR.VTX" SendPage
+   RetourArbo
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Affichage de la page dsol }
+//
+: Desole
+
+	" Desole.vtx" Sendpage
+	5000 delay
+	10 Arbo.MyArbo /=
+	Arbo.MyArbo Int Arbo.MyArbo :=
+	cls
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// Boucle principale de traitement
+//
+: run
+
+    1 arbo::arbo
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+//
+// Affichage des informations Editeur sur le logo
+//
+: AffGuide
+
+    DefautTouches
+    " Editeur.vtx" SendPage
+    wait
+    AffectTouches
+
+;
+
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+//
+// { Affichage de l'intro }
+//
+: Intro
+
+    cls
+    "                                " Line0
+    setlocalfkey fkguide AffGuide
+    Palier 99 ==
+    if
+        " NEOSERV.VTX" SendPage
+        wait
+
+    endif
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+: Done
+
+;
+
+//
+// ออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออ
+//
+// { Accs restreint }
+//
+: AccesT2
+
+   1
+   " ACCEST2.VTX" sendpage
+   cursoron
+   begin
+      16 32 locate fdheight setfont
+      Acces3614 InputVar
+      Acces3614 alltrim " FORTH" ==
+
+      if
+         " OK" line0
+         drop true dup
+
+      else
+
+         1 + dup 3 >
+
+         if
+
+            " Fin de communication" line0
+            // Dconnexion
+            " \27\57\103" print
+            false
+
+         else
+
+            false
+
+         endif
+
+      endif
+
+   until
+;
+
+
+: Main
+
+    Init
+
+    palier 99 !=
+    if
+      palier 82 ==
+      if
+        // { Accs 3614 }
+        AccesT2
+        if
+          Intro
+	  AffectTouches
+	  Run
+	  Done
+
+        endif
+
+      else
+
+           // { Accs 3615 }
+           Intro
+           AffectTouches
+           Run
+           Done
+
+      endif
+
+    else
+
+        // { Accs local }
+        AffectTouches
+        Run
+        Done
+
+    endif
+
+;

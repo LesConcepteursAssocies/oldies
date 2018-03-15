@@ -1,0 +1,53 @@
+\ ------------------------------------------------------------------------------
+\                Allocation de la m‚moire et accŠs au SHELL.
+\ ------------------------------------------------------------------------------
+
+IBASE @
+IBASE HEX
+
+: COMMAND  ( adr_chn long --- )
+  02 PSP 80 LC!
+  ASCII / PSP 81 LC!
+  ASCII C PSP 82 LC!
+  DROP 1-
+  DUP DUP C@ + 1+    ( chn --- chn+lon+1 )
+  13 SWAP C!         ( chn --- )
+  DSEGMENT OVER      ( chn --- DS chn )
+  DUP 1+ SWAP        ( chn DS --- chn+1 chn )
+  PSP 83             ( chn DS chn+1 chn --- PSP 83 )
+  ROT C@ 1+          ( chn DS chn+1 PSP 83 --- lon+1 )
+  LMOVE              ( chn --- )
+  C@ PSP 80 LC@ +
+  PSP 80 LC!         ( lon=lon+3 --- )
+  PSP 80
+  PARAM-BLOCK 2 + !
+  PARAM-BLOCK 4 + !
+;
+
+\ Appels au DOS
+: (SHELL)
+  COMMAND
+  DSEGMENT COMSPEC!
+  COMMAND.COM COUNT DROP
+  PARAM-BLOCK
+  (COMMAND) ?DOSERR
+;
+
+: SHELL
+  STATE @
+  IF
+    COMPILE (SHELL)
+  ELSE
+    2DUP SWAP 1- C!
+    (SHELL)
+  THEN
+;
+IMMEDIATE
+
+IBASE DECIMAL
+
+IBASE !
+
+EOF
+
+

@@ -1,0 +1,29 @@
+                            L'UNIVERS DE CONWAY
+                            -------------------
+
+Le programme suivant simule le c‚lŠbre "jeu de la vie", invent‚ par
+CONWAY.
+
+RŠgles du jeu.
+--------------
+
+On joue sur un damier de dimensions quelconques, sur lequel on dispose
+de fa‡on al‚atoire, une certain nombre de pions.
+
+Cette "population" va ‚voluer, … chaque tour, en respectant les rŠgles
+suivantes :
+
+   - Toute case entour‚e par au moins 2 pions donne naissance … un pion.
+   - Tout pion entour‚ par au moins 3 autres meurt.
+   - Tout pion isol‚ meurt.
+
+Le plus intŠrressant dans ce jeu, c'est que certaines configurations de pions
+au d‚part, donne des figures trŠs jolies.
+
+Ce type de simulation peut trŠs bien d‚boucher sur quelques principes
+utilis‚s en connexionisme (auto-organisation,...).
+
+Amusez-vous bien et m‚ditez...
+
+
+

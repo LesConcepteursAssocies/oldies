@@ -1,0 +1,10 @@
+//
+// test negate
+//
+
+: main
+   cls " negate" print cr
+   32 negate print cr
+   wait
+;
+

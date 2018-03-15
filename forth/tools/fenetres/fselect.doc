@@ -1,0 +1,42 @@
+              Extension au gestionnaire de menus d‚roulants :
+                     Gestion de fenˆtres de s‚lection.
+              -----------------------------------------------
+
+GENERALITES
+-----------
+
+Une fenˆtre de s‚lection est un type particulier de menu, dans le sens ou
+celui-ci est de type vertical, et que le nombre d'options s‚lectionnables
+n'est pas forc‚ment contenu en totalit‚ dans la-dite fenˆtre.
+
+Au niveau du programmeur, deux mots ont ‚t‚ ajout‚s, le mot WSELECT, qui
+permet d'ouvrir une fenˆtre de s‚lection, et le mot WGSELECT, qui se
+charge de la gestion (d‚placements, validation, abandon) du menu.
+
+Le mot WSELECT prend trois paramŠtres suppl‚mentaires, par rapport … une
+fenˆtre classique :
+
+  - Le segment, l'offset et la longueur de la chaine contenant le
+    libell‚ des diff‚rentes options ($OPTIONS de WPARAM).
+  - La couleur (fond et caractŠre) de l'option courante (OCOL de WPARAM).
+  - L'indice … partir duquel l'affichage doit commencer. Cet indice varie
+    ensuite en fonction des divers d‚placements (#F1ER de WPARAM).
+
+AprŠs l'ouverture d'une fenˆtre de s‚lection, le programmeur doit ‚x‚cuter
+le mot WGSELECT, pour d‚clencher la gestion de celui-ci. Ce mot prend en
+charge les touches de base n‚c‚ssaires … la gestion des d‚placements (flŠches,
+home, fin, pgup, pgdn), de la validation (touche Return) et de l'abandon
+(touche Escape). Il renvoi le num‚ro de l'option choisie ou 0 si l'utilisateur
+a appuy‚ sur la touche Escape.
+
+Le mot WGSELECT est volontairement s‚par‚ pour permettre un parcours
+arborescent d'un ensemble de sous-fenˆtres.
+
+Les diff‚rents libell‚s doivent ˆtre s‚par‚s par au moins un espace, … cause
+de l'utilisation du mot LITEM (version extra-segment de ITEM) dans la gestion
+de ceux-ci.
+
+Tout ce qui s'applique … une fenˆtre s'applique ‚galement … une fenˆtre de
+s‚lection.
+
+

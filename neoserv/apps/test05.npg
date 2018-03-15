@@ -1,0 +1,35 @@
+//
+// Test 04 : test CASE OF ... ENDOF ENDCASE
+//
+//
+
+public char toto := " TEST"
+local number tutu := 5
+
+: main
+   cls
+   " test CASE ... ENDCASE (touche)" print
+   wait
+   " toto =" print toto print
+   toto case
+        " TIT" OF
+                 " TOTO CONTIENT TIT" print
+               ENDOF
+        " TEST" OF
+                 " TOTO CONTIENT TEST" print
+               ENDOF
+               " DEFAUT" print
+        ENDCASE
+   " tutu =" print tutu print
+   tutu case
+        1 OF
+            " TUTU CONTIENT 1" print
+          ENDOF
+        5 OF
+            " TUTU CONTIENT 5" print
+          ENDOF
+          " DEFAUT" print
+        ENDCASE
+   " FIN DE MAIN" print wait
+;
+

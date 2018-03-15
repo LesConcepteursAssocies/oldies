@@ -1,0 +1,77 @@
+1,1,"Qui jouait le r“le de David Vincent dans le feuilleton "Les envahisseurs" ?","Paul Newman","Roy Thinnes","Larry Cohen","Robert Loggia",2,20
+2,1,"Le film "La bonne ann‚e" a ‚t‚ r‚alis‚ par :","Pierre Grimblat","Marcel Carn‚","Claude Lelouch","Claude Pinoteau",3,40
+3,1,"Qui ne jouait pas dans "Family Business" ?","Sean Connery","Rosanna Arquette","Dustin Hoffman","Matthew Broderick",2,50
+4,1,"Qui ne jouait pas dans le film "La chair et le sang"","Jennifer Jason-Leigh","Jack Thomson","Rutger Hauer","Gary Oldman",4,50
+5,1,"Qui jouait dans le film "Larry le liquidateur" ?","Arnold Schwarzennegger","Chuck Norris","Danny de Vito","Jean Claude Van Damne",3,20
+6,1,"Qui … r‚alis‚ "Basic Instinct"","Paul Verhoeven","James Cameron","George Miller","Chuck Russel",1,15
+7,1,"Qui ne jouait pas dans le film "Tremblement de terre" ?","Jane Fonda","Victoria Principal","Ava Gardner","Charlton Heston",1,30
+8,1,"Qui … r‚alis‚ le film "Le syndrome chinois"","Oliver Stone","Stanley Kubrick","James Bridges","James Cameron",3,40
+9,1,"Quel film n'a pas ‚t‚ r‚alis‚ par Stanley Kubrick ?","2001, L'odyss‚e de l'espace","Lolita","La maŒtresse du lieutenant fran‡ais","Orange m‚canique",3,25
+10,1,"Le film "Midnight Express" se d‚roule :","Dans une boŒte de nuit","Dans une prison turc","Au vietnam","Dans le quartier du Bronx … New York",2,10
+11,1,"Qui jouait "Lolita" dans le film de Stanley Kubrick ?","Jane Fonda","Sue Lyon","Faye Dunaway","Elle n'apparaŒt pas dans le film",2,50
+12,1,"Max Von Sydow n'a pas jou‚ dans le film","L'exorciste","Cadavre Exquis","Hannah et ses soeurs","Tremblement de terre",4,40
+13,1,"Qui ne joue pas dans "Saturn 5" ?","Farraw Fawcet","Kirk Douglas","Harvey Keitel","Charles Bronson",4,20
+14,1,"Qui a r‚alis‚ le film "Family Business" ?","Jack Lee","Sidney Lumet","Norman Jewison","Howard Hawks",2,30
+15,1,""L'homme au pistolet d'or" est un James Bond particulier car :","C'est le premier de la s‚rie","C'est le premier de Roger Moore","C'est le dernier de Sean Connery","Ce n'est pas un James Bond",2,10
+16,1,"Quel est le film dans lequel le plus de voitures de Polices sont d‚truites","Les blues brothers","Police Academy 3","Police Academy 4","Terminator",1,35
+17,1,"Quel film le plus longtemps ?","Le jour le plus long","JFK","Alamo","Les 10 commandements",4,25
+18,1,"Quel est le premier film d'Isabelle Adjani ?","Violette et Fran‡ois","Barocco","La gifle","L'‚t‚ meurtrier",3,25
+19,1,""Alien, le 8e passager" a ‚t‚ r‚alis‚ par :","Ridley Scott","James Cameron","George Miller","Russel Mulcahy",1,15
+20,1,""Aliens, le retour" a ‚t‚ r‚alis‚ par :","Ridley Scott","James Cameron","George Miller","Russel Mulcahy",2,25
+21,1,""Highlander" a ‚t‚ r‚alis‚ par","Ridley Scott","James Cameron","George Miller","Russel Mulcahy",4,25
+22,1,"Qui plante l'‚p‚e Excalibur dans la roche ?","Le roi Arthur","Merlin","Mordred","Le roi Uther",4,40
+23,1,"Quel est le premier film de Luc Besson ?","Le grand bleu","Le dernier combat","Subway","L‚on",2,30
+1,2,"De Quand date la loi anti-casseur en France","1944","1970","1986","1994",2,30
+2,2,"Qui est sorti vainqueur de la crise des fus‚es … Cuba, en 1962 ?","Fidel Castro","John Kennedy","Nikita Kroutchev","Aucun des trois",2,20
+3,2,"De quand date en France la lib‚ration de l'avortement ?","1946","1968","1975","1980",3,35
+4,2,"De quelle nationalit‚ est le drapeau hiss‚ sur le Reichstag … Berlin, le 30 Avril 1945 ?","Sovi‚tique","Am‚ricain","Allemand","Il n'y avait plus de drapeau",1,40
+5,2,"Quel pays est li‚ … la Chine par le trait‚ de Paix et d'amiti‚ de 1978 ?","Le Japon","La Cor‚e du Nord","Le Vietnam","L'U.R.S.S.",1,30
+6,2,"Quel gouvernement a pr‚c‚d‚ celui du mar‚chal P‚tain en Juin 1940 ?","Daladier","De Gaulle","Raynaud","Cl‚menceau",3,50
+7,2,"Quand a eu lieu la bataille de Stalingrad ?","en l'‚t‚ 1905","en Octobre 1917","en D‚cembre 1923","D‚but 1943",4,30
+8,2,"Fin 1943, … la conf‚rence de T‚h‚ran, une promesse est faŒte … l'U.R.S.S. par les alli‚s. Laquelle ?","Fournir des armes et de la nourriture","De d‚barquer en Normandie en 1944","Laisser l'Allemagne … l'U.R.S.S.","De d‚barquer en Sicile",2,40
+9,2,"Quelle est l'ann‚e du "Printemps de Prague" ?","1926","1940","1968","1976",3,20
+10,2,"Quel grand dirigeant a effectu‚ une visite symbolique aux Etats-Unis en 1979 ?","Leonid Brejnev","Deng Xiaoping","Mao Ts‚ Tung","Tchang Ka‹-Chek",2,50
+11,2,"Dans quel pays se trouvait la ville de Dantzig avant le 1er Septembre 1939","En Pologne","En Tchekoslovaquie","En Prussie","C'‚tait une ville libre",4,35
+12,2,"Quels ont ‚t‚ les premiers jeux Olympiques auxquels l'U.R.S.S. … particip‚ ?","1928","1932","1936","1952",4,40
+13,2,"Sur qui s'appuyait Mao Ts‚ Tung ?","Sur les paysans","Sur les ouvriers","Sur la classe dirigeante","Sur les trois",1,35
+14,2,"Depuis quand la Chine dispose-t-elle de la bombe atomique ?","1953","1960","1964","Elle n'en a jamais dispos‚",3,25
+15,2,"De quand date la premiŠre bombe atomique sovi‚tique","1947","1950","1953","1956",3,40
+16,2,"Qui est arriv‚ en tˆte du premier tour de l'‚lection pr‚sidentielle de 1974 en France","Fran‡ois Mitterand","Val‚ry Giscard d'estaing","Jacques Chirac","Gaston Deferre",1,25
+17,2,"Qui a succ‚d‚ au Pape Pie XII ?","Pie XIII","Paul VI","Jean-Paul Premier","Jean XXIII",4,40
+18,2,"Quelle distance s‚pare Moscou de New-York","6500 KM","10000 KM","13000 KM","16000 KM",3,15
+19,2,"Quel mouvement a ‚t‚ cr‚e par le G‚n‚ral de Gaulle en 1947 ?","Le mouvement Gaulliste","Le R.P.R.","Le R.P.F.","l'U.D.F.",3,30
+20,2,"Combien de pays comptait la CEE en 1956","4","6","8","Elle n'existait pas encore",4,20
+21,2,"Quelle grande organisation est n‚e le 26 Juin 1945","La C.E.E.","L'O.T.A.N.","L'O.N.U.","L'U.N.E.S.C.O.",3,10
+22,2,"L'U.R.S.S. a d‚clar‚ la guerre au Japon en :","1941","1943","1945","Elle ne l'a jamais d‚clar‚",3,35
+23,2,"Quel pays est entr‚ dans le club Nucl‚aire en 1974","L'Inde","Le Japon","La Chine","Isra‰l",1,20
+24,2,"Combien d'Allemands ‚taient engag‚s dans la Campagne de Russie en Juin 1941 ?","500.000","1.500.000","3.000.000","5.000.000",3,25
+25,2,"Qu'est-ce qui a directement caus‚ la chute de la IVe r‚publique","La guerre d'Alg‚rie","La guerre d'Indochine","La 2e guerre mondiale","Le plan Marshall",1,10
+26,2,"De quand date le SMIC ?","1945","1956","1969","1981",3,25
+27,2,"La premiŠre fus‚e Arianne a ‚t‚ lanc‚e","en 1976","en 1977","en 1978","en 1979",4,20
+28,2,"Quand la r‚publique populaire de Chine a-t-elle ‚t‚ admise … l'O.N.U. ?","1949","1956","1965","1971",4,40
+1,3,"Quel pourcentage de la superficie de l'ex URSS repr‚sente la Sib‚rie ?","27%","37%","57%","77%",4,25
+2,3,"Quelle ville est la plaque tournante des transports aux Etats-unis ?","New-York","Chicago","Los Angeles","Detroit",2,35
+3,3,"Quel est le pourcentage de paysans japonais ayant aussi un emploi industriel ?","10%","30%","50%","90%",4,40
+4,3,"Que vend t-on sur le march‚ libre de Rotterdam ?","De la drogue","Du bl‚","Du p‚trole","De l'or",3,20
+5,3,"Quel est le pourcentage des paysans japonais cultivant le riz ?","10%","30%","50%","90%",4,20
+6,3,"En quelle ann‚e la Chine a t-elle dispos‚e de sa premiŠre centrale nucl‚aire ?","1961","1969","1981","1989",4,25
+7,3,"Quel est le taux de d‚pendance ‚nerg‚tique des Etats-unis ?","0%","20%","40%","60%",2,35
+8,3,"Combien y a t-il de t‚l‚viseurs pour 1000 habitants en Chine (Japon = 250) ?","- de 1","1","10","25",4,25
+9,3,"Quel pays de la CEE a la plus grande population ?","La Grande-Bretagne","L'Italie","La France","L'Allemagne",4,10
+10,3,"Laquelle de ces villes des Etats-Unis est la plus … l'est ?","New-York","Chicago","Los Angeles","Detroit",1,15
+11,3,"Quelle part du territoire japonnais est presque inoccup‚e ?","1/4","1/2","3/4","9/10",3,35
+12,3,"Quelle est la seconde langue parl‚e aux Etats-unis ?","Le Fran‡ais","L'Italien","L'Espagnol","L'Anglais",3,25
+13,3,"Laquelle de ces villes des Etats-unis est la plus … l'ouest ?","New-York","Chicago","Los Angeles","Detroit",2,25
+14,3,"Quel est le premier producteur mondial d'uranium enrichi ?","L'U.R.S.S.","Les Etats-unis","La France","La Chine",2,20
+15,3,"Quel type de culture de trouve-t-on pas aux Etats-unis ?","Le cacao","Le bl‚","Le mais","La noix de coco",1,40
+16,3,"A combien d'ann‚es sont ‚valu‚es les reserves de houilles aux Etats-unis ?","30","300","3000","30000",4,30
+17,3,"Quel est le premier partenaire commercial du japon ?","La Chine","Les Etats-unis","L'Allemagne","L'Inde",2,25
+18,3,"A combien d'ann‚es sont ‚valu‚es les r‚serves de p‚tr“le aux Etats-unis","10","100","1000","10000",1,35
+19,3,"Quel pourcentage de la population active travaille dans l'agriculture en Chine ?","25%","50%","75%","90%",3,35
+20,3,"Parmi les 10 plus grandes entreprises multi-nationales, combien sont sp‚cialis‚es dans le p‚tr“le ?","3","5","7","9",3,30
+24,1,"Sur un nombre total de films projet‚s dans le monde non communiste en 1950, combien ‚taient am‚ricains ?","25%","50%","75%","90%",3,25
+21,3,"Quel pourcentage de la population active am‚ricaine travaille dans le secteur primaire","1%","3%","5%","10%",2,30
+22,3,"Dans quelle proportion le Japon est il plus petit que la Chine ?","5","10","25","50",3,20
+23,3,"Combien de voitures par an les japonnais exportent ils aux Etats-unis","20000","200000","2 millions","10 millions",3,20
+24,3,"Quelle est la population de l'Inde","680 millions","700 millions","730 millions","760 millions",3,40
+

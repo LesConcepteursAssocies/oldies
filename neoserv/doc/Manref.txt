@@ -1,0 +1,5024 @@
+          MANUEL DE REFERENCE DU LANGAGE DE DEVELOPPEMENT DE NEOSERV
+          ==========================================================
+
+TYPES ET ENTREE DES DONNEES
+---------------------------
+
+NÇoServ reconnait 4 types de donnÇes :
+
+   - Le type NUMBER (nombre), reprÇsentant les nombres
+     (entiers, flottants, ...).
+     Les nombres peuvent àtres entrÇs de diverse faáon :
+     (Par dÇfaut, la base d'entrÇe est 10 (dÇcimal)) 
+
+     exemples : 125e35        // Notation scientifique
+                3.14159       // Notation Ö virgule flottante
+                -25           // Nombre nÇgatif (signe devant le nombre)
+                FFEh          // Base hÇxadÇcimal ('h' Ö la fin du nombre)
+                010011101b    // Base binaire ('b' Ö la fin du nombre)
+                1257o         // Base octal ('o' Ö la fin du nombre)
+                +56.7         // le signe '+' est facultatif mais autorisÇ
+
+   - Le Type NUMBER[], reprÇsentant les tableaux de nombres.
+
+   - Le type CHAR, reprÇsentant les caractäres
+     (simples, chaines).
+
+     exemples : "A"           // caractäre 'A'
+                "Bonjour"     // Chaine
+
+   - Le type CHAR[], reprÇsentant les tableaux de caractäres.
+
+   En interne, tous les nombres de NÇoServ sont reprÇsentÇs en format
+   flottant (32 bits), avec la prÇcision suivante :
+
+   - Plus grand nombre reprÇsentable = 3.402823466e+38
+   - Plus petit nombre reprÇsentable = 1.175494351e-38
+
+   La longueur des chaines n'est limitÇe que par la mÇmoire disponible.
+
+COMPILATION DES PROGRAMMES
+--------------------------
+
+Chaque ligne est convertie en majuscules, ainsi "MAIN", "MaIn", "MAin" sont
+identiques et dÇsignent la màme procÇdure.
+
+CONVENTIONS
+-----------
+
+Dans les explications qui suivent, les symboles suivants sont utilisÇs :
+
+   - n : reprÇsente un nombre quelconque
+   - c : reprÇsente une chaine de caractäre quelconque
+         (contenant un ou plusieurs caractäres)
+   - s : reprÇsente un symbole quelconque (son type est indiffÇrent)
+
+Les commentaires sur les paramätres d'entrÇe et de sortie des procÇdures
+du langage suivent la convention suivante :
+
+   // se1 ... sen --- ssn ... ss1
+
+   se1 est le paramätre d'entrÇe situÇ au sommet de la pile
+   sen est le dernier paramätre d'entrÇe (situÇ au fond de la pile)
+   ssn est le dernier paramätre de sortie (situÇ au fond de la pile)
+   ss1 est le paramätre de sortie situÇ au sommet de la pile
+
+   exemples : // DÇfinition de l'addition
+              // n1 est au sommet de la pile, n2 est juste en dessous
+              // n3 est le rÇsultat empilÇ
+              : + // n1 n2 --- n3
+                 ...
+              ;
+              // DÇfinition de la procÇdure locate
+              // nLig est au sommet de la pile, nCol est juste en dessous
+              // Aucun paramätre n'est renvoyÇ (empilÇ)
+              : LOCATE // nLig nCol ---
+                 ...
+              ;
+
+En clair, il suffit de se reprÇsenter la pile comme ceci :
+
+        Avant           Apräs
+
+Sommet-> se1             ss1 <-Sommet
+         ...      ---    ...
+         sen             ssn
+
+   // se1 ... sen --- ssn ... ss1
+
+
+DESCRIPTION DES INSTRUCTIONS
+============================
+
+LE MINITEL
+----------
+
+CLS                     ---
+
+   Efface l'Çcran du minitel.
+   La position du curseur est mise Ö jour.
+
+   Syntaxe : CLS
+
+ENQROM                  ---
+
+   Demande d'identification du minitel.
+   La prochaine donnÇe Ö recevoir contiendra la sÇquence d'identification.
+
+   Syntaxe : ENQROM
+
+SETCOLOR                n ---
+
+   DÇfinition de la couleur des caractäres.
+
+   Syntaxe : Couleur SETCOLOR
+
+             Couleur = 0 pour NOIR
+                       1  "   ROUGE
+                       2  "   VERT
+                       3  "   JAUNE
+                       4  "   BLEU
+                       5  "   MAGENTA
+                       6  "   CYAN
+                       7  "   BLANC
+
+   Exemple : MAGENTA SETCOLOR  // Passage en Magenta
+
+SETBACKGROUND           n ---
+
+   DÇfinition de la couleur du fond.
+
+   Syntaxe : Couleur SETBACKGROUND
+
+             Couleur = 0 pour NOIR
+                       1  "   ROUGE
+                       2  "   VERT
+                       3  "   JAUNE
+                       4  "   BLEU
+                       5  "   MAGENTA
+                       6  "   CYAN
+                       7  "   BLANC
+
+   Exemple : GREEN SETBACKGROUND  // Passage en fond Vert
+
+   Rappel : pour que la couleur de fond devienne active, il faut
+            envoyer un espace (SetBackGround le fait automatiquement).
+
+   Note : l'attribut de dÇfinition de la couleur de fond n'est valable
+          que sur la ligne courante du minitel.
+
+GETCURSORPOS            --- nLig nCol
+
+   RÇcupäre la position du curseur du minitel.
+
+   Syntaxe : GETCURSORPOS --- Ligne Colonne
+
+             Empile les valeurs Ligne et Colonne de la position du curseur.
+
+   Exemple : GETCURSORPOS
+             vcol := vlig :=  // On conserve les valeurs
+
+LOCATE                  nLig nCol ---
+
+   Positionnement du curseur.
+
+   Syntaxe : Ligne Colonne LOCATE
+
+             Ligne   = NumÇro de ligne (1..24)
+             Colonne = NumÇro de colonne (1..40)
+
+   En fait, les limites ligne et colonnes dÇpendent de la taille actuelle
+   des caractäres (simple, double hauteur, double largeur, double taille,
+   voir SETFONT).
+
+   Exemple : 4 25 LOCATE  // Ligne 4 colonne 25
+             " Salut" PRINT
+
+   Note : Si la fin de la chaine dÇpasse la largeur de l'Çcran, celle-ci
+          continue sur la ligne suivante.
+
+LINE0                   str ---
+
+   Envoi d'un message sur la ligne 0 du minitel.
+
+   Syntaxe : Msg LINE0
+
+             Msg = Message Ö envoyer
+
+   Sur un minitel, la ligne 0 est en gÇnÇral rÇservÇe Ö l'affichage de messages
+   d'informations.
+
+   Exemple : " Vous avez reáu un message en BAL" LINE0
+
+CLEAR0                  ---
+
+   Effacement de la ligne 0 du minitel.
+
+   Syntaxe : CLEAR0
+
+   Exemple : " Vous avez reáu un message en BAL" LINE0
+             ...
+             CLEAR0
+
+SETFONT                 n ---
+
+   DÇfinition de la taille des caractäres.
+
+   Syntaxe : Taille SETFONT
+
+             Taille = 0 pour SIMPLE TAILLE
+                      1  "   DOUBLE HAUTEUR
+                      2  "   DOUBLE LARGEUR
+                      3  "   DOUBLE TAILLE
+
+   La taille des caractäres conditionne le nombre de lignes et/ou de colonnes
+   d'affichage.
+
+        Taille         Nbre de lignes     Nbre de colonnes
+   +----------------+-------------------+-------------------+
+   | SIMPLE TAILLE  |        24         |        40         |
+   | DOUBLE HAUTEUR |        12         |        40         |
+   | DOUBLE LARGEUR |        24         |        20         |
+   | DOUBLE TAILLE  |        12         |        20         |
+   +----------------+-------------------+-------------------+
+
+   Exemple : 1 SETFONT  // Passage en double hauteur
+
+   Note : l'attribut de dÇfinition de la taille des caractäres n'est valable
+          que sur la ligne courante du minitel.
+
+REPLICATE               c n ---
+
+   RÇpÇtition d'un caractäre.
+
+   Syntaxe : c n REPLICATE
+
+             c = caractäre Ö rÇpÇter
+             n = nombre de rÇpÇtition
+
+   Exemple : " a" 5 REPLICATE  // Affiche " aaaaa" Ö l'Çcran
+             " coucou" 3 REPLICATE  // Affiche " coucouuu" Ö l'Çcran
+
+SETTMODE                n ---
+
+   Initialise le mode du terminal du connectÇ courant.
+
+   Syntaxe : <Mode> SETTMODE
+
+   <Mode> est un des modes reconnus par le serveur, une des constantes
+   TMODEVDT, TMODEMIXTE ou TMODETELEINFO.
+
+   Si le mode actuel le permet, le nouveau mode est initialisÇ, sinon
+   rien ne se passe.
+
+   Exemple : TMODEMIXTE SETTMODE
+             GETTMODE TMODEMIXTE ==
+             IF
+                " Passage en mode mixte 80 colonnes" print cr
+                ...
+             ENDIF
+
+SENDPAGE                str ---
+
+   Envoi d'une page vidÇotex vers le terminal connectÇ.
+
+   Syntaxe : NomPage SENDPAGE
+
+             NomPage = Nom du fichier Ö envoyer
+
+   Exemple : " MENU.PAG" SENDPAGE  // Affichage du menu principal
+
+   Note : Voir les directives #PATHVTX et #PATH pour la dÇfinition de
+          l'emplacement des pages.
+
+EMIT                    n ---
+
+   Envoi un caractäre vers le terminal connectÇ.
+
+   Syntaxe : c EMIT
+
+             c = code ascii du caractäre Ö envoyer (0 ... 127)
+
+   Rappel : le minitel ne "comprend" que les codes ASCII compris entre
+            0 et 127.
+
+   Exemple :  // DÇfinition de la commande CLS
+              : CLS  // ---
+                 0Ch EMIT  // Envoi du caractäre ASCII 12.
+              ;
+
+USING                   s ---
+
+   DÇfinit le format d'affichage des nombres.
+
+   Syntaxe : Format USING
+
+             Format = Chaine de caractäre reprÇsentant le format
+                      d'affichage Ö utiliser.
+             Les caractäres suivants sont autorisÇ:
+             "%+-0123456789.eEfgGbdilouxX "
+             %     : dÇmarre le processus de formatage (OBLIGATOIRE)
+             +     : le signe est affichÇ
+             0...9 : affiche n chiffres (avant ou apräs le point dÇcimal)
+             .     : point dÇcimal
+             eE    : format scientifique (+-XX.XXXeE+-XXX)
+             fgG   : format flottant (+-XXXX.XXXX)
+             b     : affichage en binaire (sur 32 bits maximum)
+             di    : affichage d'un entier
+             l     : affichage d'un entier long
+             o     : affichage en octal
+             u     : affichage non signÇ
+             xX    : affichage en hexadÇcimal (x=lettres en minuscules,
+                     X=lettres en majuscules)
+
+   Le format dÇfinit avec USING reste actif jusqu'Ö une nouvelle dÇfinition
+   de format, ou l'appel Ö USINGOFF.
+
+   Exemples : LOCAL NUMBER NOMBRE := 13.14159
+              NOMBRE PRINT        // Affiche "13.141590"
+              " %.0f" USING
+              NOMBRE PRINT        // Affiche "13"
+              " %.2f" USING
+              NOMBRE PRINT        // Affiche "13.14"
+              " %d" USING
+              NOMBRE PRINT        // Affiche "2080825756"
+              " %b" USING
+              NOMBRE PRINT        // Affiche "1111100000001101110000110011100"
+              " %X" USING
+              NOMBRE PRINT        // Affiche "7C06E19C"
+              " %E" USING
+              NOMBRE PRINT        // Affiche "1.314159E+001"
+              " %.0E" USING
+              NOMBRE PRINT        // Affiche "1E+001"
+              " %o" USING
+              NOMBRE PRINT        // Affiche "17401560634"
+
+   Note : Il n'y a pas de format d'affichage par dÇfaut.
+
+USINGOFF                ---
+
+   DÇsactive le formatage des nombres dÇfinit avec USING, et repasse en
+   affichage par dÇfaut.
+
+   Syntaxe : USINGOFF
+
+   Exemple : " %x" USING  // Affichage en HÇxa
+             ...
+             USINGOFF     // Affichage normal.
+
+GETUSING                --- s
+
+   Empile l'Çventuel format d'affichage des nombres courant.
+
+   Syntaxe : GETUSING
+
+   Exemple : : PRINT0
+                GETUSING         // Sauvegarde le format courant.
+                " %0.f" USING    // Initialise un format.
+                ...
+                USING            // Restaure le format prÇcÇdent.
+             ;
+
+PRINT                   s ---
+
+   Primitive d'affichage.
+
+   Syntaxe : Sym PRINT
+
+             Sym = Symbole Ö afficher. Peut àtre de n'importe quel type.
+
+   Exemple : " Bonjour" PRINT  // Affiche " Bonjour" Ö l'Çcran
+             35 PRINT  // Affiche  " 35.000" Ö l'Çcran
+             TOTO PRINT  // Affiche le contenu de la variable TOTO
+
+   Note : Pour les chaines de caractäres, il est possible d'insÇrer
+          des codes de contrìles, sous la forme suivante:
+          " \xx ..."
+          le caractäre d'Çchappement '\' doit prÇcÇder le code numÇrique
+          (dÇcimal) du caractäre de contrìle Ö gÇnÇrer.
+          Exemples : " \27\87\27\66 Fond Blanc caractäre cyan" print
+                     char chaine := " \27\87\27\64 Fond blanc/car bleu"
+
+PRINTUSING              fmt sym ---
+
+   Primitive d'affichage formatÇ des nombres.
+
+   Syntaxe : Sym Fmt PRINTUSING
+
+             Sym = Symbole Ö afficher. Peut àtre de n'importe quel type,
+                   mais le format ne s'applique qu'aux nombres.
+             Fmt = Format d'affichage, appliquÇ si sym est un nombre
+                   (voir USING pour plus de dÇtail).
+
+   Exemple : 13.1459 " %X" PRINTUSING // Affiche "7C06E19C"
+             35.5 " %0.f" PRINTUSING  // Affiche  " 35" Ö l'Çcran
+
+   Note : L'Çventuel format courant (voir USING) n'est pas modifiÇ.
+
+CR                      ---
+
+   Envoi un retour chariot (0Dh + 0Ah) au terminal connectÇ.
+
+   Syntaxe : CR
+
+   Le curseur est alors positionnÇ Ö la ligne suivante, colonne 0.
+
+   Exemple : " COUCOU" print CR
+
+CURSORON                ---
+
+   Rend le curseur visible sur le minitel du connectÇ.
+
+   Syntaxe : CURSORON
+
+   Exemple : PSEUDO !
+             IF
+                CURSORON
+                " Entrez votre pseudo" print
+             ENDIF
+
+CURSOROFF               ---
+
+   Rend le curseur invisible sur le minitel du connectÇ.
+
+   Syntaxe : CURSOROFF
+
+   Exemple : PSEUDO
+             IF
+                CURSOROFF
+                ...
+             ENDIF
+
+BEEP                    ---
+
+   Emet un beep vers le terminal connectÇ.
+
+   Syntaxe : BEEP
+
+   Exemple : PSEUDO !
+             IF
+                BEEP
+                " Vous devez vouz certifier !" LINE0
+             ENDIF
+
+BLINKON                 ---
+
+   Active le clignotement.
+
+   Syntaxe : BLINKON
+
+   Le reste de la ligne courante sera affichÇe en clignotant.
+
+   Exemple : BLINKON " Ca clignote" print
+
+   Rappel : les attributs ne sont actifs que sur la ligne courante.
+
+BLINKOFF                ---
+
+   DÇsactive le clignotement.
+
+   Syntaxe : BLINKOFF
+
+   Le reste de la ligne courante redevient normal.
+
+   Exemple : BLINKON " Ca clignote" print BLINKOFF
+             " c'est normal" print
+
+   Rappel : les attributs ne sont actifs que sur la ligne courante.
+
+UNDERLON                ---
+
+   Active le soulignement.
+
+   Syntaxe : UNDERLON
+
+   Le reste de la ligne courante sera affichÇe en soulignÇ.
+
+   Exemple : UNDERLON " soulignÇ" print
+
+   Rappel : les attributs ne sont actifs que sur la ligne courante.
+
+UNDERLOFF               ---
+
+   DÇsactive le soulignement.
+
+   Syntaxe : UNDERLOFF
+
+   Le reste de la ligne courante sera affichÇe en normal.
+
+   Exemple : UNDERLON " soulignÇ" print UNDERLOFF
+             " normal" print
+
+   Rappel : les attributs ne sont actifs que sur la ligne courante.
+
+INVERTON                ---
+
+   Active l'affichage en inversion vidÇo.
+
+   Syntaxe : INVERTON
+
+   Le reste de la ligne courante sera affichÇe en inverse.
+
+   Exemple : INVERTON " inversÇ" print
+
+   Rappel : les attributs ne sont actifs que sur la ligne courante.
+
+INVERTOFF               ---
+
+   DÇsactive l'affichage en inversion vidÇo.
+
+   Syntaxe : INVERTOFF
+
+   Le reste de la ligne courante sera affichÇe en normal.
+
+   Exemple : INVERTON " inversÇ" print INVERTOFF
+             " normal" PRINT
+
+   Rappel : les attributs ne sont actifs que sur la ligne courante.
+
+UPPER                   ---
+
+   Passage du minitel en majuscules.
+
+   Syntaxe : UPPER
+
+   Exemple : UPPER " Entrez votre nom" print
+
+LOWER                   ---
+
+   Passage du minitel en minuscules.
+
+   Syntaxe : LOWER
+
+   Exemple : LOWER " Entrez votre prÇnom" print
+
+INPUT                   --- s
+
+   Primitive de saisie.
+   Permet la saisie d'informations Ö partir du terminal connectÇ, la saisie
+   commencant Ö la position courante du curseur.
+
+   Syntaxe : INPUT
+
+   Pendant la saisie, certaines touches de fonction du minitel ont un effet
+   particulier :
+
+   - ANNULATION : Annule la saisie en cours, remet le curseur Ö sa position
+                  initiale.
+   - CORRECTION : Recule d'un caractäre.
+
+   Toute autre touche de fonction provoque la fin de la saisie.
+
+   A la sortie, les donnÇes saisie sont empilÇe, sous  forme de chaine de
+   caractäre.
+
+   Exemple : " Entrez votre nom : " print
+             INPUT
+             NOM :=
+
+INPUTVAR                v ---
+
+   Primitive de saisie dans une variable.
+   Permet la saisie d'informations Ö partir du minitel, et le stockage
+   dans la variable donnÇe.
+
+   Syntaxe : NomVar INPUTVAR
+
+   Pendant la saisie, certaines touches de fonction du minitel ont un effet
+   particulier :
+
+   - ANNULATION : Annule la saisie en cours, remet le curseur Ö sa position
+                  initiale.
+   - CORRECTION : Recule d'un caractäre.
+
+   Toute autre touche de fonction provoque la fin de la saisie.
+
+   A la sortie, les donnÇes saisie sont sotckÇes dans la variable donnÇe.
+   La variable doit àtre de type Caractäre.
+
+   Exemple : LOCAL CHAR cNOM
+             ...
+             " Entrez votre nom : " print
+             cNOM INPUTVAR
+             ...
+
+MLINPUT                 lsize lmax --- l1 ... ln
+
+   Primitive de saisie multi-lignes.
+   Permet la saisie "au kilomätre" Ö partir du terminal connectÇ.
+
+   Syntaxe : lmax lsize MLINPUT
+
+   <lmax> est le nombre total de lignes Ö saisir.
+   <lsize> est la largeur des lignes Ö saisir, en caractäres.
+
+   Au dÇmarrage de la saisie, NÇoServ conserve la position du curseur,
+   afin de gÇrer correctement les dÇplacements de celui-ci pendant la
+   saisie.
+
+   Pendant la saisie, certaines touches de fonction du minitel ont un effet
+   particulier :
+
+   - ANNULATION : Annule la saisie de la ligne courante, remet le curseur
+                  au dÇbut de la ligne.
+
+   - CORRECTION : Recule d'un caractäre, dans la ligne courante.
+
+   - SUITE      : Passe Ö la ligne suivante, si la ligne courante n'est pas
+                  la derniäre.
+
+   - RETOUR     : Passe Ö la ligne prÇcedente, si la ligne courante n'est pas
+                  la premiäre.
+
+   Toute autre touche de fonction provoque la fin de la saisie.
+
+   A la sortie, les <lmax> lignes sont empilÇes, la derniäre Çtant au
+   sommet de la pile.
+
+   Exemple : LOCAL CHAR L1 L2 L3 L4
+             ...
+             " Tapez votre message (4 lignes)" LINE0
+             5 1 LOCATE     // Positionne le curseur sur la premiäre ligne de saisie.
+             4 40 MLINPUT   // Saisie de 4 lignes de 40 caractäres.
+             L4 :=          // Stockage
+             L3 :=          // dans les
+             L2 :=          // variables
+             L1 :=          // pour sauvegarde
+             ...
+
+MANIPULATION DE LA PILE DE DONNEES
+----------------------------------
+
+STACK#                  --- n
+
+   Empile le nombre d'ÇlÇments prÇsents sur la pile de donnÇes du
+   connectÇ courant.
+
+   Syntaxe : STACK#
+
+   Exemple : : TOTO
+               1
+               STACK#   // Empile 1
+               4
+               STACK#   // Empile 2
+             ;
+
+DUP                     s --- s s
+
+   Duplique le symbole situÇ au sommet de la pile.
+
+   Syntaxe : Sym DUP
+
+   Exemple : 3 DUP  // 3 --- 3 3
+
+              Pile Avant                Pile Apräs
+             +----------+              +----------+
+             |    3     | <- Sommet    |    3     | <- Sommet
+                 ....                  +----------+
+                                       |    3     |
+                                           ....
+
+             TOTO DUP  // TOTO --- TOTO TOTO
+
+              Pile Avant                Pile Apräs
+             +----------+              +----------+
+             |   TOTO   | <- Sommet    |   TOTO   | <- Sommet
+                 ....                  +----------+
+                                       |   TOTO   |
+                                           ....
+
+   IMPORTANT : DUP duplique un symbole, quel que soit son type.
+               En consÇquence, si vous devez dupliquer un ÇlÇment de tableau,
+               et non le tableau lui-màme, utilisez @ avant DUP.
+
+SWAP                    s1 s2 --- s1 s2
+
+   Echange les deux symboles situÇs au sommet de la pile.
+
+   Syntaxe : Sym1 Sym2 SWAP
+
+   Exemple : 4 3 SWAP  // 3 4 --- 3 4
+
+              Pile Avant                Pile Apräs
+             +----------+              +----------+
+             |    3     | <- Sommet    |    4     | <- Sommet
+             +----------+              +----------+
+             |    4     |              |    3     |
+                 ....                      ....
+
+             TITI TOTO SWAP  // TOTO TITI --- TOTO TITI
+
+              Pile Avant                Pile Apräs
+             +----------+              +----------+
+             |   TOTO   | <- Sommet    |   TITI   | <- Sommet
+             +----------+              +----------+
+             |   TITI   |              |   TOTO   |
+                 ....                      ....
+
+OVER                    s1 s2 --- s2 s1 s2
+
+   Duplique le symbole situÇ sous le premier.
+
+   Syntaxe : Sym1 Sym2 OVER
+
+   Exemple : 4 3 OVER  // 3 4 --- 4 3 4
+
+              Pile Avant                Pile Apräs
+             +----------+              +----------+
+             |    3     | <- Sommet    |    4     | <- Sommet
+             +----------+              +----------+
+             |    4     |              |    3     |
+                 ....                  +----------+
+                                       |    4     |
+                                           ....
+
+ROT                     s1 s2 s3 --- s2 s1 s3
+
+   Effectue une permutation circulaire sur les trois symboles situÇs
+   au sommet de la pile.
+
+   Syntaxe : Sym1 Sym2 Sym3 ROT
+
+   Exemple : 1 2 3 ROT  // 3 2 1 --- 2 3 1
+
+              Pile Avant                Pile Apräs
+             +----------+              +----------+
+             |    3     | <- Sommet    |    1     | <- Sommet
+             +----------+              +----------+
+             |    2     |              |    3     |
+             +----------+              +----------+
+             |    1     |              |    2     |
+                 ....                      ....
+
+NIP                     s1 s2 --- s1
+
+   Supprime le symbole situÇ sous le premier.
+
+   Syntaxe : Sym1 Sym2 NIP
+
+   Exemple : 1 2 NIP  // 2 1 --- 2
+
+              Pile Avant                Pile Apräs
+             +----------+              +----------+
+             |    2     | <- Sommet    |    2     | <- Sommet
+             +----------+                  ....    
+             |    1     |
+                 ....
+
+DROP                    s ---
+
+   Supprime le symbole situÇ au sommet de la pile.
+
+   Syntaxe : Sym DROP
+
+   Exemple : 2 DROP  // 2 ---
+
+              Pile Avant                Pile Apräs
+             +----------+              +----------+
+             |    2     | <- Sommet        ....     <- Sommet
+                 ....
+
+   Note : NIP est Çquivalent Ö la sÇquence SWAP DROP.
+
+PICK                    n --- s
+
+   Duplique le niäme symbole de la pile de donnÇe.
+
+   Syntaxe : n PICK
+
+   n va de 1 au nombre de symboles empilÇs.
+
+   Exemple : : TEST
+                1 2 3
+                3 PICK            // duplique 1 au dessus de la pile
+             ;
+
+   Note : DUP est Çquivalent Ö 1 PICK
+          OVER est Çquivalent Ö 2 PICK
+
+I                       --- n
+
+   Empile l'indice courant de la boucle la plus interne.
+
+   Syntaxe : I
+
+   Exemple : 3 0
+             DO
+                I PRINT
+             LOOP
+
+J                       --- n
+
+   Empile l'indice de la boucle externe, dans le cas de deux boucles
+   imbriquÇes.
+
+   Syntaxe : J
+
+   Exemple : 5 0
+             DO  <------+
+                3 0     | Indice courant
+                DO <--+ | de la boucle externe
+                      | |
+                   I -+ |
+                   J ---+
+                   PRINT
+                LOOP
+                CR
+             LOOP
+
+K                       --- n
+
+   Empile l'indice courant de la boucle la plus externe, dans le cas de
+   trois boucles imbriquÇes.
+
+   Syntaxe : K
+
+   Exemple : 10 0
+             DO <--------------+
+                5 0            |
+                DO <--------+  |
+                   3 0      |  |
+                   DO <--+  |  |
+                         |  |  |
+                      I -+  |  |
+                      J ----+  |
+                      K -------+
+                      PRINT
+                   LOOP
+                   CR
+                LOOP
+                CR
+             LOOP
+
+LES TEST
+--------
+
+==                      s1 s2 --- b
+
+   Empile VRAI si les deux symboles situÇs au sommet de la pile sont
+   Çgaux.
+
+   Syntaxe : Sym1 Sym2 ==
+
+   Exemple : TOTO 3 ==
+             IF
+                ...
+             ENDIF
+
+   Note : Les symboles peuvent de type quelconque (numÇrique ou caractäre).
+
+<                       s1 s2 --- b
+
+   Empile VRAI si Sym1 est infÇrieur Ö Sym2.
+
+   Syntaxe : Sym1 Sym2 <
+
+   Exemple : TOTO 5 <
+             IF
+                ...
+             ENDIF
+
+   Note : Les symboles peuvent de type quelconque (numÇrique ou caractäre).
+
+>                       s1 s2 --- b
+
+   Empile VRAI si Sym1 est supÇrieur Ö Sym2.
+
+   Syntaxe : Sym1 Sym2 >
+
+   Exemple : TOTO 78 >
+             IF
+                ...
+             ENDIF
+
+   Note : Les symboles peuvent de type quelconque (numÇrique ou caractäre).
+
+!=                      s1 s2 --- b
+
+   Empile VRAI si Sym1 est diffÇrent de Sym2.
+
+   Syntaxe : Sym1 Sym2 !=
+
+   Exemple : TOTO 75 !=
+             IF
+                ...
+             ENDIF
+
+   Note : Les symboles peuvent de type quelconque (numÇrique ou caractäre).
+
+<=                      s1 s2 --- b
+
+   Empile VRAI si Sym1 est infÇrieur ou Çgal Ö Sym2.
+
+   Syntaxe : Sym1 Sym2 <=
+
+   Exemple : TOTO TITI <=
+             IF
+                ...
+             ENDIF
+
+   Note : Les symboles peuvent de type quelconque (numÇrique ou caractäre).
+
+>=                      s1 s2 --- b
+
+   Empile VRAI si Sym1 est supÇrieur ou Çgal Ö Sym2.
+
+   Syntaxe : Sym1 Sym2 >=
+
+   Exemple : TOTO " COUCOU" >=
+             IF
+                ...
+             ENDIF
+
+   Note : Les symboles peuvent de type quelconque (numÇrique ou caractäre).
+
+LES STRUCTURES DE CONTROLE
+--------------------------
+
+Note : Vous pouvez imbriquer les structures suivantes Ö l'infini (dans les
+       limites de la mÇmoire disponible).
+
+IF ELSE ENDIF           b ---
+
+   ExÇcution conditionnelle.
+
+   Syntaxes : <condition> IF <InstV> ENDIF
+              ou
+              <condition> IF <InstV> ELSE <InstF> ENDIF
+
+   Si <condition> empile la valeur VRAI (toute valeur diffÇrente de 0), les
+   instructions reprÇsentÇes par <IntsV> seront exÇcutÇes, sinon, les
+   Çventuelles instructions reprÇsentÇes par <InstF> seront exÇcutÇes.
+   L'exÇcution du programme continura ensuite apräs le ENDIF.
+
+   Exemple : TOTO 3 == IF
+                          " TOTO est Çgal Ö 3" print
+                       ENDIF
+             PSEUDO IF
+                       ...
+                    ELSE
+                       " vous devez vous certifier !" LINE0
+                    ENDIF
+
+DO LOOP | +LOOP         nDeb nFin ---
+
+   Boucle itÇrative.
+
+   Syntaxes : Fin DÇbut DO <Instructions> LOOP
+              ou
+              Fin DÇbut DO <Instructions> <Pas> +LOOP
+
+   ExÇcute <Instructions> (Fin-DÇbut) fois.
+   La premiäre forme (DO ... LOOP) incrÇmente l'indice de 1.
+   La seconde forme (DO ... <Pas> +LOOP) incrÇment l'indice de <Pas>.
+   L'exÇcution se poursuit apräs le LOOP (ou +LOOP) quand l'indice
+   atteint Fin.
+
+   Exemple :  5 0 DO " coucou" PRINT LOOP  // Affiche 5 " coucou"
+              10 0
+              DO
+                 " coucou" print
+              2 +LOOP                      // Affiche 5 " coucou"
+
+BEGIN AGAIN             ---
+
+   Boucle infinie.
+
+   Syntaxe : BEGIN <Instructions> AGAIN
+
+   ExÇcute <Instructions> Ö l'infini.
+
+   Exemple : BEGIN
+                " Veuilez vous dÇconnecter" LINE0
+             AGAIN
+
+BEGIN UNTIL             ---
+
+   Boucle conditionnelle.
+
+   Syntaxe : BEGIN <Instructions> <Condition> UNTIL
+
+   ExÇcute <Instructions> jusqu'Ö ce que <Condition> Empile une valeur VRAI
+   (toute valeur diffÇrente de 0). A ce moment,  l'exÇcution du programme
+   continue apräs le UNTIL.
+
+   Exemple : BEGIN
+                " Veuilez vous dÇconnecter" LINE0
+             0 UNTIL  // Boucle infinie
+             BEGIN
+                " Entrez votre choix" PRINT
+                24 13 LOCATE
+                INPUT
+                DATA VAL 0 !=
+             UNTIL
+
+BEGIN WHILE REPEAT      ---
+
+   Boucle conditionnelle.
+
+   Syntaxe : BEGIN <Condition> WHILE <Instructions> REPEAT
+
+   Tant que <Condition> empile une valeur VRAI (toute valeur diffÇrente de 0),
+   <Instructions> est exÇcutÇ. Sinon, l'exÇcution du programme continue apräs
+   le REPEAT.
+
+   Exemple :  BEGIN
+                 TOTO TITI !=
+              WHILE
+                 TOTO ++
+              REPEAT
+
+CASE OF ENDOF ENDCASE   s ---
+
+   SÇlection multiple.
+
+   Syntaxe : <TVal> CASE <iVal> OF <Inst> ENDOF ENDCASE
+
+   <TVal> est la valeur Ö tester (de n'importe quel type).
+   Si une des valeurs <iVal> correspond Ö <TVal>, le bloc d'instructions
+   <Inst> correspondant est exÇcutÇ, puis l'exÇcution du programme continue
+   apräs le ENDCASE.
+   Si des instructions sont prÇsentes entre le dernier ENDOF et le ENDCASE,
+   elles seront exÇcutÇes si aucune des <iVal> ne correspond.
+
+   Exemple : TOTO
+             CASE
+                1 OF
+                     PURGEBAL
+                  ENDOF
+                2 OF
+                     CREERBAL
+                  ENDOF
+                  DROP            // On Çlimine TOTO de la pile
+                  " Choix incorrect! " LINE0
+             ENDCASE
+
+   IMPORTANT :  PrÇvoir un DROP, entre le dernier ENDOF et le ENDCASE, pour
+                Çliminer la valeur Ö tester de la pile, en cas de non succäs
+                des divers tests.
+
+DIVERS
+------
+
+#USE NomLib ...
+
+   RÇfÇrencement des librairies/modules utilisÇs par l'application en cours
+   de compilation.
+
+   Syntaxe : #USE NomLib1 [NomLib2 ...]
+
+   Permet au compilateur de rÇfÇrencer les divers appels de procÇdures
+   et accäs aux variables externe.
+
+   Le nom de la librairie peut comporter un Çventuel chemin d'accäs, sinon
+   c'est celui Çventuellement dÇfinit par la commande PATHAPPS (voir
+   SERVEUR.DOC section [System] du fichier NEOSERV.INI) qui est pris.
+
+   Si la librairie n'existe pas au moment de son rÇfÇrencement, elle est
+   automatiquement chargÇe.
+
+   APPEL DE PROCEDURES EXTERNE
+   ---------------------------
+   La syntaxe d'appel d'une procÇdure externe est la suivante :
+
+   NomLib::NomProc
+
+   NomLib doit àtre le nom d'une des librairies rÇfÇrencÇes dans la directive
+   #USE, sinon le compilateur gÇnÇrera une erreur.
+   
+   NomProc doit àtre le nom d'une des procÇdures de la librairie, sinon le
+   compilateur gÇnÇrera une erreur.
+
+   Exemple :  // Librairie LIB1.NPG
+              : PROC1
+                 ...
+              ;
+              : PROC2
+                 ...
+              ;
+
+              // Application TEST.NPG
+              #USE LIB1
+              ...
+              : PROC
+                 ...
+                 // Appel de proc1 de lib1
+                 LIB1::PROC1
+                 ...
+              ;
+              ...
+              : MAIN
+                 ...
+              ;
+
+   ACCES AUX VARIABLES EXTERNES
+   ----------------------------
+   La syntaxe d'accäs Ö une variable externe est la suivante :
+
+   NomLib.NomVar
+
+   NomLib doit àtre le nom d'une des librairies rÇfÇrencÇes dans la directive
+   #USE, sinon le compilateur gÇnÇrera une erreur.
+
+   NomVar doit àtre le nom d'une des variables (locale ou publique) de la
+   librairie, sinon le compilateur gÇnÇrera une erreur.
+
+   Exemple :  // Librairie LIB1.NPG
+              PUBLIC NUMBER NUM
+              LOCAL CHAR TOTO
+              ...
+              : PROC1
+                 ...
+              ;
+              : PROC2
+                 ...
+              ;
+
+              // Application TEST.NPG
+              #USE LIB1
+              LOCAL NUMBER TOTO
+              ...
+              : PROC
+                 ...
+                 // Appel de proc1 de lib1
+                 LIB1::PROC1
+                 ...
+                 // IncrÇmentation de NUM de LIB1
+                 LIB1.NUM ++
+              ;
+              ...
+              : MAIN
+                 ...
+                 // Affichage de TOTO de LIB1
+                 LIB1.TOTO PRINT
+                 // Affichage de TOTO de TEST
+                 TOTO PRINT
+              ;
+
+//
+
+   Commentaires.
+   Le reste de la ligne est ignorÇ.
+
+:
+
+   CrÇation d'une procÇdure/fonction.
+
+   Syntaxe : : <Nom> ... ;
+
+   CrÇÇ une nouvelle procÇdure/fonction dans le bloc de code de l'application
+   courante.
+   Toute dÇfinition doit se terminer par ';'.
+   Si <Nom> existe dÇjÖ, une erreur est gÇnÇrÇe.
+
+   Exemple : : BIENVENUE
+                " Bonjour" LINE0
+             ;
+             : MAIN             // Programme principal.
+                CLS
+                BIENVENUE
+                ...
+             ;
+
+   Note : il doit exister dans toute application destinÇe Ö àtre appelÇe,
+          une procÇdure de nom "MAIN", qui reprÇsente le point d'entrÇe du
+          programme. C'est la procÇdure qui est appelÇe apräs l'initialisation
+          de la connexion (Ö la rÇception d'une trame d'appel (X25) ou d'un
+          appui sur SHIFT+CONNEXION/FIN (MINITEL LOCAL)).
+          Si MAIN n'existe pas, l'application ne pourra àtre appelÇe
+          directement (voir les appels de procÇdure externes et la directive
+          #USE).
+
+          Une application peut comporter une procÇdure de nom "ONLIB", qui
+          sera appelÇe Ö la dÇconnexion d'un utilisateur.
+          Cette procÇdure "hÇrite" des variables locales du connectÇ au moment
+          de la dÇconnexion.
+          Si elle doit utiliser des bases de donnÇes, la procÇdure ONLIB devra
+          les ouvrir.
+          A la fin de son exÇcution, la procÇdure ONLIB  est automatiquement
+          dÇsactivÇe.
+          Une procÇdure ONLIB s'exÇcute jusqu'Ö sa dÇsactivation automatique
+          (fin de la procÇdure), oó jusqu'Ö l'activation d'une nouvelle
+          procÇdure ONLIB pour le connectÇ conáernÇ.
+          Les primitives d'entrÇe/sorties (INPUT, PRINT, ...) n'ont aucun effet
+          dans les procÇdures ONLIB.
+
+   Exemple : : ONLIB
+                " BAL" dbopen
+                if
+                   PurgeBAL
+                endif
+             ;
+
+          Une application peut aussi comporter une procÇdure de nom "GTASK",
+          qui est la tÉche globale de celle-ci.
+          Cette tÉche est lancÇe automatiquement Ö la premiäre connexion
+          Ö l'application, et dÇsactivÇe automatiquement Ö la derniäre
+          dÇconnexion, oó Ö la fin de son exÇcution (';').
+          La tÉche globale possäde son propre jeu de variables locales.
+          Si elle doit utiliser des bases de donnÇes, la procÇdure GTASK devra
+          les ouvrir.
+
+   Exemple : : GTASK
+                " BAL" dbopen
+                if
+                   PurgeBAL
+                endif
+             ;
+
+;
+
+   Marque la fin de dÇfinition d'une procÇdure/fonction.
+
+   Voir ':'.
+
+PUBLIC
+
+   DÇclaration de variables publiques.
+
+   Syntaxe : PUBLIC <Type> <NomV> [:= <Valeur>] ...
+
+   CrÇÇ une nouvelle variable de nom <NomV>, de type <Type>, en lui
+   affectant Çventuellement la valeur <Valeur>.
+   Les variables publiques sont accessibles par tous les connectÇs d'une
+   application.
+
+   Exemples : PUBLIC CHAR NOMMENU := " MENUGEN.PAG"  // Nom de la page de menu
+              PUBLIC
+              NUMBER OPT1 OPT2 OPT3          // CrÇation de 3 variables numÇriques.
+              PUBLIC CHAR[] 8 8 DAMIER       // CrÇation du tableau de nom DAMIER,
+                                             // de 8 lignes et 8 colonnes.
+
+LOCAL
+
+   DÇclaration de variables locales.
+
+   Syntaxe : LOCAL <Type> <NomV> [:= <Valeur>] ...
+
+   CrÇÇ une nouvelle variable de nom <NomV>, de type <Type>, en lui
+   affectant Çventuellement la valeur <Valeur>.
+   Les variables locales sont locales (!) Ö chaque connectÇ. A chaque
+   connexion, un jeu de ces variables est crÇÇ pour le connectÇ courant.
+
+   Exemples : LOCAL
+              CHAR PSEUDO NOM PRENOM
+              LOCAL NUMBER AGE
+              LOCAL NUMBER[] 1 8 VECTEUR   // CrÇation d'un tableau de 1 ligne
+                                           // et 8 colonnes
+
+CHAR
+
+   CrÇation d'une variable de type caractäre.
+
+   Syntaxe : CHAR <NomV> [:= <Valeur>] ...
+
+   CrÇÇ une nouvelle variable caractäre de nom <NomV>, en lui affectant
+   Çventuellement la valeur <Valeur>.
+
+   Exemples : LOCAL
+              CHAR PSEUDO NOM PRENOM
+
+CHAR[]
+
+   CrÇation de tableaux de caractäres.
+
+   Syntaxe : CHAR[] MaxLig MaxCol <NomT>
+
+   CrÇÇ un nouveau tableau de nom <NomT>, de MaxLig sur MaxCol ÇlÇments.
+   Les indices d'un tableau commencent Ö 0 et vont jusqu'Ö Nbelt.-1.
+
+   Exemple : PUBLIC CHAR[] 8 8 DAMIER       // CrÇation du tableau de nom DAMIER,
+
+NUMBER
+
+   CrÇation d'une variable de type numÇrique.
+
+   Syntaxe : NUMBER <NomV> [:= <Valeur>] ...
+
+   CrÇÇ une nouvelle variable caractäre de nom <NomV>, en lui affectant
+   Çventuellement la valeur <Valeur>.
+
+   Exemples : LOCAL
+              NUMBER OPT1 := 2 OPT2
+
+NUMBER[]
+
+   CrÇation de tableaux de nombres.
+
+   Syntaxe : NUMBER[] MaxLig MaxCol <NomT>
+
+   CrÇÇ un nouveau tableau de nom <NomT>, de MaxLig sur MaxCol ÇlÇments.
+   Les indices d'un tableau commencent Ö 0 et vont jusqu'Ö Nbelt.-1.
+
+   Exemple : LOCAL NUMBER[] 8 8 DAMIER       // CrÇation du tableau de nom DAMIER,
+
+LIBCV                   n ---
+
+   DÇconnecte le cv donnÇ.
+
+   Syntaxe : ncv LIBCV
+
+   <ncv> est compris entre 0 et le nombre de cv maximum gÇrÇs par le
+   serveur - 1.
+   Si le numÇro donnÇ est invalide, rien ne se passe.
+
+   Exemple : NBESSAI 3 >
+             IF
+                // Nombre d'essais dÇpassÇ, on se dÇconnecte
+                NUMCV LIBCV
+             ENDIF
+
+@                       Sym --- Val
+
+   Empile la valeur du symbole donnÇ.
+
+   Syntaxe : Sym @
+
+   Exemple : 5 3 TAB @ DUP   // duplique l'ÇlÇment et non le tableau
+             ...
+             : TEST  // --- sym
+               ...
+               TOTO @        // Empile la valeur courante de TOTO.
+               ...
+               TOTO ++       // La pile contient l'ancienne valeur de TOTO.
+             ;
+
+SPACE                   --- s
+
+   Empile une chaine contenant un espace.
+
+   Syntaxe : SPACE
+
+   Exemple : : TEST
+                ... PRINT SPACE
+             ;
+
+SPACES                  n --- s
+
+   Empile une chaine contenant n espaces.
+
+   Syntaxe : n SPACES
+
+   Exemple : : TEST
+                ... PRINT 5 SPACES
+             ;
+
+EMPTY?                  s --- b
+
+   Empile VRAI si le symbole donnÇ est vide.
+
+   Syntaxe : Sym EMPTY?
+
+   Sym doit àtre un symbole d'un type simple (pas de type tableau).
+
+   Si Sym est un NUMBER, EMPTY? empile VRAI si celui-ci est Çgal Ö 0.
+   Si Sym est un CHAR, EMPTY? empile VRAI si la chaine est de longueur 0,
+   oó si celle-ci n'est composÇe que d'espaces.
+
+   Exemple : : SAISIE
+                " ENTREZ VOTRE NOM" LINE0
+                5 5 LOCATE
+                INPUT
+                DUP EMPTY?
+                IF
+                   " SAISIE OBLIGATOIRE" LINE0
+                   ...
+                ELSE
+                   NOM :=
+                ENDIF
+             ;
+
+DISPLAY                 s ---
+
+   Affiche le contenu du symbole donnÇ sur l'Çcran du serveur.
+
+   Syntaxe : Sym DISPLAY
+
+   Exemple : : MAIN
+                " DEBUT" DISPLAY
+                ...
+             ;
+
+EXECUTE                 s ---
+
+   ExÇcute la procÇdure dont le nom est contenu dans la chaine donnÇe.
+
+   Syntaxe : NomProc EXECUTE
+
+   NomProc est la chaine contenant le nom de la procÇdure Ö appeler.
+   Si la procÇdure n'existe pas, oó n'est pas une procÇdure, une erreur
+   d'exÇcution est gÇnÇrÇe.
+   Une fois la procÇdure exÇcutÇe, le retour s'effectue apräs l'appel.
+
+   Exemples : LOCAL CHAR NOMPROC := " BAL::MENUGEN"
+              ...
+              NOMPROC EXECUTE
+              ...
+              " SAISIE" EXECUTE
+              ...
+
+EXECUTEAPP              s ---
+
+   ExÇcute l'application dont le nom est contenu dans la chaine donnÇe.
+
+   Syntaxe : NomApp EXECUTEAPP
+
+   NomApp est la chaine contenant le nom de l'application Ö appeler.
+   Si l'application n'existe pas, oó n'est pas une application valide
+   (ne possäde pas de MAIN), une erreur d'exÇcution est gÇnÇrÇe.
+
+   L'appel de l'application provoque la dÇconnexion de l'application courante,
+   et le re-connexion Ö l'application donnÇe.
+
+   Note : Certaines informations du connectÇ sont conservÇe (N¯ de port,
+   trame de connexion initiale, dÇpartement, pavi, palier, type de minitel).
+
+   Exemples : LOCAL CHAR NOMAPP := " BENCH"
+              ...
+              NOMAPP EXECUTEAPP
+              ...
+              " TEST" EXECUTEAPP
+              ...
+
+SEARCHAPP               s --- b
+
+   Cherche l'application dont le nom est contenu dans la chaine donnÇe, dans
+   la liste des applications prÇsentes sur le serveur.
+
+   Syntaxe : NomApp SEARCHEAPP
+
+   Empile VRAI si l'application existe et est valide (possäde un MAIN), FAUX
+   sinon.
+
+   Exemple : " ENTREZ UNE APPLICATION" PRINT
+             NOMAPP INPUTVAR
+             NOMAPP SEARCHAPP
+             IF
+                NOMAPP EXECUTEAPP
+             ELSE
+                " APPLICATION NON VALIDE" LINE0
+             ENDIF
+
+EXECKBDCMD              s --- n
+
+   ExÇcute la commande clavier donnÇe.
+
+   Syntaxe : <Cmd> EXECKBDCMD
+
+   Empile 0 si la commande s'est correctement exÇcutÇe, un code d'erreur
+   sinon.
+   La commande exÇcutÇe est ajoutÇe Ö l'historique du serveur.
+   On rÇservera en gÇnÇral cette fonctionnalitÇ au "sysop" du serveur.
+
+   Exemple : LOCAL NUMBER ISSYSOP
+             ...
+             : GESTION
+                ...
+                ISSYSOP
+                IF
+                   " Tapez une commande" print cr
+                   INPUT EXECKBDCMD
+                   IF
+                      " Erreur" line0
+                      ...
+                   ENDIF
+                ENDIF
+             ;
+
+   DÇtail des codes d'erreurs renvoyÇs:
+   -1  : Commande inconnue.
+   21  : Commande VIEW ...: paramätre invalide
+   20  : Commande VIEW ...: paramätre manquant
+   222 : Commande VIEW CV ...: CV inactif
+   221 : Commande VIEW CV ...: CV non valide
+   220 : Commande VIEW CV ...: N¯ de CV manquant
+   262 : Commande VIEW VAR ...: variable inconnue
+   261 : Commande VIEW VAR ...: paramätre manquant
+   260 : Commande VIEW VAR ...: mode trace inactif
+   230 : Commande VIEW APP ...: application inexistante
+   33  : Commande SEND ...: CV inactif
+   32  : Commande SEND ...: N¯ de CV non valide
+   31  : Commande SEND ...: paramätre manquant
+   30  : Commande SEND ...: message manquant
+   41  : Commande SET ...: paramätre invalide
+   40  : Commande SET ...: paramätre manquant
+   400 : Commande SET PALIER ...: paramätre manquant
+   410 : Commande SET COLOR ...: paramätre manquant
+   421 : Commande SET SYSTEM TRACEPAQUET ...: erreur d'ouverture du fichier
+   422 : Commande SET SYSTEM TRACESERVEUR ...: erreur d'ouverture du fichier
+   420 : Commande SET SYSTEM ...: paramätre manquant
+   51  : Commande LOAD ...: erreur(s) de compilation
+   50  : Commande LOAD ...: paramätre manquant
+   60  : Commande UNLOAD ...: paramätre manquant
+   73  : Commande LCX ...: CV inactif
+   72  : Commande LCX ...: pas de connectÇs actifs
+   71  : Commande LCX ...: paramätre invalide
+   70  : Commande LCX ...: paramätre manquant
+   82  : Commande DEBUG ...: CV inactif
+   81  : Commande DEBUG ...: N¯ de CV invalide
+   80  : Commande DEBUG ...: paramätre manquant
+   101 : Commande DEBUGSTEP ...: pas de trace invalide
+   100 : Commande DEBUGSTEP ...: paramätre manquant
+   110 : Commande CONNECT ...: paramätre manquant
+   111 : Commande CONNECT ...: numÇro de port non valide
+   112 : Commande CONNECT ...: type du port non valide
+   113 : Commande CONNECT ...: application inexistante
+   114 : Commande CONNECT ...: application non valide
+   115 : Commande CONNECT ...: connexion impossible
+
+WAIT                    ---
+
+   Met le programme en attente d'une action de l'utilisateur.
+
+   Syntaxe : WAIT
+
+   Le programme attend une action de l'utilisateur avant de continuer
+   son exÇcution. En gÇnÇral, l'action attendue est l'appui sur une touche
+   de fonction du minitel.
+
+   Exemple : " Appuyez sur SUITE" PRINT
+             WAIT
+             ...
+
+WAITEMPTYBUFFER         ---
+
+   Attend que le buffer de sortie du connectÇ courant soit vide
+   avant de continuer l'exÇcution du programme.
+
+   Syntaxe : WAITEMPTYBUFFER
+
+   Exemple : " BIGPAGE.VTX" SENDPAGE
+             WAITEMPTYBUFFER
+             ...
+
+WAITCHAR                n ---
+
+   Attente d'un caractäre donnÇ sur le flux du connectÇ courant.
+
+   Syntaxe : n WAITCHAR
+
+   n est le code ascii du caractäre Ö attendre.
+   l'exÇcution du code du connectÇ courant est suspendue jusqu'Ö
+   l'arrivÇe du caractäre donnÇ.
+   Toutes les donnÇes reáues sont empilÇes, jusqu'au caractäre.
+
+   Exemple : // Attente d'un CR
+             : WAITCR
+                13 CHR WAITCHAR
+             ;
+
+DELAY                   n ---
+
+   Interrompt l'exÇcution du programme pendant le nombre de millisecondes
+   donnÇ.
+
+   Syntaxe : n DELAY
+
+   Exemple : 2000 DELAY  // Attend 2 secondes.
+
+:=                      sd ss ---
+
+   Affectation de variables.
+
+   Syntaxe : Src Dst :=
+
+   Affecte Ö la variable Dst la valeur de Src.
+
+   Exemples : 3 TOTO :=
+              " Choix incorrect!" MSGERR :=
+
+SETGLOBALFKEY           ---
+
+   Assignation de touches de fonction.
+   L'assignation est globale Ö l'application (valable pour tous les
+   connectÇs de l'application).
+
+   Syntaxe : SETGLOBALFKEY [*|#]NomTouche NomProc [NORETURN]
+
+   Assigne Ö la touche de fonction NomTouche la procÇdure NomProc.
+   La touche peut àtre prÇcÇdÇe du caractäre Etoile "*" ou Diäse "#"
+   (*NomTouche, #NomTouche, NomTouche sont 3 assignations diffÇrentes).
+   Apräs l'assignation, l'appui sur la combinaison interceptÇe provoquera
+   l'appel de la procÇdure NomProc.
+   Le paramätre optionnel NORETURN permet de dÇterminer si il faut ou non
+   reprendre l'exÇcution de la procÇdure interrompue.
+   Si NORETURN est spÇcifiÇ, la procÇdure interrompue est abandonnÇe.
+
+   NomTouche peut àtre : FKENVOI
+                         FKRETOUR
+                         FKREPETITION
+                         FKGUIDE
+                         FKANNULATION
+                         FKSOMMAIRE
+                         FKCORRECTION
+                         FKSUITE
+
+   Exemple : : AIDE
+                " GUIDE01.PAG" SENDPAGE
+                WAIT
+             ;
+             ...
+             : MAIN
+                SETGLOBALFKEY FKGUIDE AIDE
+                ...
+                SETLOCALFKEY FKANNULATION DELBAL NORETURN
+             ;
+
+   NOTE : Si une assignation existe dÇjÖ avec la combinaison donnÇe, elle
+          est remplacÇe par la nouvelle.
+
+SELGLOBALKEYWORD        ---
+
+   Assignation d'un mot-clef.
+   L'assignation est globale Ö l'application (valable pour tous les
+   connectÇs de l'application).
+
+   Syntaxe : SETGLOBALKEYWORD MotClef NomProc [NORETURN]
+
+   Assigne au mot-clef MotClef la procÇdure NomProc.
+   Apräs l'assignation, la frappe du mot-clef provoquera l'appel de
+   la procÇdure NomProc.
+   Le paramätre optionnel NORETURN permet de dÇterminer si il faut ou non
+   reprendre l'exÇcution de la procÇdure interrompue.
+   Si NORETURN est spÇcifiÇ, la procÇdure interrompue est abandonnÇe.
+
+   Exemple : : AIDE
+                " GUIDE01.PAG" SENDPAGE
+                WAIT
+             ;
+             ...
+             : MAIN
+                SETGLOBALKEYWORD *HELP AIDE
+             ;
+
+   NOTE : Si une assignation existe dÇjÖ avec le mot-clef donnÇ, elle
+          est remplacÇe par la nouvelle.
+
+SETLOCALFKEY            ---
+
+   Assignation de touches de fonction.
+   L'assignation est locale au connectÇ courant.
+
+   Syntaxe : SETLOCALFKEY [*|#]NomTouche NomProc [NORETURN]
+
+   Assigne Ö la touche de fonction NomTouche la procÇdure NomProc.
+   La touche peut àtre prÇcÇdÇe du caractäre Etoile "*" ou Diäse "#"
+   (*NomTouche, #NomTouche, NomTouche sont 3 assignations diffÇrentes).
+   Apräs l'assignation, l'appui par le connectÇ courant sur la combinaison
+   interceptÇe provoquera l'appel de la procÇdure NomProc.
+   Le paramätre optionnel NORETURN permet de dÇterminer si il faut ou non
+   reprendre l'exÇcution de la procÇdure interrompue.
+   Si NORETURN est spÇcifiÇ, la procÇdure interrompue est abandonnÇe.
+
+   NomTouche peut àtre : FKENVOI
+                         FKRETOUR
+                         FKREPETITION
+                         FKGUIDE
+                         FKANNULATION
+                         FKSOMMAIRE
+                         FKCORRECTION
+                         FKSUITE
+
+   Exemple : : SUPPRIMER
+                ...
+             ;
+             ...
+             : AUTORISATION
+                PRIVILEGE
+                IF
+                   SETLOCALFKEY *FKANNULATION SUPPRIMER
+                   " *ANNULATION POUR DETRUIRE" LINE0
+                ENDIF
+             ;
+
+   NOTE : Si une assignation existe dÇjÖ avec la combinaison donnÇe, elle
+          est remplacÇe par la nouvelle.
+
+SETLOCALKEYWORD         ---
+
+   Assignation d'un mot-clef.
+   L'assignation est locale au connectÇ courant.
+
+   Syntaxe : SETLOCALKEYWORD MotClef NomProc [NORETURN]
+
+   Assigne au mot-clef MotClef la procÇdure NomProc.
+   Apräs l'assignation, la frappe du mot-clef provoquera l'appel de
+   la procÇdure NomProc.
+   Le paramätre optionnel NORETURN permet de dÇterminer si il faut ou non
+   reprendre l'exÇcution de la procÇdure interrompue.
+   Si NORETURN est spÇcifiÇ, la procÇdure interrompue est abandonnÇe.
+
+   Exemple : : SUPPRIMER
+                ...
+             ;
+             ...
+             : AUTORISATION
+                PRIVILEGE
+                IF
+                   SETLOCALKEYWORD *DEL SUPPRIMER
+                   " *DEL POUR DETRUIRE" LINE0
+                ENDIF
+             ;
+
+   NOTE : Si une assignation existe dÇjÖ avec le mot-clef donnÇ, elle
+          est remplacÇe par la nouvelle.
+
+EMPTYLOCALFKEYTABLE     ---
+
+   Vide la table d'assignation des touches de fontion locale au
+   connectÇ courant.
+
+   Syntaxe : EMPTYLOCALFKEYTABLE
+
+   La table (si elle existe), est vidÇe, les touches de fonction
+   reprennent leur usage normal.
+
+EMPTYGLOBALFKEYTABLE    ---
+
+   Vide la table d'assignation des touches de fontion globale Ö
+   l'application du connectÇ courant.
+
+   Syntaxe : EMPTYGLOBALFKEYTABLE
+
+   La table (si elle existe), est vidÇe, les touches de fonction
+   reprennent leur usage normal pour toute l'application du connectÇ
+   courant.
+
+EMPTYLOCALKEYWORDTABLE  ---
+
+   Vide la table d'assignation des mots-clefs locale au
+   connectÇ courant.
+
+   Syntaxe : EMPTYLOCALKEYWORDTABLE
+
+   La table (si elle existe), est vidÇe, la frappe des mots-clefs
+   n'a plus d'effet.
+
+EMPTYGLOBALKEYWORDTABLE ---
+
+   Vide la table d'assignation des mots-clefs globale Ö l'application
+   du connectÇ courant.
+
+   Syntaxe : EMPTYLOCALKEYWORDTABLE
+
+   La table (si elle existe), est vidÇe, la frappe des mots-clefs
+   n'a plus d'effet pour toute l'application.
+
+DELETEGLOBALFKEY        ---
+
+   Suppression d'une assignation globale de touche de fonction.
+
+   Syntaxe : DELETEGLOBALFKEY [*|#]NomTouche
+
+   La touche peut àtre prÇcÇdÇe du caractäre Etoile "*" ou Diäse "#"
+   (*NomTouche, #NomTouche, NomTouche sont 3 assignations diffÇrentes).
+   Voir la dÇfinition de SETGLOBALFKEY pour la liste des nom de touche
+   valides.
+   Si la touche existe dans la table d'assignation globale, elle est
+   supprimÇe. La frappe de celle-ci n'aura plus d'effet pour l'application.
+
+   Exemple : : AIDE
+                SETGLOBALFKEY FKSOMMAIRE ABANDON_AIDE
+                ...
+                DELETEGLOBALFKEY FKSOMMAIRE
+             ;
+
+DELETELOCALFKEY         ---
+
+   Suppression d'une assignation locale de touche de fonction.
+
+   Syntaxe : DELETELOCALFKEY [*|#]NomTouche
+
+   La touche peut àtre prÇcÇdÇe du caractäre Etoile "*" ou Diäse "#"
+   (*NomTouche, #NomTouche, NomTouche sont 3 assignations diffÇrentes).
+   Voir la dÇfinition de SETLOCALFKEY pour la liste des nom de touche
+   valides.
+   Si la touche existe dans la table d'assignation locale, elle est
+   supprimÇe. La frappe de celle-ci n'aura plus d'effet pour le connectÇ.
+
+   Exemple : : AIDE
+                SETLOCALFKEY FKSOMMAIRE ABANDON_AIDE
+                ...
+                DELETELOCALFKEY FKSOMMAIRE
+             ;
+
+DELETEGLOBALKEYWORD     ---
+
+   Suppression d'une assignation globale de mot-clef.
+
+   Syntaxe : DELETEGLOBALKEYWORD MotClef
+
+   Le mot-clef, si il existe, est supprimÇ de la table globale.
+   La frappe de celui-ci n'aura plus d'effet pour l'application.
+
+   Exemple : : AIDE
+                SETGLOBALKEYWORD *SOM ABANDON_AIDE
+                ...
+                DELETEGLOBALKEYWORD *SOM
+             ;
+
+DELETELOCALKEYWORD      ---
+
+   Suppression d'une assignation locale de mot-clef.
+
+   Syntaxe : DELETELOCALKEYWORD MotClef
+
+   Le mot-clef, si il existe, est supprimÇ de la table locale.
+   La frappe de celui-ci n'aura plus d'effet pour le connectÇ.
+
+   Exemple : : AIDE
+                SETLOCALKEYWORD *SOM ABANDON_AIDE
+                ...
+                DELETELOCALKEYWORD *SOM
+             ;
+
+DISABLELOCALFKEY        ---
+
+   DÇsactive l'interception locale des touches de fonctions pour le connectÇ
+   courant.
+
+   Syntaxe : DISABLELOCALFKEY
+
+   La table d'interception est toujours prÇsente, mais n'est plus prise en
+   compte par le serveur.
+
+   Exemple : : AIDE
+                DISABLELOCALFKEY   // DÇsactivation temporaire.
+                ...
+                WAIT
+                ENABLELOCALFKEY    // RÇactivation.
+             ;
+             ...
+             : MAIN
+                SETLOCALFKEY FKGUIDE AIDE
+                ...
+             ;
+
+DISABLEGLOBALFKEY       ---
+
+   DÇsactive l'interception globale des touches de fonctions pour le connectÇ
+   courant.
+
+   Syntaxe : DISABLEGLOBALFKEY
+
+   La table d'interception est toujours prÇsente, mais n'est plus prise en
+   compte par le serveur.
+
+   Exemple : : AIDE
+                DISABLEGLOBALFKEY   // DÇsactivation temporaire.
+                ...
+                WAIT
+                ENABLEGLOBALFKEY    // RÇactivation.
+             ;
+             ...
+             : MAIN
+                SETGLOBALFKEY FKGUIDE AIDE
+                ...
+             ;
+
+DISABLELOCALKEYWORD     ---
+
+   DÇsactive l'interception locale des mots-clefs pour le connectÇ
+   courant.
+
+   Syntaxe : DISABLELOCALKEYWORD
+
+   La table d'interception est toujours prÇsente, mais n'est plus prise en
+   compte par le serveur.
+
+   Exemple : : AIDE
+                DISABLELOCALKEYWORD   // DÇsactivation temporaire.
+                ...
+                WAIT
+                ENABLELOCALKEYWORD    // RÇactivation.
+             ;
+             ...
+             : MAIN
+                SETLOCALKEYWORD *HELP AIDE
+                ...
+             ;
+
+DISABLEGLOBALKEYWORD    ---
+
+   DÇsactive l'interception globale des mots-clefs pour le connectÇ
+   courant.
+
+   Syntaxe : DISABLEGLOBALKEYWORD
+
+   La table d'interception est toujours prÇsente, mais n'est plus prise en
+   compte par le serveur.
+
+   Exemple : : AIDE
+                DISABLEGLOBALKEYWORD   // DÇsactivation temporaire.
+                ...
+                WAIT
+                ENABLEGLOBALKEYWORD    // RÇactivation.
+             ;
+             ...
+             : MAIN
+                SETGLOBALKEYWORD *HELP AIDE
+                ...
+             ;
+
+ENABLELOCALFKEY         ---
+
+   RÇactive l'interception locale des touches de fonctions pour le connectÇ
+   courant.
+
+   Syntaxe : ENABLELOCALFKEY
+
+   La table d'interception est Ö nouveau prise en compte par le serveur.
+
+   Exemple : : AIDE
+                DISABLELOCALFKEY   // DÇsactivation temporaire.
+                ...
+                WAIT
+                ENABLELOCALFKEY    // RÇactivation.
+             ;
+             ...
+             : MAIN
+                SETLOCALFKEY FKGUIDE AIDE
+                ...
+             ;
+
+ENABLEGLOBALFKEY        ---
+
+   RÇactive l'interception globale des touches de fonctions pour le connectÇ
+   courant.
+
+   Syntaxe : ENABLEGLOBALFKEY
+
+   La table d'interception est Ö nouveau prise en compte par le serveur.
+
+   Exemple : : AIDE
+                DISABLEGLOBALFKEY   // DÇsactivation temporaire.
+                ...
+                WAIT
+                ENABLEGLOBALFKEY    // RÇactivation.
+             ;
+             ...
+             : MAIN
+                SETGLOBALFKEY FKGUIDE AIDE
+                ...
+             ;
+
+ENABLELOCALKEYWORD      ---
+
+   RÇactive l'interception locale des mots-clefs pour le connectÇ
+   courant.
+
+   Syntaxe : ENABLELOCALKEYWORD
+
+   La table d'interception est Ö nouveau prise en compte par le serveur.
+
+   Exemple : : AIDE
+                DISABLELOCALKEYWORD   // DÇsactivation temporaire.
+                ...
+                WAIT
+                ENABLELOCALKEYWORD    // RÇactivation.
+             ;
+             ...
+             : MAIN
+                SETLOCALKEYWORD *HELP AIDE
+                ...
+             ;
+
+ENABLEGLOBALKEYWORD     ---
+
+   RÇactive l'interception globale des mots-clefs pour le connectÇ
+   courant.
+
+   Syntaxe : ENABLEGLOBALKEYWORD
+
+   La table d'interception est Ö nouveau prise en compte par le serveur.
+
+   Exemple : : AIDE
+                DISABLEGLOBALKEYWORD   // DÇsactivation temporaire.
+                ...
+                WAIT
+                ENABLEGLOBALKEYWORD    // RÇactivation.
+             ;
+             ...
+             : MAIN
+                SETGLOBALKEYWORD *HELP AIDE
+                ...
+             ;
+
+TRANSLATEOFF            ---
+
+   DÇsactive la conversion des accents du connectÇ courant.
+
+   Syntaxe : TRANSLATEOFF
+
+   Par dÇfaut, les caractäres accentuÇs en provenance d'un minitel (sÇquence de
+   type Esc+Xx) sont convertis par NÇoServ, en caractäre accentuÇs compatible
+   avec le D.O.S.
+   Cette conversion n'est plus effectuÇe apräs TRANSLATEOFF. Cela permet, entre
+   autre, de manipuler les donnÇes telles qu'elles arrivent, dans le cas de
+   l'implÇmentation d'un protocole de tÇlÇchargement, par exemple.
+
+   Exemple : : TELSEND
+               TRANSLATEOFF
+               ...
+               TRANSLATEON
+             ;
+
+TRANSLATEON             ---
+
+   Active la conversion des accents du connectÇ courant.
+
+   Syntaxe : TRANSLATEON
+
+   Par dÇfaut, les caractäres accentuÇs en provenance d'un minitel (sÇquence de
+   type Esc+Xx) sont convertis par NÇoServ, en caractäre accentuÇs compatible
+   avec le D.O.S.
+   Cette conversion est Ö nouveau active apräs TRANSLATEON.
+
+   Exemple : : TELSEND
+               TRANSLATEOFF
+               ...
+               TRANSLATEON
+             ;
+
+FILTERINGOFF            ---
+
+   DÇsactive le filtrage des sÇquences "escapes" du connectÇ courant.
+
+   Syntaxe : FILTERINGOFF
+
+   Par dÇfaut, les sÇquences de contrìles (appelÇe aussi "sÇquences escape", de
+   type Esc+x) en provenance d'un minitel, sont filtrÇes et ÇliminÇes par
+   NÇoServ.
+   Ce filtrage n'est plus effectuÇ apräs FILTERINGOFF. Cela permet, entre
+   autre, de manipuler les donnÇes telles qu'elles arrivent, dans le cas de
+   l'implÇmentation d'un protocole de tÇlÇchargement, par exemple.
+
+   Exemple : : TELSEND
+               TRANSLATEOFF
+               FILTERINGOFF
+               ...
+               FILTERINGON
+               TRANSLATEON
+             ;
+
+FILTERINGON             ---
+
+   Active le filtrage des sÇquences "escapes" du connectÇ courant.
+
+   Syntaxe : FILTERINGON
+
+   Par dÇfaut, les sÇquences de contrìles (appelÇe aussi "sÇquences escape", de
+   type Esc+x) en provenance d'un minitel, sont filtrÇes et ÇliminÇes par
+   NÇoServ.
+   Ce filtrage est Ö nouveau actif apräs FILTERINGON.
+
+   Exemple : : TELSEND
+               TRANSLATEOFF
+               FILTERINGOFF
+               ...
+               FILTERINGON
+               TRANSLATEON
+             ;
+
+SETBINARYMODE           ---
+
+   Fait passer le connectÇ courant en mode binaire.
+
+   Syntaxe : SETBINARYMODE
+
+   Par dÇfaut, NeoServ effectue certains traitements sur chaque paquet de
+   donnÇes entrants (filtrage des sÇquences escapes, conversion des
+   accents, rÇcupÇration de la touche de fonction appuyÇe, ...).
+   Ces traitements ne sont plus effectuÇs apräs SETBINARYMODE.
+   Le mode binaire permet d'implÇmenter divers protocoles (tÇlÇchargement,
+   ...).
+
+   Exemple : : TELSEND
+               SETBINARYMODE
+               ...
+               SETNORMALMODE
+             ;
+
+   Note : Le paquet entrant est rÇcupÇrable avec DATA.
+
+SETNORMALMODE           ---
+
+   Fait passer le connectÇ courant en mode normal.
+
+   Syntaxe : SETBINARYMODE
+
+   Par dÇfaut, NeoServ effectue certains traitements sur chaque paquet de
+   donnÇes entrants (filtrage des sÇquences escapes, conversion des
+   accents, rÇcupÇration de la touche de fonction appuyÇe, ...).
+   Ces traitements sont Ö nouveau effectuÇs apräs SETNORMALMODE.
+   Le mode binaire permet d'implÇmenter divers protocoles (tÇlÇchargement,
+   ...).
+
+   Exemple : : TELSEND
+               SETBINARYMODE
+               ...
+               SETNORMALMODE
+             ;
+
+LES OPERATEURS
+--------------
+
+&                       n1 n2 --- n3
+
+   Effectue un ET binaire entre les deux symboles situÇs au sommet de la pile,
+   et empile le rÇsultat.
+
+   Syntaxe : Sym1 Sym2 &
+
+   Exemple : 3 TOTO :=
+             5 TITI :=
+             TOTO TITI &          // 00000011 & 00000101 = 00000001
+
+|                       n1 n2 --- n3
+
+   Effectue un OU binaire entre les deux symboles situÇs au sommet de la pile,
+   et empile le rÇsultat.
+
+   Syntaxe : Sym1 Sym2 |
+
+   Exemple : 3 TOTO :=
+             5 TITI :=
+             TOTO TITI |          // 00000011 & 00000101 = 00000111
+
+^                       n1 n2 --- n3
+
+   Effectue un OU EXCLUSIF binaire entre les deux symboles situÇs au sommet
+   de la pile, et empile le rÇsultat.
+
+   Syntaxe : Sym1 Sym2 ^
+
+   Exemple : 3 TOTO :=
+             5 TITI :=
+             TOTO TITI ^          // 00000011 & 00000101 = 00000110
+
+&&                      b1 b2 --- b3
+
+   Effectue un ET logique entre les deux symboles situÇs au sommet de la pile,
+   et empile le rÇsultat.
+
+   Syntaxe : Sym1 Sym2 &&
+
+   Exemple : TRUE TOTO :=
+             FALSE TITI :=
+             TOTO TITI &&         // Empile FALSE
+
+||                      b1 b2 --- b3
+
+   Effectue un OU logique entre les deux symboles situÇs au sommet de la pile,
+   et empile le rÇsultat.
+
+   Syntaxe : Sym1 Sym2 ||
+
+   Exemple : TRUE TOTO :=
+             FALSE TITI :=
+             TOTO TITI ||         // Empile TRUE
+
+!                       b --- !b
+
+   Effectue une nÇgation logique du symbole situÇ au sommet de la pile,
+   et empile le rÇsultat.
+
+   Syntaxe : Sym !
+
+   Exemple : TRUE TOTO :=
+             TOTO !         // Empile FALSE
+             !              // Empile TRUE
+
+~                       n --- ~n
+
+   Effectue une le complÇment Ö 1 du symbole situÇ au sommet de la pile,
+   et empile le rÇsultat.
+
+   Syntaxe : Sym ~
+
+   Exemple : 1 TOTO :=
+             TOTO ~         // Empile -4
+
+++                      s ---
+
+   IncrÇmente le contenu du symbole situÇ au sommet de la pile.
+
+   Syntaxe : Sym ++
+
+   Exemple : 5 TOTO :=
+             ...
+             TOTO ++         // TOTO = 6
+             ...
+             TOTO PRINT      // Affiche 6
+
+--                      s ---
+
+   DÇcrÇmente le contenu du symbole situÇ au sommet de la pile.
+
+   Syntaxe : Sym --
+
+   Exemple : 5 TOTO :=
+             ...
+             TOTO --         // TOTO = 4
+             ...
+             TOTO PRINT      // Affiche 4
+
++=                      sd ss ---
+
+   Ajoute le premier symbole au second.
+
+   Syntaxe : Src Dst +=
+
+   Est Çquivalent Ö la sÇquence : Src Dst + Dst :=
+
+   Exemple : 5 TOTO :=
+             3 TOTO +=  // TOTO = 8
+
+-=                      sd ss ---
+
+   Soustrait le premier symbole au second.
+
+   Syntaxe : Src Dst -=
+
+   Est Çquivalent Ö la sÇquence : Src Dst - Dst :=
+
+   Exemple : 5 TOTO :=
+             3 TOTO -=  // TOTO = 2
+
+*=                      sd ss ---
+
+   Multiple le premier symbole par la valeur du second.
+
+   Syntaxe : Src Dst *=
+
+   Est Çquivalent Ö la sÇquence : Src Dst * Dst :=
+
+   Exemple : 5 TOTO :=
+             3 TOTO *=  // TOTO = 15
+
+/=                      sd ss ---
+
+   Divise le premier symbole par la valeur du second.
+
+   Syntaxe : Src Dst /=
+
+   Est Çquivalent Ö la sÇquence : Src Dst / Dst :=
+
+   Exemple : 10 TOTO :=
+             2 TOTO /=  // TOTO = 5
+
+%=                      sd ss ---
+
+   Calcule le modulo de src et dst.
+
+   Syntaxe : Src Dst %=
+
+   Est Çquivalent Ö la sÇquence : Src Dst % Dst :=
+
+   Exemple : 10 TOTO :=
+             2 TOTO %=  // TOTO = 0
+
+&=                      sd ss ---
+
+   Effectue un ET binaire entre src et dst.
+
+   Syntaxe : Src Dst &=
+
+   Est Çquivalent Ö la sÇquence : Src Dst & Dst :=
+
+   Exemple : 10 TOTO :=
+             2 TOTO &=  // TOTO = 2
+
+|=                      sd ss ---
+
+   Effectue un OU binaire entre src et dst.
+
+   Syntaxe : Src Dst |=
+
+   Est Çquivalent Ö la sÇquence : Src Dst | Dst :=
+
+   Exemple : 10 TOTO :=
+             2 TOTO |=  // TOTO = 10
+
+^=                      sd ss ---
+
+   Effectue un OU exclusif binaire entre src et dst.
+
+   Syntaxe : Src Dst ^=
+
+   Est Çquivalent Ö la sÇquence : Src Dst ^ Dst :=
+
+   Exemple : 10 TOTO :=
+             2 TOTO ^=  // TOTO = 8
+
+<<                      s2 s1 --- s3
+
+   DÇcale Sym2 de Sym1 bits vers la gauche, et empile le rÇsultat.
+
+   Syntaxe : Sym1 Sym2 <<
+
+   Note : Sym1 ne doit pas àtre supÇrieur Ö 31.
+
+   Exemple : 4 TOTO :=
+             2 TOTO <<  // Empile 16
+
+>>                      s2 s1 --- s3
+
+   DÇcale Sym2 de Sym1 bits vers la droite, et empile le rÇsultat.
+
+   Syntaxe : Sym1 Sym2 >>
+
+   Note : Sym1 ne doit pas àtre supÇrieur Ö 31.
+
+   Exemple : 4 TOTO :=
+             2 TOTO >>  // Empile 1
+
+<<=                     sd ss ---
+
+   DÇcale Dst de Src bits vers la gauche, et met le rÇsultat dans Dst.
+
+   Syntaxe : Src Dst <<=
+
+   Est Çquivalent Ö la sÇquence : Src Dst << Dst :=
+
+   Note : Src ne doit pas àtre supÇrieur Ö 31.
+
+   Exemple : 4 TOTO :=
+             2 TOTO <<=  // TOTO = 16
+
+>>=                     sd ss ---
+
+   DÇcale Dst de Src bits vers la droite, et met le rÇsultat dans Dst.
+
+   Syntaxe : Src Dst >>=
+
+   Est Çquivalent Ö la sÇquence : Src Dst >> Dst :=
+
+   Note : Src ne doit pas àtre supÇrieur Ö 31.
+
+   Exemple : 4 TOTO :=
+             2 TOTO >>=  // TOTO = 1
+
+LES MATHEMATIQUES
+-----------------
+
++                       n1 n2 --- n3
+
+   Additionne les deux symboles au sommet de la pile, et empile le
+   rÇsultat.
+
+   Syntaxe : Sym1 Sym2 +
+
+   Exemple : 3 4 +  // Empile 7
+
+-                       n1 n2 --- n3
+
+   Soustrait les deux symboles au sommet de la pile, et empile le rÇsultat.
+
+   Syntaxe : Sym1 Sym2 -
+
+   Exemple : 8 4 -  // Empile 4
+
+*                       n1 n2 --- n3
+
+   Multiplie les deux symboles au sommet de la pile, et empile le rÇsultat.
+
+   Syntaxe : Sym1 Sym2 *
+
+   Exemple : 8 4 *  // Empile 32
+
+/                       n1 n2 --- n3
+
+   Divise Sym1 par Sym2, et empile le rÇsultat.
+
+   Syntaxe : Sym1 Sym2 /
+
+   Exemple : 8 4 /  // Empile 2
+
+%                       n1 n2 --- n3
+
+   Calcule le reste de la division de Sym1 par Sym2, et empile le rÇsultat.
+
+   Syntaxe : Sym1 Sym2 %
+
+   Exemple : 10 5 %  // Empile 0
+
+ACOS                    n1 --- n2
+
+   Empile l'arc cosinus du symbole donnÇ.
+
+   Syntaxe : Sym ACOS
+
+   Exemple : 45.5 ACOS
+
+ASIN                    n1 --- n2
+
+   Empile l'arc sinus du symbole donnÇ.
+
+   Syntaxe : Sym ASIN
+
+   Exemple : 45.5 ASIN
+
+ATAN                    n1 --- n2
+
+   Empile l'arc tangante du symbole donnÇ.
+
+   Syntaxe : Sym ATAN
+
+   Exemple : 45.5 ATAN
+
+ATAN2                   n1 n2 --- n3
+
+   Empile l'arc tangante de Sym1/Sym2.
+
+   Syntaxe : Sym1 Sym2 ATAN2
+
+   Exemple : 35.5 45.5 ATAN2
+
+CEIL                    n1 --- n2
+
+   Arrondi le symbole donnÇe au chiffre immÇdiatement supÇrieur, et empile
+   le rÇsultat.
+
+   Syntaxe : Sym CEIL
+
+   Exemple : 45.5 CEIL  // Empile 46
+
+COS                     n1 --- n2
+
+   Empile le cosinus du symbole donnÇ.
+
+   Syntaxe : Sym COS
+
+   Exemple : 45.5 COS
+
+COSH                    n1 --- n2
+
+   Empile le cosinus hyperbolique du symbole donnÇ.
+
+   Syntaxe : Sym COSH
+
+   Exemple : 45.5 COSH
+
+EXP                     n1 --- n2
+
+   Empile e puissance Sym.
+
+   Syntaxe : Sym EXP
+
+   Exemple : 45 EXP
+
+EXP-1                   n1 --- n2
+
+   Empile e puissance Sym-1.
+
+   Syntaxe : Sym EXP-1
+
+   Exemple : 45 EXP-1
+
+ABS                     n1 --- n2
+
+   Empile la valeur absolue du symbole donnÇ.
+
+   Syntaxe : Sym ABS
+
+   Exemple : -45.5 ABS  // Empile 45.5
+
+NEGATE                  n1 --- -n1
+
+   Rend le nombre empilÇ negatif, et empile le rÇsultat.
+
+   Syntaxe : Sym NEGATE
+
+   Exemple : 32 NEGATE  // Empile -32
+
+FLOOR                   n1 --- n2
+
+   Arrondi le symbole donnÇe au chiffre immÇdiatement infÇrieur, et empile
+   le rÇsultat.
+
+   Syntaxe : Sym FLOOR
+
+   Exemple : 45.5 FLOOR  // Empile 45
+
+HYPOT                   n1 n2 --- n3
+
+   Empile l'hypothÇnuse du triange rectangle de cotÇs Sym1 et Sym2.
+
+   Syntaxe : Sym1 Sym2 HYPOT
+
+   Exemple : 10.5 9.5 HYPOT
+
+LOG                     n1 --- n2
+
+   Empile le logarithme naturel du symbole donnÇ.
+
+   Syntaxe : Sym LOG
+
+   Exemple : 45.5 LOG
+
+LOG1+                   n1 --- n2
+
+   Empile le logarithme de 1+Sym.
+
+   Syntaxe : Sym LOG1+
+
+   Exemple : 45.5 LOG1+
+
+LOG10                   n1 --- n2
+
+   Empile le logarithme en base 10 du symbole donnÇ.
+
+   Syntaxe : Sym LOG10
+
+   Exemple : 45.5 LOG10
+
+POW                     n1 n2 --- n3
+
+   Empile Sym1 puissance Sym2
+
+   Syntaxe : Sym1 Sym2 POW
+
+   Exemple : 2 32 POW
+
+POW10                   n1 --- n2
+
+   Empile 10 puissance Sym.
+
+   Syntaxe : Sym POW10
+
+   Exemple : 2 POW10
+
+RND                     n1 --- n2
+
+   Empile un nombre alÇatoire compris entre 0 et Sym-1.
+
+   Syntaxe : Sym RND
+
+   Exemple : 10 RND
+
+RANDOMIZE               ---
+
+   Initialise le gÇnÇrateur de nombres alÇatoires.
+
+   Syntaxe : RANDOMIZE
+
+   Exemple : : ALEA  // n1 --- n2
+               RANDOMIZE
+               RND
+             ;
+
+SIN                     n1 --- n2
+
+   Empile le sinus du symbole donnÇ.
+
+   Syntaxe : Sym SIN
+
+   Exemple : 45.5 SIN
+
+SINH                    n1 --- n2
+
+   Empile le sinus hyperbolique du symbole donnÇ.
+
+   Syntaxe : Sym SINH
+
+   Exemple : 45.5 SINH
+
+SQRT                    n1 --- n2
+
+   Empile la racine carrÇe du symbole donnÇ.
+
+   Syntaxe : Sym SQRT
+
+   Exemple : 2 SQRT
+
+TAN                     n1 --- n2
+
+   Empile la tangante du symbole donnÇ.
+
+   Syntaxe : Sym TAN
+
+   Exemple : 45.5 TAN
+
+TANH                    n1 --- n2
+
+   Empile la tangante hyperbolique du symbole donnÇ.
+
+   Syntaxe : Sym TANH
+
+   Exemple : 45.5 TANH
+
+INT                     n1 --- n2
+
+   Empile la partie entiäre du symbole donnÇ.
+
+   Syntaxe : Sym INT
+
+   Exemple : 45.5 INT  // Empile 45
+
+LES CHAINES DE CARACTERES
+-------------------------
+
+STRCAT                  sd ss ---
+
+   ConcatÇnation de chaines.
+   Concatäne la chaine Src Ö la chaine Dst.
+
+   Syntaxe : Src Dst STRCAT
+
+   Exemple : " SALUT " DEBUT :=
+             " LES GARS" FIN :=
+             FIN DEBUT STRCAT  // Debut = "SALUT LES GARS"
+
+STRLEN                  str --- n
+
+   Empile la longueur de la chaine donnÇe.
+
+   Syntaxe : Str STRLEN
+
+   Exemple : " COUCOU" STRLEN  // Empile 6
+
+STRLWR                  str ---
+
+   Converti les caractäres de la chaine donnÇe en minuscules.
+
+   Syntaxe : Str STRLWR
+
+   Exemple : " SALUT" TOTO :=
+             TOTO STRLWR   // Toto = "salut"
+
+STRUPR                  str ---
+
+   Converti les caractäres de la chaine donnÇe en majuscules.
+
+   Syntaxe : Str STRUPR
+
+   Exemple : " salut" TOTO :=
+             TOTO STRUPR   // Toto = "SALUT"
+
+STRREV                  str ---
+
+   Inverse les caractäres de la chaine donnÇe.
+
+   Syntaxe : Str STRREV
+
+   Exemple : " SALUT" TOTO :=
+             TOTO STRREV          // Toto = "TULAS"
+
+AT                      s2 s1 --- n
+
+   Recherche de sous-chaine.
+   Empile la position de la sous-chaine Str2 dans la chaine Str1.
+   La position commence Ö partir de 0.
+
+   Syntaxe : Str1 Str2 AT
+
+   Si Str2 est non trouvÇe dans Str1, empile -1.
+
+   Exemple : " SALUT LES GARS" TOTO :=
+             TOTO " ES" AT  // Empile 7
+             TOTO " COU" AT  // Empile -1 
+
+SUBSTR                  str pos lng --- str
+
+   Extraction de sous-chaine.
+   Extrait une sous-chaine de Str, Ö partir de la position Pos, sur
+   une longueur Lon. La position est comptÇe Ö partir de 0.
+   Empile la sous-chaine extraite.
+
+   Syntaxe : Str Pos Lon SUBSTR
+
+   Exemple : " SALUT LES GAR" TOTO :=
+             TOTO 3 5 SUBSTR  // Empile "UT LE"
+
+   Note : Si Pos est supÇrieur Ö la longueur de la chaine, rien n'est
+          extrait.
+          Si Pos+Lon est supÇrieur Ö la longueur de la chaine, Lon est
+          ajustÇ.
+
+VAL                     str --- n
+
+   Converti la chaine donnÇe en nombre, et empile le nombre obtenu.
+
+   Syntaxe : Str VAL
+
+   Exemple : " 3.14159" TOTO :=
+             TOTO VAL  // Empile 3.14159
+
+STR                     n --- str
+
+   Converti le nombre donnÇ en une chaine de caractäres, en respectant
+   le format d'affichage courant (voir USING).
+
+   Syntaxe : n STR
+
+   Exemple : LOCAL NUMBER NUM1 := 345
+                   CHAR CHIFFRE
+             ...
+             NUM1 STR CHIFFRE :=
+
+RTRIM                   str --- str'
+
+   Enläve les espace Ö droite de la chaine donnÇe.
+   Empile la nouvelle chaine.
+
+   Syntaxe : Str RTRIM
+
+   Exemple : CHAR STR := " COUCOU    "
+             ...
+             STR RTRIM   // Empile "COUCOU"
+
+LTRIM                   str --- str'
+
+   Enläve les espace Ö gauche de la chaine donnÇe.
+   Empile la nouvelle chaine.
+
+   Syntaxe : Str LTRIM
+
+   Exemple : CHAR STR := "     COUCOU"
+             ...
+             STR LTRIM   // Empile "COUCOU"
+
+ALLTRIM                 str --- str'
+
+   Enläve les espace Ö droite et gauche de la chaine donnÇe.
+   Empile la nouvelle chaine.
+
+   Syntaxe : Str ALLTRIM
+
+   Exemple : CHAR STR := "     COUCOU   "
+             ...
+             STR ALLTRIM   // Empile"COUCOU"
+
+ASC                     str --- n
+
+   Converti le caractäre donnÇ en un code ASCII.
+
+   Syntaxe : Str ASC
+
+   Exemple : CHAR CAR := " A"
+             ...
+             CAR ASC       // Empile 65
+
+CHR                     n --- str
+
+   Converti le nombre donnÇ en un caractäre.
+
+   Syntaxe : n CHR
+
+   Exemple : 65 CHR       // Empile " A".
+
+STRSPN                  s2 s1 --- n
+
+   Empile VRAI si la chaine Str1 n'est composÇe que des caractäres
+   de la chaine Str2, FAUX sinon.
+
+   Syntaxe : Str1 Str2 STRSPN
+
+   Exemple : " 125"
+             " 0123456789" STRSPN
+             IF
+                " EST UN NOMBRE" PRINT
+             ELSE
+                " N'EST PAS UN NOMBRE" PRINT
+             ENDIF
+
+STRIN                   s2 s1 --- n
+
+   Empile VRAI si la chaine Str1 contient un des caractäres
+   de la chaine Str2, FAUX sinon.
+
+   Syntaxe : Str1 Str2 STRIN
+
+   Exemple : " ENTREZ UNE LETTRE" PRINT
+             INPUT
+             " ABCDEFGHIJKLMNOPQRSTUVWXYZ" STRIN
+             IF
+                " EST UNE LETTRE" PRINT
+             ELSE
+                " N'EST PAS UNE LETTRE" PRINT
+             ENDIF
+
+STRTOK                  Tab delim chaine ---
+
+   DÇcoupe la chaine donnÇe en item sÇparÇs par le dÇlimiteur donnÇ, et
+   stocke ceux-ci dans le tableau donnÇ.
+
+   Syntaxe : Chaine Delim Tab STRTOK
+
+   Le tableau doit àtre du type caractäre.
+   Son Çventuel ancien contenu est supprimÇ. Ses dimensions sont Çventuellement
+   ajustÇes ( 1 ligne et n colonnes).
+
+   Exemple : CHAR[] 5 5 CTAB
+             CHAR CHAINE := "UN DEUX TROIS QUATRE CINQ"
+             CHAR DELIM := " "
+             ...
+             CHAINE DELIM CTAB STRTOK
+             ...
+             CTAB ALEN            // Empile 1 5
+
+ENCODE                  Src FmtDst FmtSrc --- Ch
+
+   Encodage d'une chaine de caractäres.
+
+   Syntaxe : FmtSrc FmtDst Src ENCODE
+
+   Fabrique une chaine de caractäres en dÇplacant les caractäres de la chaine
+   source Src dans la chaine destination. Les dÇplacements sont dÇterminÇs par
+   les formats des deux chaines, dÇfinis par FmtSrc pour la chaine source, et
+   par FmtDst pour la chaine destination.
+   La chaine fabriquÇe est empilÇe.
+
+   Exemples : " 123" " 3 2 1" " ABC" ENCODE                   // Empile " C B A"
+              " 123" " 1&2&3" " ABC" ENCODE                   // Empile " A&B&C"
+              " 123456789A" " 789A4512" " 30-12/1990" ENCODE  // Empile " 19901230"
+              " ABCDEFGH" " EF/GH/CD" " 19901230" ENCODE      // Empile "12/30/90"
+
+ADIR                    Tab masque ---
+
+   RÇcupäre la liste des fichiers correspondants au masque donnÇ, et stocke
+   ceux-ci dans le tableau donnÇ.
+
+   Syntaxe : Masque Tab ADIR
+
+   Le tableau doit àtre du type caractäre.
+   Son Çventuel ancien contenu est supprimÇ. Ses dimensions sont Çventuellement
+   ajustÇes ( n ligne et 4 colonnes).
+   Masque est une chaine pouvant contenir les "jokers" du D.O.S.
+   Les colonnes contiennent les informations suivantes:
+   colonne 0 : nom du fichier (13 caractäres maxi)
+   colonne 1 : taille du fichier (sous forme de chaine de caractäres)
+   colonne 2 : date de derniäre Çcriture, sous la forme "JJ/MM/AAA"
+   colonne 3 : heure de derniäre Çcriture, sous la forme "HH:MM:SS"
+   Si aucun fichier ne correspond au masque donnÇ, le tableau contiendra
+   une seule ligne de 4 colonnes vides.
+
+   Exemple : CHAR[] 5 5 CTAB
+             ...
+             " *.EXE" CTAB ADIR
+             ...
+             " \APPS\*.NPG" CTAB ADIR
+
+STRTRAN                 Chaine OccDst OccSrc ---
+
+   Remplace dans la chaine donnÇe, toutes les occurences de OccSrc par
+   OccDst.
+
+   Syntaxe : OccSrc OccDst Chaine STRTRAN
+
+   Exemple : CHAR CHAINE := " COUCOU"
+             ...
+             " O" " HA" CHAINE STRTRAN
+             CHAINE PRINT                // Affiche " CHAUCHAU"
+
+LEFT                    Chaine Len --- NewCh
+
+   Empile les Len caractäres Ö gauche de la chaine donnÇe.
+
+   Syntaxe : Chaine Len LEFT
+
+   Si Len est plus grand que la longueur de la chaine, il est ajustÇ.
+
+   Exemple : LOCAL CHAR CHAINE := "BONJOUR"
+             ...
+             CHAINE 3 LEFT        // Empile "BON"
+             ...
+             CHAINE 25 LEFT       // Empile "BONJOUR"
+
+RIGHT                   Chaine Len --- NewCh
+
+   Empile les Len caractäres Ö droite de la chaine donnÇe.
+
+   Syntaxe : Chaine Len RIGHT
+
+   Si Len est plus grand que la longueur de la chaine, il est ajustÇ.
+
+   Exemple : LOCAL CHAR CHAINE := "BONJOUR"
+             ...
+             CHAINE 4 RIGHT        // Empile "JOUR"
+             ...
+             CHAINE 25 RIGHT       // Empile "BONJOUR"
+
+PADL                    Len Car Chaine --- NewCh
+
+   Compläte la chaine donnÇe avec le caractäre donnÇ, jusqu'Ö ce qu'elle
+   atteigne la longueur donnÇe. Le caractäre est mis Ö gauche de la chaine.
+   Empile la nouvelle chaine.
+
+   Syntaxe : Chaine Car Len PADL
+
+   Si la chaine originale est plus longue que Len, la nouvelle chaine
+   contiendra Len caractäre de Chaine, Çquivalant Ö Chaine 0 Len SUBSTR.
+
+   Exemples : LOCAL CHAINE := "BONJOUR"
+              ...
+              CHAINE "  " 10 PADL   // Empile "   BONJOUR"
+              ...
+              CHAINE "  " 5 PADL    // Empile "BONJO"
+
+PADR                    Len Car Chaine --- NewCh
+
+   Compläte la chaine donnÇe avec le caractäre donnÇ, jusqu'Ö ce qu'elle
+   atteigne la longueur donnÇe. Le caractäre est mis Ö droite de la chaine.
+   Empile la nouvelle chaine.
+
+   Syntaxe : Chaine Car Len PADR
+
+   Si la chaine originale est plus longue que Len, la nouvelle chaine
+   contiendra Len caractäre de Chaine, Çquivalant Ö Chaine 0 Len SUBSTR.
+
+   Exemples : LOCAL CHAINE := "BONJOUR"
+              ...
+              CHAINE "  " 10 PADR   // Empile "BONJOUR   "
+              ...
+              CHAINE "  " 5 PADR    // Empile "BONJO"
+
+PADC                    Len Car Chaine --- NewCh
+
+   Centre la chaine donnÇe avec le caractäre donnÇ, jusqu'Ö ce qu'elle
+   atteigne la longueur donnÇe. Le caractäre est mis de part et d'autre
+   de la chaine.
+   Empile la nouvelle chaine.
+
+   Syntaxe : Chaine Car Len PADC
+
+   Si la chaine originale est plus longue que Len, la nouvelle chaine
+   contiendra Len caractäre de Chaine, Çquivalant Ö Chaine 0 Len SUBSTR.
+
+   Exemples : LOCAL CHAINE := "BONJOUR"
+              ...
+              CHAINE "  " 10 PADC   // Empile " BONJOUR  "
+              ...
+              CHAINE "  " 5 PADC    // Empile "BONJO"
+
+STRINS                  Len Pos Dst Src --- Str
+
+   Copie les <Len> caractäres de la chaine <Src> dans la chaine <Dst>, Ö
+   partir de la position <Pos>.
+
+   Syntaxe : Src Dst Pos Len STRINS
+
+   <Pos> est comptÇ Ö partir de 0.
+   La nouvelle chaine est empilÇe.
+   <Pos> et <Len> sont ajustÇs le cas ÇchÇant, conformÇment aux longueurs
+   des chaines (si <Pos> est supÇrieur Ö la longueur de la chaine, il est mis
+   Ö la longueur de la chaine destination, si <Len> est supÇrieur Ö la longueur
+   de la chaine, il est mis Ö la longueur de la chaine source).
+
+   Exemples : LOCAL CHAINE1 := "BONJOUR"
+                    CHAINE2 := " OU MAUVAIS "
+              ...
+              CHAINE2 CHAINE1 3 5 STRINS  // Empile "BON OU MJOUR"
+
+STRDEL                  Len Pos Src --- Str
+
+   Supprime les <Len> caractäres de la chaine <Src>, Ö partir de la
+   position <Pos>.
+
+   Syntaxe : Src Pos Len STRDEL
+
+   La nouvelle chaine est empilÇe.
+   <Pos> est comptÇ Ö partir de 0.
+   si <Pos> est hors limite, rien n'est supprimÇ et la chaine source est
+   empilÇe telle quel.
+   si <Len> est supÇrieur Ö la longueur de la chaine, il est ajustÇ.
+
+   Exemples : LOCAL CHAINE1 := " OU MAUVAIS"
+              ...
+              CHAINE1 3 5 STRDEL  // Empile " OUAIS "
+
+STRSET                  Car Len Pos Src --- Str
+
+   Remplace les <Len> caractäres de la chaine <Src> par le caractäre <Car>,
+   Ö partir de la position <Pos>.
+
+   Syntaxe : Src Pos Len Car STRSET
+
+   La nouvelle chaine est empilÇe.
+   <Pos> est comptÇ Ö partir de 0.
+   si <Pos> est hors limite, rien n'est remplacÇ et la chaine source est
+   empilÇe telle quel.
+   si <Len> est supÇrieur Ö la longueur de la chaine, il est ajustÇ.
+
+   Exemples : LOCAL CHAINE1 := " OU MAUVAIS"
+              ...
+              CHAINE1 3 5 " ." STRSET  // Empile " OU.....AIS"
+
+LES VARIABLES ET CONSTANTES
+---------------------------
+
+TRUE                    --- b
+
+   Empile la valeur VRAI.
+
+   Syntaxe : TRUE
+
+   Exemple : PSEUDO IF TRUE ELSE FALSE ENDIF
+
+FALSE                   --- b
+
+   Empile la valeur FAUSSE.
+
+   Syntaxe : FALSE
+
+   Exemple : PSEUDO IF TRUE ELSE FALSE ENDIF
+
+FKENVOI                 --- c
+
+   Empile le code de la touche ENVOI.
+
+   Syntaxe : FKENVOI
+
+   Exemple : " appuyez sur ENVOI" print
+             BEGIN
+                wait
+                FKEY
+                FKENVOI ==
+             UNTIL
+
+FKRETOUR                --- c
+
+   Empile le code de la touche RETOUR.
+
+   Syntaxe : FKRETOUR
+
+   Exemple : " appuyez sur RETOUR" print
+             BEGIN
+                wait
+                FKEY
+                FKRETOUR ==
+             UNTIL
+
+FKREPETITION            --- c
+
+   Empile le code de la touche REPETITION.
+
+   Syntaxe : FKREPETITION
+
+   Exemple : " appuyez sur REPETITION" print
+             BEGIN
+                wait
+                FKEY
+                FKREPETITION ==
+             UNTIL
+
+FKGUIDE                 --- c
+
+   Empile le code de la touche GUIDE.
+
+   Syntaxe : FKGUIDE
+
+   Exemple : " appuyez sur GUIDE" print
+             wait
+             FKEY
+             FKGUIDE == IF AIDE THEN
+
+FKANNULATION            --- c
+
+   Empile le code de la touche ENVOI.
+
+   Syntaxe : FKANNULATION
+
+   Exemple : " appuyez sur ANNULATION" print
+             BEGIN
+                wait
+                FKEY
+                FKANNULATION ==
+             UNTIL
+
+FKSOMMAIRE              --- c
+
+   Empile le code de la touche ENVOI.
+
+   Syntaxe : FKSOMMAIRE
+
+   Exemple : " appuyez sur SOMMAIRE" print
+             BEGIN
+                wait
+                FKEY
+                FKSOMMAIRE ==
+             UNTIL
+
+FKCORRECTION            --- c
+
+   Empile le code de la touche CORRECTION.
+
+   Syntaxe : FKCORRECTION
+
+   Exemple : " appuyez sur CORRECTION" print
+             BEGIN
+                wait
+                FKEY
+                FKCORRECTION ==
+             UNTIL
+
+FKSUITE                 --- c
+
+   Empile le code de la touche SUITE.
+
+   Syntaxe : FKSUITE
+
+   Exemple : " appuyez sur SUITE" print
+             BEGIN
+                wait
+                FKEY
+                FKSUITE ==
+             UNTIL
+
+BLACK                   --- n
+
+   Empile le code de la couleur NOIRE.
+
+   Syntaxe : BLACK
+
+   Exemple : BLACK SETCOLOR
+
+RED                     --- n
+
+   Empile le code de la couleur ROUGE.
+
+   Syntaxe : RED
+
+   Exemple : RED SETCOLOR
+
+GREEN                   --- n
+
+   Empile le code de la couleur VERTE.
+
+   Syntaxe : GREEN
+
+   Exemple : GREEN SETCOLOR
+
+YELLOW                  --- n
+
+   Empile le code de la couleur JAUNE.
+
+   Syntaxe : YELLOW
+
+   Exemple : YELLOW SETCOLOR
+
+BLUE                    --- n
+
+   Empile le code de la couleur BLEUE.
+
+   Syntaxe : BLUE
+
+   Exemple : BLUE SETCOLOR
+
+MAGENTA                 --- n
+
+   Empile le code de la couleur MAGENTA.
+
+   Syntaxe : MAGENTA
+
+   Exemple : MAGENTA SETCOLOR
+
+CYAN                    --- n
+
+   Empile le code de la couleur CYAN.
+
+   Syntaxe : CYAN
+
+   Exemple : CYAN SETCOLOR
+
+WHITE                   --- n
+
+   Empile le code de la couleur BLANCHE.
+
+   Syntaxe : WHITE
+
+   Exemple : WHITE SETCOLOR
+
+FSIMPLE                 --- n
+
+   Empile le code de la simple taille.
+
+   Syntaxe : FSIMPLE
+
+   Exemple : FSIMPLE SETFONT
+
+FDHEIGHT                --- n
+
+   Empile le code de la double hauteur.
+
+   Syntaxe : FDHEIGHT
+
+   Exemple : FDHEIGHT SETFONT
+
+FDWEIGHT                --- n
+
+   Empile le code de la double largeur.
+
+   Syntaxe : FDWEIGHT
+
+   Exemple : FDWEIGHT SETFONT
+
+FDSIZE                  --- n
+
+   Empile le code de la double taille.
+
+   Syntaxe : FDSIZE
+
+   Exemple : FDSIZE SETFONT
+
+TMODEVDT                --- n
+
+   Empile le code du mode de fonctionnement VidÇoTex.
+
+   Syntaxe : TMODEVDT
+
+   Exemple : GETTMODE TMODEVDT ==
+             IF
+                ...
+             ENDIF
+
+TMODEMIXTE              --- n
+
+   Empile le code du mode de fonctionnement Mixte.
+
+   Syntaxe : TMODEMIXTE
+
+   Exemple : GETTMODE TMODEMIXTE ==
+             IF
+                ...
+             ENDIF
+
+   Rappel : Le mode mixte est le mode 80 colonnes des minitels, dans lequel
+            les touches de fonctions (SUITE, RETOUR, ...) sont encores actives.
+
+TMODETELEINFO           --- n
+
+   Empile le code du mode de fonctionnement TÇlÇInformatique.
+
+   Syntaxe : TMODETELEINFO
+
+   Exemple : GETTMODE TMODETELEINFO ==
+             IF
+                ...
+             ENDIF
+
+   Rappel : Le Mode TÇlÇInformatique est le mode 80 colonnes, compatible avec
+            Les terminaux de types ASCII (VTxxx).
+
+GETTMODE                --- n
+
+   Empile le mode du terminal du connectÇ courant.
+
+   Syntaxe : GETTMODE
+
+   Exemple : GETTMODE TMODETELEINFO ==
+             IF
+                ...
+             ENDIF
+
+FKEY                    --- c
+
+   Empile le code (sous forme de caractäre) de la touche de fonction
+   renvoyÇe par le minitÇliste courant.
+
+   Syntaxe : FKEY
+
+   Exemple : " Appuyez sur SUITE pour continuer" print
+             BEGIN
+               WAIT   // Attend une action de l'utilisateur
+               FKEY
+               FKSUITE ==
+             UNTIL
+
+DATA                    --- s
+
+   Empile les donnÇes reáues par le connectÇ courant.
+
+   Syntaxe : DATA
+
+   Exemple : " MENU.VTX" SENDPAGE
+             BEGIN
+                " Entrez votre choix" PRINT
+                24 13 LOCATE
+                INPUT
+                DATA VAL 0 !=
+             UNTIL
+
+TIME                    --- s
+
+   Empile l'heure courante du systäme, sous forme de chaine de caractäres
+   au format "HH:MM:SS"
+
+   Syntaxe : TIME
+
+   Exemple : " IL EST " print TIME PRINT
+
+TIMER                   --- n
+
+   Empile l'heure courante du systäme, en centiämes de secondes.
+
+   Syntaxe : TIMER
+
+   Exemple : : DIFFTIME
+                TIMER
+                ...
+                TIMER -
+             ;
+
+DATE                    --- s
+
+   Empile la date courante du systäme, sous forme de chaine de caractäres
+   au format "JJ/MM/AAAA"
+
+   Syntaxe : DATE
+
+   Exemple : " Nous sommes le " print DATE print
+
+CNXDATA                 --- s
+
+   Empile la trame d'appel du connectÇ courant, sous forme de chaine
+   de caractäres.
+
+   Syntaxe : CNXDATA
+
+   Exemple : " Trame de CNX = " print CNXDATA print
+
+   Note : Les connectÇs LOCAUX n'ont pas de trame de connexion.
+
+DEPT                    --- s
+
+   Empile le dÇpartement d'appel (sous forme de chaine de caractäre)
+   du connectÇ courant.
+
+   Syntaxe : DEPT
+
+   Exemple : DEPT DPT :=
+
+PAVI                    --- s
+
+   Empile le N¯ de  PAVI sous forme de chaine de caractäres, du
+   connectÇ courant.
+
+   Syntaxe : PAVI
+
+   Exemple : " PAVI : " print PAVI print
+
+PALIER                  --- s
+
+   Empile le palier ("82"=3614, ...) sous forme de chaine de caractäre
+   du connectÇ courant.
+
+   Syntaxe : PALIER
+
+   Exemple : " Palier : " print PALIER print
+
+NCOMP                   --- s
+
+   Empile le numÇro complÇmentaire du connectÇ courant, sous forme de chaine
+   de caractäre.
+
+   Syntaxe : NCOMP
+
+   Exemple : " N¯ Comp : " print NCOMP print
+
+APP                     --- s
+
+   Empile le nom de l'application appelÇe par le connectÇ courant.
+
+   Syntaxe : APP
+
+   Exemple : " Bienvenue sur " print APP print
+
+CNXDATE                 --- s
+
+   Empile la date de connexion du connectÇ courant, sous forme de chaine
+   de caractäres au format "JJ/MM/AAAA".
+
+   Syntaxe : CNXDATE
+
+   Exemple : " ArrivÇ le " print CNXDATE print
+
+CNXTIME                 --- s
+
+   Empile l'heure de connexion du connectÇ courant, sous forme de chaine
+   de caractäres au format "HH:MM:SS".
+
+   Syntaxe : CNXTIME
+
+   Exemple : " ArrivÇ Ö " print CNXTIME PRINT
+
+MTYPE                   --- n
+
+   Empile le type de minitel du connectÇ courant, sous forme de code
+   numÇrique, en utilisant la correspondance suivante :
+
+   62h : Minitel M1.
+   63h : Minitel M1.
+   72h : Minitel M1.
+   73h : Minitel M1 couleur.
+   64h : Minitel M10.
+   66h : Minitel M10.
+   75h : Minitel M1b.
+   77h : Minitel M10b.
+   76h : Minitel M2.
+   7Ah : Minitel M12.
+   79h : Minitel M5 (portable).
+   80h : Minitel Rapide/Photo.
+
+   Syntaxe : MTYPE
+
+   Exemple : MTYPE 76h !=
+             IF
+                " Il vous faut un minitel 2" LINE0
+             ENDIF
+
+NUMCV                   --- n
+
+   Empile le numÇro de cv du connectÇ courant.
+
+   Syntaxe : NUMCV
+
+   Exemple : : INFO
+                " Vous àtes sur la voie " print
+                NUMCV print
+                ...
+             ;
+
+SRVLAUNCHDATE           --- s
+
+   Empile la date de lancement du serveur, sous forme de chaine
+   de caractäres au format "JJ/MM/AAAA".
+
+   Syntaxe : SRVLAUNCHDATE
+
+   Exemple : " Serveur lancÇ le " print SRVLAUNCHDATE print
+
+SRVLAUNCHTIME           --- s
+
+   Empile l'heure de lancement du serveur, sous forme de chaine
+   de caractäres au format "HH:MM:SS".
+
+   Syntaxe : SRVLAUNCHTIME
+
+   Exemple : " Serveur lancÇ Ö " print SRVLAUNCHTIME PRINT
+
+SRVMEMAVAIL             --- n
+
+   Empile la mÇmoire disponible sur le serveur, en octets.
+
+   Syntaxe : SRVMEMAVAIL
+
+   Exemple : " Il reste " print SRVMEMAVAIL print "  octets"
+
+SRVCHARGE               --- n
+
+   Empile la charge actuelle du serveur, en pourcentage.
+   La charge est un ratio calculÇ entre le nombre de connectÇs total courant
+   et le nombre de connectÇs maximum du serveur.
+
+   Syntaxe : SRVCHARGE
+
+   Exemple : " Charge actuelle : " print SRVCHARGE print " %"
+
+SRVCHARGEMAX            --- n
+
+   Empile la charge maximum, pour la journÇe courante, du serveur,
+   en pourcentage.
+   La charge est un ratio calculÇ entre le nombre de connectÇs total courant
+   et le nombre de connectÇs maximum du serveur.
+
+   Syntaxe : SRVCHARGEMAX
+
+   Exemple : " Charge maxi : " print SRVCHARGEMAX print " %"
+
+SRVNBCNX                --- n
+
+   Empile le nombre total de connectÇs actuels sur le serveur.
+
+   Syntaxe : SRVNBCNX
+
+   Exemple : " Il y a " print SRVNBCNX "  connectÇs"
+
+SRVMAXCNX               --- n
+
+   Empile le nombre total maximum de connectÇs, pour la journÇe courante,
+   sur le serveur.
+
+   Syntaxe : SRVMAXCNX
+
+   Exemple : " Il y a eu " print SRVMAXCNX "  connectÇs maximum"
+
+SRVSTOPTIME             --- s
+
+   Empile l'heure d'arret du serveur, sous forme de chaine
+   de caractäres au format "HH:MM:SS".
+
+   Syntaxe : SRVSTOPTIME
+
+   Exemple : " Arret du serveur Ö " print SRVSTOPTIME PRINT
+
+   Note : les secondes sont toujours Ö zÇro.
+
+LES BASES DE DONNEES
+--------------------
+
+REMARQUE RELATIVES AUX BASES DE DONNEES:
+----------------------------------------
+Le chemin utilisÇ pour accÇder aux bases de donnÇes et fichiers annexes
+est (dans l'ordre) :
+   - Le chemin dÇfini par la directive #PATHDBF, s'il existe
+   sinon,
+   - Le chemin dÇfini par la directive #PATH, s'il existe
+   sinon, le chemin courant est pris.
+
+DBOPEN                  s --- b
+
+   Ouverture d'une base de donnÇes et des fichiers (index, mÇmo) associÇs.
+
+   Syntaxe : NomBase DBOPEN
+
+   Ouvre la base NomBase, ainsi que l'Çventuel index de production (NomBase.CDX)
+   associÇ, si celui-ci existe. Le fichier mÇmo (NomBase.FPT) Çventuel est aussi
+   ouvert.
+   Si un index est ouvert, la premiäre clef est sÇlectionnÇe.
+
+   La base ouverte devient la base courante.Le pointeur d'enregistrement est placÇ
+   au dÇbut de celle-ci.
+
+   Renvoi VRAI si tout c'est bien passÇ, FAUX sinon.
+
+   Exemple : " BAL" DBOPEN  // BAL.DBF est ouvert
+                            // ainsi que BAL.CDX, et BAL.FPT si ils existent.
+                            // La 1äre clef de BAL.CDX est sÇlectionnÇe.
+             IF
+                ...
+             ELSE
+                " Boites Aux Lettres indisponibles" LINE0
+             ENDIF
+
+DBCLOSE                 s ---
+
+   Ferme une base de donnÇes, et tous ses fichiers associÇs.
+
+   Syntaxe : NomBase DBCLOSE
+
+   Exemple : " BAL" DBCLOSE
+
+   IMPORTANT : Si NomBase est la base courante, il faudra en sÇlectionner une
+               nouvelle (voir DBSELECT).
+
+DBCLOSEALL              ---
+
+   Ferme toutes les bases de donnÇes, et tous les fichiers associÇs.
+
+   Syntaxe : DBCLOSEALL
+
+   Exemple : DBCLOSEALL
+
+DBAPPENDBLANK           ---
+
+   Ajoute un enregistrement vide Ö la base de donnÇes courante, et en fait
+   l'enregistrement courant.
+
+   Syntaxe : DBAPPENDBLANK
+
+   Exemple : DBAPPENDBLANK
+
+DBBOF                   --- b
+
+   Renvoie VRAI si on est au dÇbut de la base de donnÇes courante.
+
+   Syntaxe : DBBOF
+
+   Exemple : BEGIN
+                DBBOF !
+             WHILE
+                ...
+                -1 DBSKIP  // On remonte d'un enreg.
+             REPEAT
+
+DBBOTTOM                ---
+
+   Se place Ö la fin de la base de donnÇes courante.
+
+   Syntaxe : DBBOTTOM
+
+   Exemple : " BAL" DBOPEN
+             IF
+                DBBOTTOM
+             ENDIF
+
+DBSELECT                s ---
+
+   SÇlectionne une base de donnÇes parmis celles ouvertes, et en fait la
+   base de donnÇes courante.
+
+   Syntaxe : NomAlias DBSELECT
+
+   NomAlias est l'alias de la base Ö sÇlectionner (le nom de la base
+   de donnÇes).
+
+   Exemple : " ..\DBF\BAL" DBOPEN
+             " ..\DBF\MESSAGES" DBOPEN  // Derniäre ouverte, base courante.
+             " BAL" DBSELECT            // "BAL" devient la base courante.
+
+DBSELECTED              --- s
+
+   Empile le nom (alias) de la base de donnÇes courante.
+
+   Syntaxe : DBSELECTED
+
+   Exemple : : INTRO
+                DBSELECTED
+                " MODULES\QREP\QREP" DBOPEN
+                IF
+                   ...
+                   " QREP" DBCLOSE
+                ENDIF
+                DBSELECT  // On resÇlectionne l'ancienne base.
+             ;
+
+DBSETALIAS              Alias NomBase ---
+
+   Change l'alias d'une base de donnÇes.
+
+   Syntaxe : NomBase Alias DBSETALIAS
+
+   Par dÇfaut, l'alias d'une base de donnÇe est le nom du fichier.
+
+   Exemple : " BAL" DBOPEN
+             IF
+                " BAL" " MESBAL" DBSETALIAS
+                ...
+                " MESBAL" DBSELECT
+                ...
+                " MESBAL" DBCLOSE
+             ENDIF
+
+DBDELETE                ---
+
+   Marque l'enregistrement courant de la base de donnÇes courante comme effacÇ.
+
+   Syntaxe : DBDELETE
+
+   Exemple : " Confirmez-vous la destruction (O/N) ?" PRINT
+             WAIT
+             DATA STRUPR " O" ==
+             IF
+                DBDELETE
+             ENDIF
+
+DBDELETED               --- b
+
+   Renvoie VRAI si l'enregistrement courant de la base de donnÇes courante
+   est marquÇ comme effacÇ.
+
+   Syntaxe : DBDELETED
+
+   Exemple : DBDELETED
+             IF
+                DBRECALL
+             ENDIF
+
+DBEOF                   --- b
+
+   Renvoie VRAI si on est Ö la fin de la base de donnÇes courante.
+
+   Syntaxe : DBEOF
+
+   Exemple : BEGIN
+                DBEOF !
+             WHILE
+                ...
+                1 DBSKIP  // On descend d'un enreg.
+             REPEAT
+
+DBCOMMIT                ---
+
+   Met Ö jour (physiquement, sur le disque) la base de donnÇes courante,
+   ainsi que les fichiers associÇs (index et mÇmo).
+
+   Syntaxe : DBCOMMIT
+
+   Exemple : DBAPPENDBLANK
+             ...
+             DBCOMMIT
+
+DBCOMMITALL             ---
+
+   Met Ö jour (physiquement, sur le disque) toutes les bases de donnÇes
+   du connectÇ courant, ainsi que les fichiers associÇs (index et mÇmo).
+
+   Syntaxe : DBCOMMITALL
+
+   Exemple : DBAPPENDBLANK
+             ...
+             DBCOMMITALL
+
+DBGO                    n ---
+
+   Se place sur l'enregistrement donnÇ de la base courante.
+
+   Syntaxe : Num DBGO
+
+   Exemple : " BAL" DBOPEN
+             IF
+                5 DBGO
+             ENDIF
+
+DBLOCK                  ---
+
+   Verouille l'enregistrement courant de la base de donnÇes courante.
+
+   Syntaxe : DBLOCK
+
+   Exemple : DBAPPENDBLANK
+             ...
+             DBLOCK
+             ...
+             DBUNLOCK
+
+DBLOCKED                --- b
+
+   Renvoie VRAI si l'enregistrement courant de la base de donnÇes courante
+   est verouillÇ.
+
+   Syntaxe : DBLOCKED
+
+   Exemple : 5 DBGO
+             DBLOCKED IF DBUNLOCK ENDIF
+             ...
+
+DBFLOCK                 ---
+
+   Verouille la base de donnÇes courante, ainsi que les fichiers index et
+   mÇmo associÇs.
+
+   Syntaxe : DBFLOCK
+
+   Exemple : : PURGEBAL
+                " BAL" DBOPEN
+                DBFLOCK
+                ...
+                DBUNLOCK
+             ;
+
+DBFLOCKED               --- b
+
+   Renvoie VRAI si la base courante est verouillÇe.
+
+   Syntaxe : DBFLOCKED
+
+   Exemple : DBFLOCKED
+             IF
+                " Base indisponible" LINE0
+             ENDIF
+
+DBINDEX                 --- s
+
+   Empile le nom de l'index courant, pour la base de donnÇes courante du
+   connectÇ.
+
+   Syntaxe : DBINDEX
+
+   Exemple : " BAL" DBOPEN
+             IF
+                " INDEX COURANT =" PRINT
+                DBINDEX PRINT
+             ENDIF
+
+DBKEY                   --- s
+
+   Empile l'expression DBASE de la clef d'index courante, pour la base
+   de donnÇes courante du connectÇ.
+
+   Syntaxe : DBKEY
+
+   L'expression est empilÇe sour forme de chaine de caractäres.
+
+   Exemple : " BAL" DBOPEN
+             IF
+                " CLEF COURANTE =" PRINT
+                DBKEY PRINT
+             ENDIF
+
+DBRECALL                ---
+
+   Enläve, si elle existe, la marque d'effacement de l'enregistrement
+   courant de la base de donnÇes courante.
+
+   Syntaxe : DBRECALL
+
+   Exemple : 3 DBGO
+             DBDELETED IF DBRECALL ENDIF
+
+DBRECCOUNT              --- n
+
+   Renvoie le nombre d'enregistrements de la base courante.
+
+   Syntaxe : DBRECCOUNT
+
+   Exemple : " BAL" DBOPEN
+             " Il y a " PRINT
+             DBRECCOUNT PRINT
+             " inscrits" PRINT
+
+DBRECNO                 --- n
+
+   Renvoie le numÇro de l'enregistrement courant de la base de donnÇes courante.
+
+   Syntaxe : DBRECNO
+
+   Exemple : " BAL" DBOPEN
+             PSEUDO DBSEEK
+             IF
+                " Vous àtes le n¯ " PRINT
+                DBRECNO PRINT CR
+             ENDIF
+
+DBSEEK                  s --- b
+
+   Recherche d'une clef dans la base, en utilisant l'index courant.
+   Renvoi VRAI si la clef est trouvÇe, FAUX sinon.
+   Si la clef est trouvÇe, l'enregistrement correspondant devient
+   l'enregistrement courant.
+
+   Syntaxe : Clef DBSEEK
+
+   Exemple : " Entrez votre nom " PRINT
+             INPUT
+             " BAL" DBSELECT
+             DBSEEK
+             IF
+                ...
+             ELSE
+                " Vous n'àtes pas certifiÇ" LINE0
+             ENDIF
+
+   Note : La clef Çtant donnÇe sous forme d'une chaine de caractäres,
+          si l'index est de type DATE, la clef devra se prÇsenter sous
+          la forme "AAAAMMJJ" (exemple : "19942004"),
+          si l'index est de type NUMERIQUE, la clef devra se prÇsenter sous
+          la forme "XX.XX" (exemples: "365.25", "33", "789.456").
+
+DBSKIP                  n ---
+
+   DÇplace le pointeur d'enregistrement de la base de donnÇes courante,
+   de Nb enregistrements.
+
+   Syntaxe : Nb DBSKIP
+
+   Exemple : " BAL" DBOPEN
+             IF
+                DBTOP
+                BEGIN
+                   DBEOF !
+                WHILE
+                   ...
+                   1 DBSKIP
+                REPEAT
+             ENDIF
+
+   Note : Nb peut àtre nÇgatif.
+
+DBSETINDEX              s ---
+
+   SÇlectionne un index parmis ceux prÇsents dans le fichier de production
+   (NomBase.CDX) de la base courante.
+   Si l'index donnÇe n'existe pas ou est invalide, une erreur d'exÇcution est
+   gÇnÇrÇe.
+   Pour sÇlectionner l'ordre "naturel" (n¯ d'enregistrement), empilez un
+   index vide.
+
+   Syntaxe : NomIndex DBSETINDEX
+
+   Exemple : " BAL" DBOPEN  // en supposant que "AGE" soit un des index
+             " AGE" DBSETINDEX
+             "  " DBSETINDEX // sÇlection de l'ordre naturel
+
+   Rappel : il peut y avoir jusqu'Ö 47 index dans un fichier de production
+            (NomBase.CDX).
+
+DBTOP                   ---
+
+   Se place au dÇbut de la base courante.
+
+   Syntaxe : DBTOP
+
+   Exemple : " BAL" DBOPEN
+             IF
+                DBTOP
+                ...
+             ENDIF
+
+DBUNLOCK                ---
+
+   DÇverouille tous les enregistrements verouillÇs de la base courante.
+
+   Syntaxe : DBUNLOCK
+
+   Exemple : DBAPPENDBLANK
+             ...
+             DBLOCK
+             ...
+             DBUNLOCK
+
+DBUNLOCKALL             ---
+
+   DÇverouille toutes les bases du connectÇ courant.
+
+   Syntaxe : DBUNLOCKALL
+
+   Exemple : " BAL" DBSELECT
+              DBAPPENDBLANK
+             ...
+             DBLOCK
+             ...
+             " MESSAGES" DBSELECT
+              DBAPPENDBLANK
+             ...
+             DBLOCK
+             ...
+             DBUNLOCKALL
+
+DBREPLACE               ch val ---
+
+   Stocke la valeur donnÇe dans le champ donnÇ de la base courante.
+
+   Syntaxe : Valeur NomChamp DBREPLACE
+
+   Exemple : " Entrez votre nom " PRINT
+             INPUT
+             " BAL" DBSELECT
+             DBAPPENDBLANK
+             " NOM" DBREPLACE
+
+   Note : Pour les champs de type caractäre, la valeur Ö stocker doit àtre
+          une chaine (!).
+          Pour les champs de type date, la valeur Ö stocker peut àtre :
+             - de type chaine, auquel cas elle doit avoir le format
+               "AAAAMMJJ".
+               Exemple : " 19943006" " DATEJOUR" DBREPLACE
+             - de type numÇrique, auquel cas elle doit reprÇsenter une date
+               en jour julien.
+               Exemple : 2345635 " DATEJOUR" DBREPLACE
+          Pour les champs de type logique, la valeur Ö stocker peut àtre :
+             - de type caractäre (chaine de longueur 1), auquel cas elle 
+               doit contenir un des caractäres suivants :
+               "Y","y","N","n","T","t","F","f"
+             - de type numÇrique, auquel cas elle doit contenir soit 0 (FAUX),
+               soit 1 (VRAI)
+               Exemple : TRUE " MARIE" DBREPLACE
+                         " F" " CELIBAT" DBREPLACE
+          Pour les champs de type mÇmo, la valeur Ö stocker doit àtre
+          une chaine (de longueur quelconque).
+          Pour les champs numÇriques, la valeur Ö stocker doit àtre un
+          nombre (!)
+
+DBFIELD                 ch --- s
+
+   Empile le contenu du champ donnÇ de la base de donnÇes courante.
+
+   Syntaxe : NomChamp DBFIELD
+
+   Exemple : " BAL" DBOPEN
+             PSEUDO DBSEEK
+             IF
+                " DATDERACC" DBFIELD
+                " Dernier accäs le " PRINT PRINT CR
+             THEN
+
+   Note : Pour les champs de type caractäre, une chaine est empilÇe.
+          Pour les champs de type date, une chaine au format "AAAAMMJJ" est
+          empilÇe.
+          Pour les champs de type logique, TRUE ou FALSE est empilÇ, en
+          fonction de la valeur du champ.
+          Pour les champs de type mÇmo, une chaine est empilÇe.
+          Pour les champs de type numÇrique, un nombre est empilÇ.
+
+DBFIELDTYPE             ch --- s
+
+   Empile le type du champ donnÇ de la base de donnÇes courante, sous forme
+   de chaine de caractäre.
+
+   Syntaxe : NomChamp DBFIELDTYPE
+
+   Le type empilÇ peut àtre un des suivants :
+   - "C" : Champ de type caractäre
+   - "D" : Champ de type date
+   - "L" : Champ de type logique
+   - "M" : Champ de type mÇmo
+   - "N" : Champ de type numÇrique
+
+   Exemple : " BAL" DBOPEN
+             IF
+                " PSEUDO" DBFIELDTYPE " C" !=
+                IF
+                   " STRUCTURE DES BAL MODIFIEE" LINE0
+                ENDIF
+             ENDIF
+
+DBFIELDLEN              ch --- n
+
+   Empile la longueur du champ donnÇ de la base de donnÇes courante.
+
+   Syntaxe : NomChamp DBFIELDLEN
+
+   Exemple : " BAL" DBOPEN
+             IF
+                " PSEUDO" DBFIELDLEN
+                ...
+             ENDIF
+
+DBFIELDCOUNT            --- n
+
+   Empile le nombre de champs de la base de donnÇes courante.
+
+   Syntaxe : DBFIELDCOUNT
+
+   Exemple : " BAL" DBOPEN
+             IF
+                DBFIELDCOUNT 5 <
+                IF
+                   " STRUCTURE DES BALS MODIFIEES" LINE0
+                ENDIF
+             ENDIF
+
+DBFIELDLENDEC           ch --- n
+
+   Empile le nombre de dÇcimales du champ donnÇ de la base de donnÇes courante.
+
+   Syntaxe : NomChamp DBFIELDLENDEC
+
+   Exemple : " BAL" DBOPEN
+             IF
+                " AGE" DBFIELDLENDEC
+                ...
+             ENDIF
+
+DBNUMFIELD->NAME        n --- s
+
+   Empile la nom du champ de la base de donnÇes courante, correspondant au
+   numÇro donnÇ.
+
+   Syntaxe : Num DBNUMFIELD->NAME
+
+   Num doit àtre compris entre 1 et DBFIELDCOUNT.
+
+   Exemple : " BAL" DBOPEN
+             IF
+                DBFIELDCOUNT 0
+                DO
+                   I 1 + DBNUMFIELD->NAME PRINT CR
+                LOOP
+             ENDIF
+
+TRAITEMENT DES ERREURS D'EXECUTION
+----------------------------------
+
+DBERROR                 --- n
+
+   Empile le code d'erreur relatif aux manipulations des bases
+   de donnÇes (fonction DBxx).
+
+   Syntaxe : DBERROR
+
+   Empile le code d'erreur de la derniäre fonction de manipulation
+   de base de donnÇes utilisÇe. 0 signifie qu'aucune erreur n'est
+   survenue.
+
+   Exemple : " BAL" DBCLOSE
+             DBERROR
+             IF
+                // Traitement de l'erreur
+             THEN
+
+ERROR?                  --- b
+
+   Empile VRAI si une erruer d'exÇcution est survenue.
+
+   Syntaxe : ERROR?
+
+   En fontion du comportement choisi (voir #LIBONERROR), le programme
+   peut àtre ammenÇ Ö tester une condition d'erreur (si #LIBONERROR est
+   Ö OFF). ERROR? permet de le faire.
+
+   Exemple : : TEST
+                ...
+                ERROR?
+                IF
+                   // Traitement de l'erreur.
+                ELSE
+                   ...
+                ENDIF
+             ;
+
+ERRORCODE               --- n
+
+   Empile le code de la derniäre erreur d'exÇcution survenue.
+
+   Syntaxe : ERRORCODE
+
+   Permet un traitement fin des erreurs d'exÇcution.
+
+   ERRORCODE peut empiler une des valeurs suivante:
+
+       0 : Pile de donnÇes vide
+       1 : Pile de retour vide
+       2 : Pile de donnÇes pleine
+       3 : Pile de retour pleine
+       4 : Type incompatible
+       5 : Indice de tableau hors limite
+       6 : DonnÇe non initialisÇe
+       7 : Impossible d'ouvrir le fichier
+       8 : Base dÇjÖ ouverte
+       9 : Impossible d'ouvrir la base
+      10 : Impossible de fermer la base
+      11 : Impossible de fermer les bases
+      12 : Pas de base courante
+      13 : Impossible d'ajouter un enregistrement vide
+      14 : La base n'est pas ouverte
+      15 : Nom de champ incorrect
+      16 : Date incorrecte
+      17 : L'opÇrande destination ne peut àtre un litÇral
+      18 : Division par zÇro
+      19 : Format d'affichage non valide
+
+   Exemple : : TEST
+                ...
+                ERROR?
+                IF
+                   // Traitement de l'erreur.
+                   ERRORCODE
+                   CASE
+                      0 OF
+                           ...
+                        ENDOF
+                      ...
+                   ENDCASE
+                ELSE
+                   ...
+                ENDIF
+             ;
+
+    Note : En ce qui concerne es erreurs relatives aux bases
+           de donnÇes (8 Ö 16), DBERROR permet de rÇcupÇrer le
+           code d'erreur.
+
+LES DIRECTIVES DE COMPILATION
+-----------------------------
+
+Les directives de compilation permettent de modifier les variables systämes
+d'une application.
+Elles ne doivent pas se trouver dans une dÇfinition de procÇdure.
+Elles peuvent se situer n'importe ou dans le source.
+
+#STACKSIZE
+
+   ParamÇtrage de la taille des piles.
+
+   Syntaxe : #STACKSIZE Nb
+
+   Permet de limiter la taille des piles utilisÇes par les connectÇs de
+   l'application en cours de compilation Ö Nb Elements.
+   Quand la pile donnÇes, ou la pile de retour (qui est utilisÇe pour
+   stocker en interne les adresses de retour des appels de procÇdures)
+   atteignent la valeur donnÇe, une erreur d'exÇcution "Pile ... pleine" est
+   gÇnÇrÇe.
+   Cela permet, entre autre, de limiter l'utilisation des resources mÇmoires
+   dans certaines applications, ou de prÇvenir les risques de boucles
+   infinies.
+
+   Exemple : #STACKSIZE 3    // Seuls 3 symboles (ou appels) sont empilables.
+             ...
+
+             : PROC1
+                ...
+             ;
+             : PROC2
+                ...
+                PROC1        // GÇnäre une erreur "Pile de retour pleine".
+             ;
+             : PROC3
+                ...
+                PROC2
+             ;
+             : PROC4
+                ...
+               PROC3
+             ;
+             ...
+             : MAIN
+                1 2 3 4      // GÇnäre une erreur "Pile de donnÇes pleine".
+                ...
+                PROC4
+             ;
+
+#NAME
+
+   Changement du nom de l'application en cours de compilation.
+
+   Syntaxe : #NAME = NomApp
+
+   Permet de renommer l'application courante.
+   Si NomApp est le nom d'une application existante, une erreur de compilation
+   est gÇnÇrÇe.
+   Seuls les 10 premiers caractäres de NomApp sont pris.
+
+   Exemple : #NAME = BAL
+
+   Rappel : le nom par dÇfaut d'une application est celui du fichier
+            chargÇ par la commande LOAD.
+
+#NUMCOMP
+
+   DÇfinition du numÇro complÇmentaire de l'application en cours de
+   compilation.
+
+   Syntaxe : #NUMCOMP = XX
+
+   Permet de dÇfinir le numÇro complÇmentaire (aussi appelÇ sous-adresse)
+   de l'application courante.
+   Seuls les numÇros compris entre 1 et 99 sont autorisÇs.
+   Toute autre valeur provoque une erreur de compilation.
+
+   Exemple : #NUMCOMP = 55
+
+#PATH
+
+   DÇfinition du rÇpertoire principal de l'application.
+
+   Syntaxe : #PATH = Chemin
+
+   Permet de dÇfinir le rÇpertoire principal de l'application.
+
+   Exemple : // Application TOTO.NPG
+             ...
+             #PATH = L:\APP\TOTO
+             ...
+
+   Note : Si aucun chemin n'est spÇcifiÇ par une directive #PATH, le chemin
+          courant est pris.
+
+#PATHDBF
+
+   DÇfinition du rÇpertoire des bases de donnÇes et des index associÇs
+   de l'application.
+
+   Syntaxe : #PATHDBF = Chemin
+
+   Permet de dÇfinir le rÇpertoire des bases de donnÇes et des fichiers index
+   associÇs. Le rÇpertoire donnÇ sera utilisÇ par les fonctions de manipulation
+   de bases de donnÇes (DBOPEN, DBSELECT, DBSETINDEX, ...).
+
+   Exemple : // Application TOTO.NPG
+             ...
+             #PATHDBF = L:\APP\TOTO\BASES
+             ...
+
+   Note : Si aucun chemin n'est spÇcifiÇ par une directive #PATHDBF, le chemin
+          Çventuellement dÇfini par la directive #PATH est pris, sinon c'est le
+          chemin courant qui est pris.
+
+#PATHVTX
+
+
+   DÇfinition du rÇpertoire des pages vidÇotex de l'application.
+
+   Syntaxe : #PATHVTX = Chemin
+
+   Permet de dÇfinir le rÇpertoire des pages vidÇotex.
+   Le rÇpertoire donnÇ sera utilisÇ par les fonctions de manipulation
+   des pages vidÇotex (SENDPAGE, ...).
+
+   Exemple : // Application TOTO.NPG
+             ...
+             #PATHVTX = L:\APP\TOTO\PAGES
+             ...
+
+   Note : Si aucun chemin n'est spÇcifiÇ par une directive #PATHVTX, le chemin
+          Çventuellement dÇfini par la directive #PATH est pris, sinon c'est le
+          chemin courant qui est pris.
+
+#LIBONERROR
+
+   Permet de paramÇtrer le comportement de l'application courante en cas
+   d'erreur d'exÇcution.
+
+   Syntaxe : #LIBONERROR = ON | OFF
+
+   Avec ON, toute erreur d'exÇcution aura pour consÇquence la
+   dÇconnexion immÇdiate du connectÇ responsable de l'erreur.
+   Avec OFF, le code de l'application continuera a s'exÇcuter,
+   il faudra alors prendre en considÇration le fait qu'une erreur
+   s'est produite.
+
+   Rappel : Par dÇfaut, LIBONERROR est Ö ON.
+
+#CONFCNX
+
+   Permet de paramÇtrer la confirmation ou non des appels entrants sur le
+   ou les flux X25 du serveur.
+
+   Syntaxe : #CONFCNX = ON | OFF
+
+   Avec ON, les appels entrants sont confirmÇs par le serveur.
+   Avec OFF, les appels entrants ne sont pas confirmÇs par le serveur.
+
+   Rappel : Par dÇfaut, CONFCNX est Ö ON.
+
+#WARNING
+
+   Permet de paramÇtrer l'affichage de messages d'avertissements Ö la
+   compilation.
+
+   Syntaxe : #WARNING = ON | OFF
+
+   Avec ON, NÇoServ affiche des informations supplÇmentaires Ö la compilation
+   d'une application (procÇdure et variable non utilisÇes, ...).
+
+   Rappel : Par dÇfaut, WARNING est Ö OFF.
+
+#ECHO
+
+   Permet de paramÇtrer l'affichage des lignes du programme en cours de
+   compilation.
+
+   Syntaxe : #ECHO = ON | OFF
+
+   Avec ON, NÇoServ affiche chaque ligne du source courant en cours de
+   compilation. La ligne est affichÇe avant sa compilation.
+
+   Rappel : Par dÇfaut, ECHO est Ö OFF.
+
+#DBAUTOCOMMIT
+
+   Permet d'activer le raffraichissement (commit) automatique des bases
+   de donnÇes de l'application courante.
+
+   Syntaxe : #DBAUTOCOMMIT = n
+
+   n est la pÇriode de raffraichissement des bases, en minutes.
+   Les base sont raffraichi pour chaque connectÇ de l'application, ainsi
+   que pour les Çventuelles tÉches de fond et ONLIB.
+
+   Exemple : #DBAUTOCOMMIT = 10  // Raffraichissement toutes les 10mn.
+
+   Rappel : Par dÇfaut, il n'y a pas de raffraichissement automatique des
+            bases de donnÇes des applications.
+
+#ANTICIPATION
+
+   Permet de paramÇtrer l'anticipation de l'application courante.
+
+   Syntaxe : #ANTICIPATION = ON | OFF
+
+   Avec ON, Ö la rÇception d'un paquet, le buffer de sortie du cv
+   conáernÇ est vidÇ. Les prochaines informations Ö envoyer seront
+   donc traitÇes plus rapidement.
+
+   Rappel : Par dÇfaut, ANTICIPATION est Ö OFF.
+
+MANIPULATION DES TABLEAUX
+-------------------------
+
+ALEN                    Tab --- MaxLig MaxCol
+
+   Empile les dimensions maximum d'un tableau.
+
+   Syntaxe : Tab ALEN
+
+   Empile les dimensions (nombre de lignes et nombre de colonnes) du tableau
+   donnÇ.
+
+   Exemple : LOCAL NUMBER[] 8 8 DAMIER
+             ...
+             DAMIER ALEN   // Empile 8 8
+
+AFILL                   Val Tab ---
+
+   Remplissage d'un tableau avec une valeur.
+
+   Syntaxe : Val Tab AFILL
+
+   Remplis le tableau Tab avec la valeur Val.
+   Val doit àtre du màme type que le tableau.
+
+   Exemple : LOCAL NUMBER[] 8 8 DAMIER
+             ...
+             : RAZ
+                0 DAMIER AFILL
+             ;
+
+ASEARCH                 Val Tab --- Lig Col Flag
+
+   Recherche d'une valeur dans un tableau.
+
+   Syntaxe : Val Tab ASEARCH
+
+   Recherche la valeur donnÇe dans le tableau donnÇ.
+   Empile TRUE si la valeur est trouvÇe, ainsi que sa position dans le
+   tableau.
+   Empile FALSE si la valeur n'est pas trouvÇe. Dans ce cas, la position
+   empilÇe est invalide.
+
+   Exemple : LOCAL NUMBER[] 8 8 DAMIER
+             ...
+             : CHERCHE1
+                1 DAMIER ASEARCH
+                IF
+                   " TROUVE EN " PRINT PRINT PRINT
+                ELSE
+                   DROP DROP
+                ENDIF
+             ;
+
+AINS                    Tab ---
+
+   Ajoute une ligne Ö la fin du tableau donnÇ.
+
+   Syntaxe : Tab AINS
+
+   Une ligne (vide) est ajoutÇe Ö la fin du tableau.
+   Le nombre de lignes est ajustÇ.
+
+   Exemple : CHAR[] 8 8 ctab
+             ...
+             CTAB ALEN        // Empile 8 8
+             ...
+             CTAB AINS
+             ...
+             CTAB ALEN        // Empile 9 8
+
+ADEL                    Tab ---
+
+   Supprime la derniäre ligne du tableau donnÇ.
+
+   Syntaxe : Tab ADEL
+
+   La derniäre ligne du tableau est supprimÇe.
+   Le nombre de lignes est ajustÇ.
+
+   Exemple : CHAR[] 8 8 ctab
+             ...
+             CTAB ALEN        // Empile 8 8
+             ...
+             CTAB ADEL
+             ...
+             CTAB ALEN        // Empile 7 8
+
+ACOPY                   TabDst TabSrc ---
+
+   Copie d'un tableau dans un autre.
+
+   Syntaxe : TabSrc TabDst ACOPY
+
+   Le contenu du tableau TabSrc est copiÇ dans TabDst.
+   Les tableaux doivent àtre du màme type.
+
+   Les tableaux peuvent avoir des tailles diffÇrentes, auquel cas
+   c'est la taille du plus petit qui est prise en compte. Les Çventuels
+   ÇlÇments restants du tableaux destination ne sont pas modifiÇs.
+
+   Exemple : CHAR[] 8 8 TAB1
+             CHAR[] 5 5 TAB2
+             ...
+             TAB2 TAB1 ACOPY   // Ne copie que les 5x5 ÇlÇments de TAB2
+                               // dans TAB1
+
+ACLONE                  TabDst TabSrc ---
+
+   Rend le tableau TabDst identique (en taille et en contenu) au
+   tableau TabSrc.
+
+   Syntaxe : TabSrc TabDst ACLONE
+
+   Les tableaux doivent àtre du màme type.
+   Le prÇcÇdent contenu de TabDst est supprimÇ, puis TabSrc est
+   copiÇ intÇgralement dans TabDst. Les dimensions de TabDst sont
+   Çventuellement ajustÇes.
+
+   Exemple : CHAR[] 8 8 TAB1
+             CHAR[] 5 5 TAB2
+             ...
+             TAB1 ALEN           // Empile 8 8
+             ...
+             TAB2 TAB1 ACCLONE
+             ...
+             TAB1 ALEN           // Empile 5 5
+
+MANIPULATION DES TACHES
+-----------------------
+
+SETLOCALTASK            ---
+
+   Activation d'une tÉche locale au connectÇ courant.
+
+   Syntaxe : SETLOCALTASK NomProc
+
+   NomProc est le nom de la procÇdure qui doit s'exÇcuter en tÉche de fond.
+
+   Exemple : : BACKGROUND
+                BEGIN
+                   TIMER 10 % 0 ==
+                   IF
+                      10 1 LOCATE TIME PRINT
+                   ENDIF
+                AGAIN
+             ;
+             ...
+             : MAIN
+                ...
+                SETLOCALTASK BACKGROUND
+                ...
+             ;
+
+   NOTE : Il ne peut y avoir qu'une seule tÉche locale par connectÇ.
+          Si une tÉche est dÇjÖ active, elle est dÇsactivÇe avant la mise en
+          place de la nouvelle tÉche.
+
+          Une tÉche locale Çtant "liÇe" Ö un connectÇ, elle partage les
+          donnÇes de celui-ci (variables locales, buffers des flux entrant
+          et sortant, ...), Ö l'exception de la pile de donnÇe (la tÉche de
+          fond possäde sa propre pile), ainsi que les bases de donnÇes
+          (la tÉche de fond possäde ses propres bases de donnÇes).
+
+          Toute modification d'une information partagÇe est propagÇe au
+          connectÇ "liÇ" Ö la tÉche (accäs Ö une nouvelle variable locale,
+          ...).
+
+          Une erreur d'exÇcution provoque la dÇsactivation de la tÉche de
+          fond.
+
+          La dÇconnexion du cv principal provoque la dÇsactivation de sa
+          tÉche de fond.
+
+DELETELOCALTASK         ---
+
+   DÇsactive la tÉche locale du connectÇ courant.
+
+   Syntaxe : DELETELOCALTASK
+
+   La tÉche de fond du connectÇ courant est dÇsactivÇe.
+
+   Exemple : : BACKGROUND
+                BEGIN
+                   TIMER 10 % 0 ==
+                   IF
+                      10 1 LOCATE TIME PRINT
+                   ENDIF
+                AGAIN
+             ;
+             ...
+             : MAIN
+                ...
+                SETLOCALTASK BACKGROUND
+                ...
+                DELETELOCALTASK
+                ...
+             ;
+
+   NOTE : Une tÉche de fond peut s'auto-dÇsactiver.
+
+LOCALTASKACTIVE?        --- b
+
+   Empile VRAI si la tÉche locale du connectÇ courant est active, FAUX
+   sinon.
+
+   Syntaxe : LOCALTASKACTIVE?
+
+   Exemple : : ATTENDFINTACHE
+                BEGIN
+                   LOCALTASKACTIVE? !
+                UNTIL
+             ;
+
+MANIPULATION DES DATES
+----------------------
+
+DTOS                    d --- s
+
+   Converti une date de la forme "JJ/MM/AAAA" vers la forme "AAAAMMJJ"
+   La date convertie est empilÇe.
+
+   Syntaxe : d DTOS
+
+   Exemple : DATE DTOS
+
+STOD                    s --- d
+
+   Converti une date de la forme "AAAAMMJJ" vers la forme "JJ/MM/AAAA"
+   La date convertie est empilÇe.
+
+   Syntaxe : s STOD
+
+   Exemple : LOCAL CHAR SDAT
+             ...
+             DATE DTOS SDAT :=
+             ...
+             SDAT STOD PRINT
+             ...
+
+DTOJ                    s --- n
+
+   Converti une date de la forme "AAAAMMJJ" en jours julien.
+   Le nombre obtenu est empilÇ.
+
+   Syntaxe : s DTOJ
+
+   si un nombre infÇrieur Ö zÇro est empilÇ, cela signifie que la date
+   donnÇe est invalide.
+
+   Exemple : : TESTDATE  // d --- b
+                DTOS DTOJ 0 <
+             ;
+             ...
+             " entrez la date de räglement" print
+             DATVAR INPUTVAR
+             DATVAR TESTDATE
+             IF
+                " date invalide" line0
+             ELSE
+                ...
+             ENDIF
+
+JTOD                    n --- s
+
+   Converti une date en jours julien en une date de la forme "AAAAMMJJ".
+   La date est empilÇe.
+
+   Syntaxe : n JTOD
+
+   Exemple : : DATEFACTURE  // d1 --- d2
+                DTOS DTOJ
+                30 + JTOD STOD
+             ;
+             ...
+             " räglement Ö 30 jours au plus tard le " print
+             DATE DATEFACTURE PRINT
+
+DAY                     d --- n
+
+   Empile un nombre reprÇsentant le jours du mois (1 Ö 31) de la date donnÇe.
+   La date est empilÇe sour la forme "AAAAMMJJ".
+
+   Syntaxe : d DAY
+
+   Exemple : DATE DTOS DAY
+
+DOW                     d --- n
+
+   Empile un nombre reprÇsentant le jour de la semaine (1 Ö 7)
+   de la date donnÇe.
+   La date est empilÇe sour la forme "AAAAMMJJ".
+   1 = Dimanche, 2 = Lundi, etc...
+
+   Syntaxe : d DOW
+
+   Exemple : DATE DTOS DOW
+
+MONTH                   d --- n
+
+   Empile un nombre reprÇsentant le mois (1 Ö 12) de la date donnÇe.
+   La date est empilÇe sour la forme "AAAAMMJJ".
+
+   Syntaxe : d MONTH
+
+   Exemple : DATE DTOS MONTH
+
+YEAR                    d --- n
+
+   Empile un nombre reprÇsentant l'annÇe de la date donnÇe.
+   La date est empilÇe sour la forme "AAAAMMJJ".
+
+   Syntaxe : d YEAR
+
+   Exemple : DATE DTOS YEAR
+
+CDOW                    d --- s
+
+   Empile le nom du jour de la date donnÇe, sous forme de chaine de
+   caractäres.
+   La date est empilÇe sour la forme "AAAAMMJJ".
+
+   Syntaxe : d CDOW
+
+   Exemple : DATE DTOS CDOW
+
+CMONTH                  d --- s
+
+   Empile le nom du mois de la date donnÇe, sous forme de chaine de
+   caractäres.
+   La date est empilÇe sour la forme "AAAAMMJJ".
+
+   Syntaxe : d CMONTH
+
+   Exemple : DATE DTOS CMONTH
+
+MANIPULATION DES FICHIERS
+-------------------------
+
+FOPEN                   s --- b
+
+   Ouverture d'un fichier.
+
+   Syntaxe : <NomFichier> FOPEN
+
+   Ouvre le fichier donnÇ, en lecture seule.
+
+   Renvoi VRAI si tout c'est bien passÇ, FAUX sinon.
+
+   Exemple : : LIRE
+                " INFOS.TXT" FOPEN
+                IF
+                   ...
+                ELSE
+                   " IMPOSSIBLE D'OUVRIR LE FICHIER" LINE0
+                ENDIF
+             ;
+
+   Note : Un connectÇ ne peut ouvrir qu'un seul fichier Ö la fois.
+          Si un fichier est dÇjÖ ouvert pour le connectÇ courant,
+          il est refermÇ.
+
+FCLOSE                  ---
+
+   Fermeture d'un fichier.
+
+   Syntaxe : FCLOSE
+
+   Le fichier du connectÇ courant est fermÇ.
+
+   Si aucun fichier n'est ouvert, rien ne se passe.
+
+   Exemple : : LIRE
+                " INFOS.TXT" FOPEN
+                IF
+                   ...
+                   FCLOSE
+                ELSE
+                   " IMPOSSIBLE D'OUVRIR LE FICHIER" LINE0
+                ENDIF
+             ;
+
+FEOF                    --- b
+
+   Envoi VRAI si on est Ö la fin du fichier du connectÇ courant,
+   FAUX sinon.
+
+   Syntaxe : FEOF
+
+   Si aucun fichier n'est ouvert, VRAI est empilÇ.
+
+   Exemple : : LIRE
+                " INFOS.TXT" FOPEN
+                IF
+                   BEGIN
+                      FEOF !
+                   WHILE
+                      ...
+                   REPEAT
+                   FCLOSE
+                ELSE
+                   " IMPOSSIBLE D'OUVRIR LE FICHIER" LINE0
+                ENDIF
+             ;
+
+FREADLN                 --- s
+
+   Lecture d'une ligne de texte du fichier du connectÇ courant.
+
+   Syntaxe : FREADLN
+
+   Si aucun fichier n'est ouvert, une erreur d'exÇcution est gÇnÇrÇe.
+   La ligne lue est empilÇe, sans le CRLF.
+
+   Exemple : : LIRE
+                " INFOS.TXT" FOPEN
+                IF
+                   BEGIN
+                      FEOF !
+                   WHILE
+                      FREADLN
+                      PRINT
+                   REPEAT
+                   FCLOSE
+                ELSE
+                   " IMPOSSIBLE D'OUVRIR LE FICHIER" LINE0
+                ENDIF
+             ;
+
+   Note : La longueur d'une ligne de texte ne peut dÇpasser 512 caractäres.
+
+FREAD                   n --- s nlus
+
+   Lecture de <n> octets du fichier du connectÇ courant.
+
+   Syntaxe : n FREAD
+
+   Si aucun fichier n'est ouvert, une erreur d'exÇcution est gÇnÇrÇe.
+   Le nombre d'octets effectivements lus est empilÇ, ainsi que le buffer.
+
+   Exemple : : LIRE
+                " INFOS.TXT" FOPEN
+                IF
+                   BEGIN
+                      FEOF !
+                   WHILE
+                      // Lecture de 39 caractäre Ö la fois
+                      39 FREAD
+                      // Affichage
+                      // Si le nombre d'octets lus est > Ö 0.
+                      IF
+                         PRINT
+                      ENDIF
+                   REPEAT
+                   FCLOSE
+                ELSE
+                   " IMPOSSIBLE D'OUVRIR LE FICHIER" LINE0
+                ENDIF
+             ;
+
+FSIZE                   --- n
+
+   Empile la taille (en octets) du fichier du connectÇ courant.
+
+   Syntaxe : FSIZE
+
+   Si aucun fichier n'est ouvert, 0 est empilÇ.
+
+   Exemple : " INFOS.TXT" FOPEN
+             IF
+                FSIZE
+                ...
+                FCLOSE
+             ENDIF
+
+CALCULS DE CRC ET CONVERSIONS
+-----------------------------
+
+CRC16                   l b --- crc16
+
+   Calcule le CRC 16 bits du buffer <b> de longueur <l>.
+
+   Syntaxe : Buff Lon CRC16
+
+   Exemple : // Calcul du crc 16 bits d'un fichier
+             : CRC16FILE   // s --- crc16
+                0 SWAP
+                FOPEN
+                IF
+                   BEGIN
+                      FEOF !
+                   WHILE
+                      // Lecture par bloc de 128 octets
+                      128 FREAD
+                      CRC16 +
+                   REPEAT
+                   FCLOSE
+                ENDIF
+             ;
+
+CRC32                   l b --- crc32
+
+   Calcule le CRC 32 bits du buffer <b> de longueur <l>.
+
+   Syntaxe : Buff Lon CRC32
+
+   Exemple : // Calcul du crc 32 bits d'un fichier
+             : CRC32FILE   // s --- crc32
+                0 SWAP
+                FOPEN
+                IF
+                   BEGIN
+                      FEOF !
+                   WHILE
+                      // Lecture par bloc de 128 octets
+                      128 FREAD
+                      CRC32 +
+                   REPEAT
+                   FCLOSE
+                ENDIF
+             ;
+
+B8->7                   l1 b1 --- b2 l2
+
+   Converti le contenu du buffer <b1> de longueur <l1> donnÇ, de 8 bits
+   vers 7 bits.
+
+   Syntaxe : Buff Len B8->7
+
+   Un buffer contenant le rÇsultat, ainsi que sa longueur, est empilÇ.
+
+   Exemple : LOCAL CHAR TEST := "CHAINE A CONVERTIR (ÄÅÇÉÑÖÜáYâä)"
+             ...
+             TEST DUP STRLEN B8->7
+             ...
+
+B7->8                   l1 b1 --- b2 l2
+
+   Converti le contenu du buffer <b1> de longueur <l1> donnÇ, de 7 bits
+   vers 8 bits.
+
+   Syntaxe : Buff Len B7->8
+
+   Un buffer contenant le rÇsultat, ainsi que sa longueur, est empilÇ.
+
+   Exemple : LOCAL CHAR TEST := "CHAINE A CONVERTIR (ÄÅÇÉÑÖÜáYâä)"
+             ...
+             TEST DUP STRLEN B8->7
+             ...
+             B7->8
+             ...
+
+XXENCODE                l1 b1 --- b2 l2
+
+   XXEncodage du contenu du buffer <b1> de longueur <l1>.
+
+   Syntaxe : Buff Len XXENCODE
+
+   l'XXEncodage est issu du monde unix, et permet de coder sous une forme
+   "imprimable" (caractäres ascii 7 bits) un buffer.
+
+   Un buffer contenant le rÇsultat, ainsi que sa longueur, est empilÇ.
+
+   Exemple : LOCAL CHAR TEST := "CHAINE A CONVERTIR (ÄÅÇÉÑÖÜáYâä)"
+             ...
+             TEST DUP STRLEN XXENCODE
+             ...
+             XXDECODE
+             ...
+
+XXDECODE                l1 b1 --- b2 l2
+
+   XXDÇcodage du contenu du buffer <b1> de longueur <l1>.
+
+   Syntaxe : Buff Len XXDECODE
+
+   l'XXEncodage est issu du monde unix, et permet de coder sous une forme
+   "imprimable" (caractäres ascii 7 bits) un buffer.
+
+   Un buffer contenant le rÇsultat, ainsi que sa longueur, est empilÇ.
+
+   Exemple : LOCAL CHAR TEST := "CHAINE A CONVERTIR (ÄÅÇÉÑÖÜáYâä)"
+             ...
+             TEST DUP STRLEN XXENCODE
+             ...
+             XXDECODE
+             ...
+
+   Note: Pour que le rÇsultat soit significatif, il faut que le buffer
+         Ö convertir soit XXEncodÇ.
+
+UUENCODE                l1 b1 --- b2 l2
+
+   UUEncodage du contenu du buffer <b1> de longueur <l1>.
+
+   Syntaxe : Buff Len UUENCODE
+
+   l'UUEncodage est issu du monde unix, et permet de coder sous une forme
+   "imprimable" (caractäres ascii 7 bits) un buffer.
+
+   Un buffer contenant le rÇsultat, ainsi que sa longueur, est empilÇ.
+
+   Exemple : LOCAL CHAR TEST := "CHAINE A CONVERTIR (ÄÅÇÉÑÖÜáYâä)"
+             ...
+             TEST DUP STRLEN UUENCODE
+             ...
+             UUDECODE
+             ...
+
+UUDECODE                l1 b1 --- b2 l2
+
+   UUDÇcodage du contenu du buffer <b1> de longueur <l1>.
+
+   Syntaxe : Buff Len UUDECODE
+
+   l'UUEncodage est issu du monde unix, et permet de coder sous une forme
+   "imprimable" (caractäres ascii 7 bits) un buffer.
+
+   Un buffer contenant le rÇsultat, ainsi que sa longueur, est empilÇ.
+
+   Exemple : LOCAL CHAR TEST := "CHAINE A CONVERTIR (ÄÅÇÉÑÖÜáYâä)"
+             ...
+             TEST DUP STRLEN UUENCODE
+             ...
+             UUDECODE
+             ...
+
+   Note: Pour que le rÇsultat soit significatif, il faut que le buffer
+         Ö convertir soit UUEncodÇ.
+
+EMISSION / RECEPTION DE PAQUETS
+-------------------------------
+
+Les primitives suivantes servent Ö manipuler des donnÇes brutes, tant en envoi
+qu'en rÇception, de faáon Ö implÇmenter facilement diverses protocoles de
+tÇlÇchargement, entre autre.
+
+FLUSHOUTBUFFER          ---
+
+   Force le vidage du buffer de sortie du connectÇ courant.
+
+   Syntaxe : FLUSHOUTBUFFER
+
+   Les donnÇes en partance sont perdues.
+
+   Exemple : : TELSEND
+                FLUSHOUTBUFFER
+                ...
+             ;
+
+EMITBUFFER              s ---
+
+   Emission du buffer donnÇ pour le connectÇ courant.
+
+   Syntaxe : Buffer EMITBUFFER
+
+   Le buffer n'est soumis Ö aucun processus de conversion quelconque, il
+   est envoyÇ tel quel.
+
+   Exemple : : TELSEND
+                FLUSHOUTBUFFER
+                ...
+                // BuffOut contient les donnÇes Ö envoyer
+                BuffOut EMITBUFFER
+                ...
+             ;
+

@@ -1,0 +1,46 @@
+:iCXA
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+:jC:iCX@
+XEAQDuand vous marchez sur une case,
+plusieurs cas se prBesentent:
+
+	A1D: il y a une mine
+
+		BBAOBUAMD !!! Dommage, c'est la fin du
+pauvre dBemineur !
+
+
+Z A2D: il n'y a pas de mine
+
+	- les cases alentour ne contiennent pasde mines non plus : le jeu dBecouvre pourvous toutes les cases Aa proximitBe qui necontiennent pas de mines.
+
+	- il y a une ou plusieurs mines Aa
+proximitBe : le jeu vous indique combien
+de mines se trouvent Aa cotBe de vous.
+
+
+
+
+:jCXZE]RETOUR		SUITE:jCBZ@

@@ -1,0 +1,24 @@
+//
+// Test 02 : test IF ... ELSE ... ENDIF.
+//
+//
+
+public number nb1 nb2 := 4
+
+: main
+   cls
+   " test du IF ... ENDIF (touche)" print
+   wait
+   nb1
+   if
+      " nb1 est <> de 0" print
+      nb2 if " nb2 est <> de 0" print endif
+      wait
+   else
+      " nb1 est 0 ou ind‚fini" print
+      nb2 if " nb2 est <> de 0" print endif
+      wait
+   endif
+   " FIN DE MAIN" print wait
+;
+

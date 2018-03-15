@@ -1,0 +1,11 @@
+// test lib‚ration
+
+: main
+   cls
+   " test de d‚connection" print cr
+   wait
+   numcv libcv
+   " jamais affich‚" print cr
+   wait
+;
+

@@ -1,0 +1,26 @@
+Projet GameDream, Atelier de développement de jeux 3D
+
+1999-2000, Guillaumaud philippe <pguillaumaud@april.org>
+
+Prérequis
+---------
+Pour compiler et/ou utiliser les programmes fournis, vous aurez besoin des
+libraries suivantes:
+
+- Gtk v1.2 ou supérieure (www.gtk.org)
+- Mesa v3.0 ou supérieure (www.mesa3d.org)
+- GtkGLArea v1.2 ou supérieure (www.student.oulu.fi/~jlof/gtkglarea/)
+
+Préambule
+---------
+GameDream est (sera...) composé de deux modules principaux:
+
+- gbuild, module de création des mondes 3D:
+	- création/insertion d'objets 3D de provenances diverses
+	- définition des "comportements" des divers objets présents
+
+- gplay, module client servira à explorer les mondes 3D créés avec gbuild
+	- mono ou multijoueur
+	- mode plein écran (exploitation des cartes 3D)
+
+

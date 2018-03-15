@@ -1,0 +1,116 @@
+// Test de 100 additions
+
+LOCAL NUMBER ii := 0
+
+: main
+
+	cls
+	" Test de 100 additions ..." print cr cr
+	" d‚but : " print TIME print cr
+
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+	ii ++
+
+	" fin   : " print TIME print cr
+	" ii = " print ii print cr
+	wait
+
+;

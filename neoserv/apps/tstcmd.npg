@@ -1,0 +1,16 @@
+//
+// test ex‚cution de commandes clavier.
+//
+
+: main
+   cls
+   " test execkbdcmd" print cr
+   " entrez une commande" print cr
+   begin
+      input execkbdcmd drop
+      fkey fksommaire ==
+   until
+   " fin" print cr
+   wait
+;
+

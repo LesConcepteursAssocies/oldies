@@ -1,0 +1,19 @@
+//
+// Infos serveur
+//
+
+: main
+   " %.1f" using
+   cls
+   " informations du serveur" print cr
+   " lancement le   : " print srvlaunchdate print cr
+   " lancement …    : " print srvlaunchtime print cr
+   " RAM disponible : " print srvmemavail print "  octets" print cr
+   " charge actuelle: " print srvcharge print " %" print cr
+   " charge max.    : " print srvchargemax print " %" print cr
+   " nb. cnx        : " print srvnbcnx print cr
+   " pointe         : " print srvmaxcnx print cr
+   " arret …        : " print srvstoptime print cr
+   wait
+;
+

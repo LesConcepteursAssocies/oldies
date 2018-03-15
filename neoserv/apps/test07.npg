@@ -1,0 +1,16 @@
+//
+// tests op‚rateurs
+//
+
+local number var1 := 3 var2 := 5
+
+: main
+   cls " test op‚rateurs" print cr wait
+   " var1 =" print var1 print 32 emit " var2 =" print var2 print cr cr
+   " var1 & var2 =" print var1 var2 & print cr
+   " var1 | var2 =" print var1 var2 | print cr
+   " var1 ^ var2 =" print var1 var2 ^ print cr
+   " ~var1 ="       print var1 ~ print cr
+   wait
+;
+

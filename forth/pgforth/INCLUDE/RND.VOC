@@ -1,0 +1,26 @@
+\ ------------------------------------------------------------------------------
+\                     G‚n‚ration de nombres pseudo-al‚atoires.
+\ ------------------------------------------------------------------------------
+
+CR .( Chargement du g‚n‚rateur de nombres pseudos-al‚atoires )
+
+IBASE @
+IBASE DECIMAL
+
+VARIABLE SEED
+
+: SEEDON
+  SEED @ 75 UM* 75 0 D+
+  2DUP U< - -
+  1- DUP SEED !
+;
+
+: RND ( n --- [0..n-1] )
+  SEEDON UM* SWAP DROP
+;
+
+IBASE !
+
+EOF
+
+

@@ -1,0 +1,11 @@
+// test des stats
+#use modules\stats\stats
+
+: main
+   cls
+   " test des stats" print wait
+   stats::StatMain
+   " retour" print
+   wait
+;
+

@@ -1,0 +1,85 @@
+dnl AC_INIT pointe sur un fichier qui doit toujours exister dans le projet.
+dnl -----------------------------------------------------------------------
+AC_INIT(configure.in)
+VERSION=`cat ${srcdir}/.version`
+
+dnl définition de quelques constantes relatives au projet
+dnl -----------------------------------------------------------------------
+GDREAM_MAJOR_VERSION=[`expr $VERSION : '\([0-9][0-9]*\)'`]
+AC_SUBST(GDREAM_MAJOR_VERSION)
+GDREAM_MINOR_VERSION=[`expr $VERSION : '[0-9][0-9]*\.\([0-9][0-9]*\)'`]
+AC_SUBST(GDREAM_MINOR_VERSION)
+GDREAM_MICRO_VERSION=[`expr $VERSION : '[0-9][0-9]*\.[0-9][0-9]*\.\([0-9][0-9]*\)'`]
+AC_SUBST(GDREAM_MICRO_VERSION)
+
+dnl Initialisation d'automake
+AM_INIT_AUTOMAKE([gbuild], $VERSION)
+dnl Version minimum requise de autoconf
+AC_PREREQ(2.13)
+
+dnl Utilisé par autoheader
+AM_CONFIG_HEADER(config.h)
+
+dnl détection du compilateur et autres outils nécessaires
+AC_ISC_POSIX
+AC_PROG_CC
+AM_PROG_CC_STDC
+AC_HEADER_STDC
+
+dnl warnings maximum (merci loic...)
+AC_COMPILE_WARNINGS
+
+dnl détection des libraries X11
+AC_PATH_XTRA
+
+dnl détection de GTK et GTKGL
+AM_PATH_GTK(1.2.0,,AC_MSG_ERROR(GTK not installed, or gtk-config not in path))
+AM_PATH_GTKGL
+
+dnl Checks for dynamic linking
+AC_CHECK_LIB(dl,dlopen)
+if test "$ac_cv_lib_dl_dlopen" = "yes"; then
+  AC_CHECK_FUNCS(dlopen)
+else
+AC_CHECK_FUNCS(dlopen)
+if test "$ac_cv_func_dlopen" = "no"; then
+  AC_MSG_ERROR(Can't find dlopen.)
+fi
+fi
+
+dnl Support international, ajouter les langues à prendre en compte
+ALL_LINGUAS=""
+AM_GNU_GETTEXT
+localedir='${prefix}/${DATADIRNAME}/locale'
+AC_SUBST(localedir)
+
+dnl Define unclus dans le fichier config.h par autoheader
+dnl Set PACKAGE_LOCALE_DIR in config.h.
+if test "x${prefix}" = "xNONE"; then
+  AC_DEFINE_UNQUOTED(PACKAGE_LOCALE_DIR, "${ac_default_prefix}/${DATADIRNAME}/locale")
+else
+  AC_DEFINE_UNQUOTED(PACKAGE_LOCALE_DIR, "${prefix}/${DATADIRNAME}/locale")
+fi
+
+dnl Set PACKAGE_DATA_DIR in config.h.
+if test "x${datadir}" = 'x${prefix}/share'; then
+  if test "x${prefix}" = "xNONE"; then
+    AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${ac_default_prefix}/share/${PACKAGE}")
+  else
+    AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${prefix}/share/${PACKAGE}")
+  fi
+else
+  AC_DEFINE_UNQUOTED(PACKAGE_DATA_DIR, "${datadir}/${PACKAGE}")
+fi
+
+dnl Set PACKAGE_SOURCE_DIR in config.h.
+packagesrcdir=`cd $srcdir && pwd`
+AC_DEFINE_UNQUOTED(PACKAGE_SOURCE_DIR, "${packagesrcdir}")
+
+dnl Génération des Makefiles
+AC_OUTPUT([
+Makefile
+src/Makefile
+intl/Makefile
+po/Makefile.in
+])

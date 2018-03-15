@@ -1,0 +1,38 @@
+              Extension au gestionnaire de fenˆtres dynamiques :
+                       Gestion de menus d‚roulants.
+              --------------------------------------------------
+
+GENERALITES
+-----------
+
+Un menu n'est qu'un type particulier de fenˆtre, avec en plus un texte
+contenant le libell‚ des diff‚rentes options de celui-ci.
+
+Au niveau du programmeur, deux mots ont ‚t‚ ajout‚s, le mot WMENU, qui
+permet d'ouvrir une fenˆtre de type menu, et le mot WGESMENU, qui se
+charge de la gestion (d‚placements, validation, abandon) du menu.
+
+Le mot WMENU prend trois paramŠtres suppl‚mentaires, par rapport … une
+fenˆtre classique :
+
+  - Le segment, l'offset et la longueur de la chaine contenant le
+    libell‚ des diff‚rentes options ($OPTIONS de WPARAM).
+  - Le type de menu (Horizontal, Vertical) (TMENU de WPARAM).
+  - La couleur (fond et caractŠre) de l'option courante (OCOL de WPARAM).
+
+AprŠs l'ouverture d'une fenˆtre de type menu, le programmeur doit ‚x‚cuter
+le mot WGESMENU, pour d‚clencher la gestion de celui-ci. Ce mot prend en
+charge les touches de base n‚c‚ssaires … la gestion des d‚placements (flŠches),
+de la validation (touche Return) et de l'abandon (touche Escape). Il renvoi le
+num‚ro de l'option choisie ou 0 si l'utilisateur a appuy‚ sur la touche Escape.
+
+Le mot WGESMENU est volontairement s‚par‚ pour permettre un parcours
+arborescent d'un ensemble de sous-menus.
+
+Les diff‚rents libell‚s doivent ˆtre s‚par‚s par au moins un espace, … cause
+de l'utilisation du mot LITEM (version extra-segment de ITEM) dans la gestion
+de ceux-ci.
+
+Tout ce qui s'applique … une fenˆtre s'applique ‚galement … un menu.
+
+

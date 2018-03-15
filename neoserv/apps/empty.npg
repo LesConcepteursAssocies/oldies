@@ -1,0 +1,16 @@
+//
+// test empty
+//
+local
+char toto
+
+: main
+   cls
+   " test empty" print cr
+   toto empty? if " toto est vide" print cr endif
+   wait
+   "  " toto :=
+   toto empty? if " toto est vide" print cr endif
+   wait
+;
+

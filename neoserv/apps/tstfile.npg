@@ -1,0 +1,27 @@
+//
+// tests fichiers texte
+//
+
+: main
+   cls
+   " test fichiers texte" print cr
+   wait
+   " ouverture de EUROPEVA.ERR" print cr
+   " EUROPEVA.ERR" fopen
+   if
+      " TAILLE = " print fsize print "  octets" print cr
+      begin
+         feof !
+      while
+         // freadln print cr
+         39 fread print cr
+         wait
+      repeat
+      fclose
+      " FIN DU FICHIER" print
+   else
+      " ERREUR D'OUVERTURE" LINE0
+   endif
+   wait
+;
+

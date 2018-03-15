@@ -1,0 +1,20 @@
+//
+// Test manip des piles
+//
+
+: main
+   cls
+   " %.0f" using
+   " test pile" print cr wait
+   1 2 3
+   " taille pile =" print stack# print cr
+   3 pick
+   " taille pile =" print stack# print cr
+   stack# 0
+   do
+      print "  " print
+   loop
+   wait
+   usingoff
+;
+

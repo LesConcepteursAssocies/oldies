@@ -1,0 +1,68 @@
+2000-03-17  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* réécriture de GBwinmvt en C++
+
+2000-03-15  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* réécriture de GBcamera en C++
+
+2000-03-10  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifications dans GBmisc
+
+2000-03-08  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifications dans GBglmisc
+
+2000-03-02  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifications GBwinparam
+	* modifications GBstatusbar, GBmainmenu (ajout sous-menu paramètres d'un projet)
+
+2000-02-25  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifications de configure.in (ajout d'options d'optimisations)
+	* un peu de ménage dans les sources (GBcamera)
+
+2000-02-24  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modification configure.in (ajout de la librairie gnome-xml)
+	* ajout facteur d'echelle et rotation dans la structure objet
+
+2000-02-23  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifications de GBworld, GBobjets
+	* modification GBglarea, gestion de la sélection d'objets 3D sur clic de souris
+
+2000-02-22  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifications de GBtrackball (ca marche avec les quaternions...)
+	* grosses modifs GBworld et GBobjets, création d'un monde de test
+
+2000-02-18  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* travail sur GBtrackball, GBmath
+	* modifs configure.in, makefile.am (ajout d'imlib)
+
+2000-01-28  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* modifs dans GBmath.cc et GB3Dtypes.h
+	* suppression de warnings divers
+	* ajout du repertoire glade
+	* modif GBobjets
+	* modif GBworld (fonction DrawWorld)
+	* ajout de l'icone des parametres du projet dans la barre d'outils 1
+
+2000-01-27  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* ajout d'une 2ème barre d'icones (primitives 3D) (dans GBtoolbar.cc)
+	* passage en C++
+
+2000-01-24  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* ajout de la fenêtre de gestion des options (GBwinparam.c)
+	* ajout de la fenêtre de gestion des mouvements (GBwinmvt.c)
+
+2000-01-11  Philippe GUILLAUMAUD  <pguillaumaud@april.org>
+
+	* mise à disposition de la v0.1.0 (pré-alpha)
